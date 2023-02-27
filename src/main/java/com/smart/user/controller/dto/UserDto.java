@@ -2,59 +2,43 @@ package com.smart.user.controller.dto;
 
 import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
-import lombok.Builder;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
 public class UserDto {
 
-  private Long userId;
-  private String name;
-  private String email;
-  private String password;
-  private String nickName;
-  private LocalDateTime createDate;
-  private LocalDateTime updateDate;
-  private Status userStatus;
+  @Getter
+  @NoArgsConstructor(access = AccessLevel.PROTECTED)
+  @AllArgsConstructor
+  public static class JoinRequest {
 
-  @Builder
-  public UserDto(Long userId, String name, String email, String password, String nickName,
-      LocalDateTime createDate, LocalDateTime updateDate, Status userStatus) {
-    this.userId = userId;
-    this.name = name;
-    this.email = email;
-    this.password = password;
-    this.nickName = nickName;
-    this.createDate = createDate;
-    this.updateDate = updateDate;
-    this.userStatus = userStatus;
-  }
+    @NotBlank
+    private String name;
 
-  static UserDto of(User user) {
-    return UserDto.builder()
-        .userId(user.getUserId())
-        .name(user.getName())
-        .email(user.getEmail())
-        .password(user.getPassword())
-        .nickName(user.getNickName())
-        .createDate(user.getCreateDate())
-        .updateDate(user.getUpdateDate())
-        .userStatus(user.getUserStatus())
-        .build();
-  }
+    @NotBlank
+    @Email
+    private String email;
 
-  public User toEntity() {
-    return User.builder()
-        .name(this.getName())
-        .email(this.getEmail())
-        .password(this.getPassword())
-        .nickName(this.getNickName())
-        .userStatus(this.getUserStatus())
-        .build();
+    @NotBlank
+    private String password;
+
+    @NotBlank
+    private String nickname;
+
+    public User toEntity() {
+      return User.builder()
+          .name(getName())
+          .email(getEmail())
+          .password(getPassword())
+          .nickname(getNickname())
+          .createDate(LocalDateTime.now())
+          .userStatus(Status.NORMAL)
+          .build();
+    }
   }
 }

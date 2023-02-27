@@ -1,8 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="me.liiot.snsserver.mapper.UserMapper">
+<mapper namespace="com.smart.user.mapper.UserMapper">
   <select id="getAllUsers">
-    select * from user
+    select *
+    from user
+  </select>
+
+  <insert parameterType="com.smart.user.domain.User" id="joinUser">
+    INSERT INTO USER (name, email, password, nickname, user_status, create_date)
+    VALUES (#{name}, #{email}, #{password}, #{nickname}, #{userStatus}, #{createDate});
+  </insert>
+
+  <select parameterType="String" id="checkUserMail">
+    SELECT EXISTS(
+             *
+             from USER
+             WHERE email = #{email}
+             )
+  </select>
+
+  <select parameterType="String" id="checkUserNickname">
+    SELECT EXISTS(
+             *
+             from USER
+             WHERE nickname = #{nickname}
+             )
   </select>
 </mapper>
