@@ -5,8 +5,12 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface UserDao {
-  User getUser(String name);
+
+  User getUser(String nickname);
+
   void joinUser(User user);
+
   boolean checkUserMail(String email);
+
   boolean checkUserNickname(String nickname);
 }

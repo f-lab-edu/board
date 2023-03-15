@@ -3,6 +3,7 @@ package com.smart.user.service.Implement;
 import com.smart.global.error.DuplicatedUserEmailException;
 import com.smart.global.error.DuplicatedUserNicknameException;
 import com.smart.user.controller.dto.UserDto.JoinRequest;
+import com.smart.user.controller.dto.UserDto.UserResponse;
 import com.smart.user.dao.UserDao;
 import com.smart.user.domain.User;
 import com.smart.user.service.UserService;
@@ -19,13 +20,21 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public void join(JoinRequest request) {
-    if(userDao.checkUserMail(request.getEmail())) throw new DuplicatedUserEmailException();
-    if(userDao.checkUserNickname(request.getNickname())) throw new DuplicatedUserNicknameException();
+    if (userDao.checkUserMail(request.getEmail())) {
+      throw new DuplicatedUserEmailException();
+    }
+    if (userDao.checkUserNickname(request.getNickname())) {
+      throw new DuplicatedUserNicknameException();
+    }
     userDao.joinUser(request.toEntity());
   }
 
   @Override
-  public User getUser(String name) {
-    return userDao.getUser(name);
+  public UserResponse getUser(String nickname) {
+    User user = userDao.getUser(nickname);
+    if (user == null) {
+      throw new IllegalArgumentException();
+    }
+    return UserResponse.toResponse(user);
   }
 }
