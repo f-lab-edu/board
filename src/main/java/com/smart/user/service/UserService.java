@@ -1,12 +1,11 @@
 package com.smart.user.service;
 
-import com.smart.user.controller.dto.UserDto.JoinRequest;
-import com.smart.user.controller.dto.UserDto.UserResponse;
+import com.smart.user.controller.dto.UserDto;
 
 public interface UserService {
 
-  void join(JoinRequest request);
+  void join(UserDto.JoinRequest request);
 
-  UserResponse getUser(String name);
+  UserDto.Response getUser(String name);
 
 }

@@ -11,13 +11,17 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * dto inner 클래스
+ * - dto 클래스 파일의 개수를 줄일 수 있으며 도메인별로 정리가 가능해 응집도가 높아진다는 장점이 있다.
+ */
 public class UserDto {
 
   @Getter
   @NoArgsConstructor(access = AccessLevel.PROTECTED)
   @AllArgsConstructor
   @Builder
-  public static class UserResponse {
+  public static class Response {
 
     @NotBlank
     private Long userId;
@@ -42,8 +46,8 @@ public class UserDto {
     @NotBlank
     private Status userStatus;
 
-    static public UserResponse toResponse(User user) {
-      return UserResponse.builder()
+    static public Response toResponse(User user) {
+      return Response.builder()
           .userId(user.getUserId())
           .name(user.getName())
           .email(user.getEmail())
