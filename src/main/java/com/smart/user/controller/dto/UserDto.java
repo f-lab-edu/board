@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +15,7 @@ public class UserDto {
 
   @Getter
   @NoArgsConstructor(access = AccessLevel.PROTECTED)
-  @AllArgsConstructor
+  @AllArgsConstructor @Builder
   public static class JoinRequest {
 
     @NotBlank
