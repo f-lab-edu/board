@@ -3,16 +3,16 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.smart.user.dao.UserDao">
-  <select id="getUserByNickname" parameterType="String" resultType="com.smart.user.domain.User">
+  <select id="getUserByEmail" parameterType="String" resultType="com.smart.user.domain.User">
     select *
     from user
-    where nickname = #{nickname}
+    where email = #{email}
   </select>
 
-  <delete id="deleteUserByNickname" parameterType="String">
+  <delete id="deleteUserByEmail" parameterType="String">
     delete
     from user
-    where nickname = #{nickname}
+    where email = #{email}
   </delete>
 
   <insert id="joinUser" parameterType="com.smart.user.domain.User" useGeneratedKeys="true"

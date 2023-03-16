@@ -22,9 +22,9 @@ public class UserController {
     this.userService = userService;
   }
 
-  @GetMapping("/{nickname}/exist")
-  public UserDto.Response getUser(@PathVariable("nickname") String nickname) {
-    return userService.getUser(nickname);
+  @GetMapping("/{email}/exist")
+  public UserDto.Response getUser(@PathVariable("nickname") String email) {
+    return userService.getUserByEmail(email);
   }
 
   @PostMapping("/join")

@@ -26,7 +26,7 @@ class UserDaoTest {
 
   @BeforeEach
   public void 테스트유저생성() {
-    userDao.deleteUserByNickname("nickname");
+    userDao.deleteUserByEmail("test@email");
     JoinRequest joinRequest = JoinRequest
         .builder()
         .name("name")
@@ -39,14 +39,14 @@ class UserDaoTest {
 
   @AfterEach
   public void 테스트유저삭제(){
-    userDao.deleteUserByNickname("nickname");
+    userDao.deleteUserByEmail("test@email");
   }
 
   @Test
   public void 유저회원가입() {
     userDao.joinUser(user);
 
-    User retUser = userDao.getUserByNickname("nickname");
+    User retUser = userDao.getUserByEmail("test@email");
     Assertions.assertEquals(user.getUserId(), retUser.getUserId());
   }
 

@@ -6,6 +6,6 @@ public interface UserService {
 
   void join(UserDto.JoinRequest request);
 
-  UserDto.Response getUser(String name);
+  UserDto.Response getUserByEmail(String email);
 
 }

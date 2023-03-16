@@ -2,6 +2,7 @@ package com.smart.user.service.Implement;
 
 import com.smart.global.error.DuplicatedUserEmailException;
 import com.smart.global.error.DuplicatedUserNicknameException;
+import com.smart.global.error.NotFoundUserException;
 import com.smart.user.controller.dto.UserDto;
 import com.smart.user.dao.UserDao;
 import com.smart.user.domain.User;
@@ -29,10 +30,10 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public UserDto.Response getUser(String nickname) {
-    User user = userDao.getUserByNickname(nickname);
+  public UserDto.Response getUserByEmail(String email) {
+    User user = userDao.getUserByEmail(email);
     if (user == null) {
-      throw new IllegalArgumentException();
+      throw new NotFoundUserException();
     }
     return UserDto.Response.toResponse(user);
   }

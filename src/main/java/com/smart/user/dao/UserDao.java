@@ -6,9 +6,9 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface UserDao {
 
-  User getUserByNickname(String nickname);
+  User getUserByEmail(String email);
 
-  void deleteUserByNickname(String nickname);
+  void deleteUserByEmail(String email);
 
   void joinUser(User user);
 
