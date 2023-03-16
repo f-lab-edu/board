@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public UserDto.Response getUser(String nickname) {
-    User user = userDao.getUser(nickname);
+    User user = userDao.getUserByNickname(nickname);
     if (user == null) {
       throw new IllegalArgumentException();
     }
