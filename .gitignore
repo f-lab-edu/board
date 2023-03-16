@@ -38,3 +38,4 @@ out/
 
 ### db info ###
 application-mariadb.properties
+application-testdb.properties
