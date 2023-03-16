@@ -1,8 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="me.liiot.snsserver.mapper.UserMapper">
-  <select id="getAllUsers">
-    select * from user
+<mapper namespace="com.smart.user.dao.UserDao">
+  <select id="getUserByEmail" parameterType="String" resultType="com.smart.user.domain.User">
+    select *
+    from user
+    where email = #{email}
   </select>
+
+  <delete id="deleteUserByEmail" parameterType="String">
+    delete
+    from user
+    where email = #{email}
+  </delete>
+
+  <insert id="joinUser" parameterType="com.smart.user.domain.User" useGeneratedKeys="true"
+    keyProperty="userId">
+    insert into user (user_id, name, email, password, nickname, user_status, create_date)
+    values (#{userId}, #{name}, #{email}, #{password}, #{nickname}, #{userStatus}, #{createDate});
+  </insert>
+
+  <select id="checkUserMail" parameterType="String" resultType="boolean">
+    select exists(
+             select *
+             from user
+             WHERE email = #{email}
+             )
+  </select>
+
+  <select id="checkUserNickname" parameterType="String" resultType="boolean">
+    SELECT exists(
+             select *
+             from user
+             WHERE nickname = #{nickname}
+             )
+  </select>
+
 </mapper>
