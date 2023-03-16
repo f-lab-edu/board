@@ -23,7 +23,7 @@ public class UserController {
   }
 
   @GetMapping("/{email}/exist")
-  public UserDto.Response getUser(@PathVariable("nickname") String email) {
+  public UserDto.Response getUser(@PathVariable("email") String email) {
     return userService.getUserByEmail(email);
   }
 
