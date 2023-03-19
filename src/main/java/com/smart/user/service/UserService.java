@@ -1,6 +1,8 @@
 package com.smart.user.service;
 
 import com.smart.user.controller.dto.UserDto;
+import com.smart.user.domain.User;
+import java.util.Optional;
 
 public interface UserService {
 
@@ -8,4 +10,5 @@ public interface UserService {
 
   UserDto.Response getUserByEmail(String email);
 
+  Optional<User> findByEmail(String username);
 }

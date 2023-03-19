@@ -21,4 +21,5 @@ public class User {
   private LocalDateTime createDate;
   private LocalDateTime updateDate;
   private Status userStatus;
+  private String role;
 }

@@ -1,0 +1,45 @@
+package com.smart.config;
+
+import static org.springframework.security.config.Customizer.withDefaults;
+
+import jakarta.servlet.DispatcherType;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+public class SpringSecurityConfig {
+
+  @Bean
+  public BCryptPasswordEncoder encodePwd() {
+    return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http.csrf().disable().cors().disable()
+        .authorizeHttpRequests(request -> request
+            .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
+            .requestMatchers("/").permitAll()
+            .anyRequest().authenticated()
+        )
+        .formLogin(login -> login
+            .loginPage("/login")
+            .loginProcessingUrl("/login")
+            .usernameParameter("email")
+            .passwordParameter("password")
+            .defaultSuccessUrl("/access", true)
+            .permitAll()
+        )
+        .logout(withDefaults());
+
+    http.logout()
+        .logoutSuccessUrl("/login")
+        .invalidateHttpSession(true);   // 세션 날리기;
+
+    return http.build();
+  }
+
+}

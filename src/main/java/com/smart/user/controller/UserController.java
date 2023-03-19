@@ -32,4 +32,5 @@ public class UserController {
   public void join(@RequestBody @Valid UserDto.JoinRequest request) {
     userService.join(request);
   }
+
 }
