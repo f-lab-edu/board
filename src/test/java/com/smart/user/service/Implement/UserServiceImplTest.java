@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.smart.global.error.DuplicatedUserEmailException;
 import com.smart.global.error.DuplicatedUserNicknameException;
+import com.smart.global.error.IllegalAuthCodeException;
 import com.smart.global.error.NotFoundUserException;
 import com.smart.mail.event.MailEvent;
 import com.smart.user.controller.dto.UserDto.JoinRequest;
@@ -50,7 +51,7 @@ class UserServiceImplTest {
     userDao = mock(UserDao.class);
     httpSession = new MockHttpSession();
     eventPublisher = mock(ApplicationEventPublisher.class);
-    userService = new UserServiceImpl(userDao, httpSession, eventPublisher);
+    userService = new UserServiceImpl(userDao, eventPublisher, httpSession);
   }
 
   @BeforeEach
@@ -124,6 +125,27 @@ class UserServiceImplTest {
     Assertions
         .assertThrows(DuplicatedUserEmailException.class, () -> userService.join(joinRequest));
     verify(userDao).checkUserMail("test@email");
+  }
+
+  @DisplayName("올바른 인증요청으로 유저상태가 NORMAL로 업데이트된다.")
+  @Test
+  public void 유저상태업데이트() {
+    httpSession.setAttribute("test@email", "authCode");
+    doNothing().when(userDao).updateUserStatus("test@email", Status.NORMAL);
+
+    userService.verifyAuthCode("test@email", "authCode");
+
+    verify(userDao).updateUserStatus("test@email", Status.NORMAL);
+  }
+
+  @DisplayName("올바르지 않은 인증요청으로 유저상태 업데이트를 실패한다.")
+  @Test
+  public void 유저상태업데이트실패() {
+    httpSession.setAttribute("test@email", "unAuthCode");
+
+    Assertions
+        .assertThrows(IllegalAuthCodeException.class,
+            () -> userService.verifyAuthCode("test@email", "authCode"));
   }
 
   @DisplayName("가입된 이메일로 유저찾기를 성공한다.")

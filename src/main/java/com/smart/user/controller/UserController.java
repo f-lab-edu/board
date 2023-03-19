@@ -36,6 +36,6 @@ public class UserController {
 
   @GetMapping("/join-auth")
   public void join(@RequestParam String email, @RequestParam String authCode) {
-    System.out.println("인증완료 : "+email+" "+authCode);
+    userService.verifyAuthCode(email, authCode);
   }
 }
