@@ -86,7 +86,7 @@ public class UserDto {
           .password(getPassword())
           .nickname(getNickname())
           .createDate(LocalDateTime.now())
-          .userStatus(Status.NORMAL)
+          .userStatus(Status.UNAUTHORIZED)
           .build();
     }
   }
