@@ -6,6 +6,10 @@ public interface UserService {
 
   void join(UserDto.JoinRequest request);
 
+  String makeAuthCode();
+
+  void saveAuthCode(String email, String code);
+
   UserDto.Response getUserByEmail(String email);
 
 }
