@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Join Page</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<script th:inline="javascript">
+    function send(){
+        const email =$("#email").val();
+        const password =$("#password").val();
+        const name =$("#name").val();
+        const nickname =$("#nickname").val();
+
+        const sendDTO = {
+            email:email,
+            password:password,
+            name:name,
+            nickname:nickname
+        };
+        $.ajax({
+            url: "/api/v1/user/join",
+            data: JSON.stringify(sendDTO),
+            contentType : 'application/json',
+            type: 'POST',
+        }).done(function (data){
+            console.log(data);
+           alert('회원가입이 완료되었습니다. 메일함에 가서 인증링크를 클릭해주세요.');
+        });
+    }
+</script>
+
+<body>
+<h1>Join</h1>
+<form>
+    <div>
+        <label for="email">email:</label>
+        <input type="text" id="email" name="email" required>
+    </div>
+    <div>
+        <label for="password">password:</label>
+        <input type="password" id="password" name="password" required>
+    </div>
+    <div>
+        <label for="name">name:</label>
+        <input type="text" id="name" name="name" required>
+    </div>
+    <div>
+        <label for="nickname">nickname:</label>
+        <input type="text" id="nickname" name="nickname" required>
+    </div>
+    <button type="button" onclick="send()">Join</button>
+</form>
+</body>
+</html>
