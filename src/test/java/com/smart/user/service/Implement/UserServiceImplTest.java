@@ -131,7 +131,6 @@ class UserServiceImplTest {
   @Test
   public void 유저상태업데이트() {
     httpSession.setAttribute("test@email", "authCode");
-    doNothing().when(userDao).updateUserStatus("test@email", Status.NORMAL);
 
     userService.verifyAuthCode("test@email", "authCode");
 
