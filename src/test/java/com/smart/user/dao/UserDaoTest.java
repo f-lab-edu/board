@@ -28,14 +28,14 @@ class UserDaoTest {
   @BeforeEach
   public void 테스트유저생성() {
     userDao.deleteUserByEmail("test@email");
-    JoinRequest joinRequest = JoinRequest
+    user = JoinRequest
         .builder()
         .name("name")
         .nickname("nickname")
         .password("password")
         .email("test@email")
-        .build();
-    user = joinRequest.toEntity();
+        .build()
+        .toEntity();
   }
 
   @AfterEach
