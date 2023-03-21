@@ -22,18 +22,16 @@ public class SpringSecurityConfig {
     http.csrf().disable().cors().disable()
         .authorizeHttpRequests(request -> request
             .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-            .requestMatchers("/").permitAll()
-            .anyRequest().authenticated()
+            .requestMatchers("/","/login","/api/v1/user/**","/join").permitAll()
+            .anyRequest().authenticated() //모든 요청 인청요청
         )
-        .formLogin(login -> login
+        .formLogin(login -> login // form 방식 로그인 사용
             .loginPage("/login")
-            .loginProcessingUrl("/login")
             .usernameParameter("email")
             .passwordParameter("password")
-            .defaultSuccessUrl("/access", true)
+            .defaultSuccessUrl("/mypage", true)
             .permitAll()
-        )
-        .logout(withDefaults());
+        );
 
     http.logout()
         .logoutSuccessUrl("/login")
