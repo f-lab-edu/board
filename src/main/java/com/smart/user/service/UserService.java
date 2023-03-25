@@ -10,5 +10,5 @@ public interface UserService {
 
   UserDto.Response getUserByEmail(String email);
 
-  Optional<User> findByEmail(String username);
+  Optional<User> findByEmail(String email);
 }

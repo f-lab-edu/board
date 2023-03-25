@@ -30,6 +30,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.0' // mapper unit test
+	testImplementation 'org.springframework.boot:spring-boot-starter-security'
 }
 
 tasks.named('test') {
