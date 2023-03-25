@@ -39,3 +39,4 @@ out/
 ### db info ###
 application-mariadb.properties
 application-testdb.properties
+application-email.properties
