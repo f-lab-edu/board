@@ -14,7 +14,7 @@ public class MailEventHandler{
   }
 
   @EventListener
-  public void eventHandle(MailEvent event) {
+  public void eventHandle(MailAuthEvent event) {
     mailService.sendAuthMail(event.getEmail(), event.getAuthCode());
   }
 }

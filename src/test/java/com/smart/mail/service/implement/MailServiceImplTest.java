@@ -1,4 +1,4 @@
-package com.smart.mail.service.Implement;
+package com.smart.mail.service.implement;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;

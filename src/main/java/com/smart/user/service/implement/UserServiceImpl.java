@@ -1,10 +1,10 @@
-package com.smart.user.service.Implement;
+package com.smart.user.service.implement;
 
 import com.smart.global.error.DuplicatedUserEmailException;
 import com.smart.global.error.DuplicatedUserNicknameException;
 import com.smart.global.error.IllegalAuthCodeException;
 import com.smart.global.error.NotFoundUserException;
-import com.smart.mail.event.MailEvent;
+import com.smart.mail.event.MailAuthEvent;
 import com.smart.user.controller.dto.UserDto;
 import com.smart.user.dao.UserDao;
 import com.smart.user.domain.Status;
@@ -41,18 +41,16 @@ public class UserServiceImpl implements UserService {
     }
 
     String code = makeAuthCode();
-    eventPublisher.publishEvent(new MailEvent(request.getEmail(), code));
+    eventPublisher.publishEvent(new MailAuthEvent(request.getEmail(), code));
     saveAuthCode(request.getEmail(), code);
     userDao.joinUser(request.toEntity());
   }
 
-  @Override
-  public String makeAuthCode() {
+  private String makeAuthCode() {
     return UUID.randomUUID().toString();
   }
 
-  @Override
-  public void saveAuthCode(String email, String authCode) {
+  private void saveAuthCode(String email, String authCode) {
     session.setAttribute(email, authCode);
     session.setMaxInactiveInterval(60 * 60 * 24); // TTL 24시간
   }

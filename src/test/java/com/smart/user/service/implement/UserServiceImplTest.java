@@ -1,4 +1,4 @@
-package com.smart.user.service.Implement;
+package com.smart.user.service.implement;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
@@ -10,7 +10,7 @@ import com.smart.global.error.DuplicatedUserEmailException;
 import com.smart.global.error.DuplicatedUserNicknameException;
 import com.smart.global.error.IllegalAuthCodeException;
 import com.smart.global.error.NotFoundUserException;
-import com.smart.mail.event.MailEvent;
+import com.smart.mail.event.MailAuthEvent;
 import com.smart.user.controller.dto.UserDto.JoinRequest;
 import com.smart.user.controller.dto.UserDto.Response;
 import com.smart.user.dao.UserDao;
@@ -78,12 +78,12 @@ class UserServiceImplTest {
   @DisplayName("회원가입을 성공하여 인증메일이벤트를 호출한다.")
   @Test
   public void 인증메일이벤트호출() {
-    ArgumentCaptor<MailEvent> mailEventCaptor = ArgumentCaptor.forClass(MailEvent.class);
+    ArgumentCaptor<MailAuthEvent> mailEventCaptor = ArgumentCaptor.forClass(MailAuthEvent.class);
     doNothing().when(eventPublisher).publishEvent(mailEventCaptor.capture());
 
     userService.join(joinRequest);
 
-    verify(eventPublisher).publishEvent(any(MailEvent.class));
+    verify(eventPublisher).publishEvent(any(MailAuthEvent.class));
     Assertions.assertEquals(joinRequest.getEmail(), mailEventCaptor.getValue().getEmail());
   }
 

@@ -1,4 +1,4 @@
-package com.smart.mail.service.Implement;
+package com.smart.mail.service.implement;
 
 import com.smart.mail.service.MailService;
 import org.springframework.mail.SimpleMailMessage;
@@ -22,8 +22,7 @@ public class MailServiceImpl implements MailService {
     javaMailSender.send(makeAuthMail(email, authCode));
   }
 
-  @Override
-  public SimpleMailMessage makeAuthMail(String email, String authCode) {
+  private SimpleMailMessage makeAuthMail(String email, String authCode) {
     SimpleMailMessage mailMessage = new SimpleMailMessage();
 
     mailMessage.setTo(email);
