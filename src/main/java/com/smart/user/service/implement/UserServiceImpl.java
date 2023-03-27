@@ -39,11 +39,11 @@ public class UserServiceImpl implements UserService {
     if (userDao.checkUserNickname(request.getNickname())) {
       throw new DuplicatedUserNicknameException();
     }
+    userDao.joinUser(request.toEntity());
 
     String code = makeAuthCode();
-    eventPublisher.publishEvent(new MailAuthEvent(request.getEmail(), code));
     saveAuthCode(request.getEmail(), code);
-    userDao.joinUser(request.toEntity());
+    eventPublisher.publishEvent(new MailAuthEvent(request.getEmail(), code));
   }
 
   private String makeAuthCode() {
