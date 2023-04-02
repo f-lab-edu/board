@@ -27,7 +27,7 @@ class MailServiceImplTest {
   final String MAIL = "test@test.com";
   final String AUTH_CODE = "authCode";
 
-  @DisplayName("회원가입 인증 메일을 전송한다.")
+  @DisplayName("올바른 인증 메일을 생성하여 전송한다.")
   @Test
   public void 인증메일전송() {
     ArgumentCaptor<SimpleMailMessage> valueCapture = ArgumentCaptor
@@ -38,5 +38,6 @@ class MailServiceImplTest {
 
     verify(javaMailSender).send(any(SimpleMailMessage.class));
     Assertions.assertEquals(MAIL, valueCapture.getValue().getTo()[0]);
+    Assertions.assertTrue(valueCapture.getValue().getText().contains(AUTH_CODE));
   }
 }
