@@ -7,7 +7,6 @@ import com.smart.user.controller.dto.UserDto;
 import com.smart.user.dao.UserDao;
 import com.smart.user.domain.User;
 import com.smart.user.service.UserService;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,10 +36,5 @@ public class UserServiceImpl implements UserService {
       throw new NotFoundUserException();
     }
     return UserDto.Response.toResponse(user);
-  }
-
-  @Override
-  public Optional<User> findByEmail(String email) {
-    return Optional.ofNullable(userDao.getUserByEmail(email));
   }
 }

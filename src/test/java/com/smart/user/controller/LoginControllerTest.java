@@ -1,8 +1,6 @@
 package com.smart.user.controller;
 
-import static org.assertj.core.api.FactoryBasedNavigableListAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -12,7 +10,6 @@ import com.smart.user.controller.dto.UserDto.JoinRequest;
 import com.smart.user.dao.UserDao;
 import com.smart.user.domain.User;
 import jakarta.servlet.http.HttpSession;
-import org.apache.catalina.core.StandardContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,11 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.thymeleaf.spring6.SpringTemplateEngine;
-import org.thymeleaf.spring6.expression.ThymeleafEvaluationContext;
 
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -34,9 +28,6 @@ public class LoginControllerTest {
   private UserDao userDao;
   private MockMvc mockMvc;
   private User user;
-
-  @Autowired
-  private SpringTemplateEngine templateEngine;
 
   @BeforeEach
   public void setUp() {
@@ -50,13 +41,13 @@ public class LoginControllerTest {
     mockMvc = MockMvcBuilders.standaloneSetup(new LoginController()).build(); // MockMvc 객체 생성 및 초기화
   }
 
-//  @AfterEach
-//  public void deletePreUser() {
-//    User preUser = userDao.getUserByEmail(user.getEmail());
-//    if (preUser != null) {
-//      userDao.deleteUserByEmail(preUser.getEmail());
-//    }
-//  }
+  @AfterEach
+  public void deletePreUser() {
+    User preUser = userDao.getUserByEmail(user.getEmail());
+    if (preUser != null) {
+      userDao.deleteUserByEmail(preUser.getEmail());
+    }
+  }
 
   @Test
   public void testLoginSuccess() throws Exception {
