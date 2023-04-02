@@ -63,5 +63,19 @@ public class LoginControllerTest {
     HttpSession session = resultActions.andReturn().getRequest().getSession();
     assertNotNull(session);
   }
-}
 
+  @Test
+  public void testLoginFail() throws Exception{
+    userDao.joinUser(user);
+    ResultActions resultActions = mockMvc.perform(post("/login")
+            .param("email", user.getEmail())
+            .param("password", "wrongPassword"))
+        .andDo(print())
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/login"))
+        .andDo(print());
+
+    HttpSession session = resultActions.andReturn().getRequest().getSession();
+    assertNotNull(session);
+  }
+}

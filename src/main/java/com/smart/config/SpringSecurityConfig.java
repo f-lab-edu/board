@@ -25,17 +25,18 @@ public class SpringSecurityConfig {
             .requestMatchers("/","/login","/api/v1/user/**","/join").permitAll()
             .anyRequest().authenticated() //모든 요청 인청요청
         )
-        .formLogin(login -> login // form 방식 로그인 사용
+        .formLogin(login -> login
             .loginPage("/login")
             .usernameParameter("email")
             .passwordParameter("password")
-            .defaultSuccessUrl("/mypage", true)
+            .defaultSuccessUrl("/mypage", false)
+            .failureUrl("/login?error")// 로그인 실패 시 로그인 페이지에 머무르도록 변경
             .permitAll()
         );
 
     http.logout()
         .logoutSuccessUrl("/login")
-        .invalidateHttpSession(true);   // 세션 날리기;
+        .invalidateHttpSession(true);   // 세션 날리기
 
     return http.build();
   }
