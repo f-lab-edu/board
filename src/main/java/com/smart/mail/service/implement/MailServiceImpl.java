@@ -1,7 +1,7 @@
 package com.smart.mail.service.implement;
 
 import com.smart.mail.service.MailService;
-import org.springframework.mail.MailSendException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 public class MailServiceImpl implements MailService {
 
   private final JavaMailSender javaMailSender;
+
+  @Value("${mail.auth.url}")
+  private String mailUrl;
 
   public MailServiceImpl(JavaMailSender javaMailSender) {
     this.javaMailSender = javaMailSender;
@@ -31,11 +34,10 @@ public class MailServiceImpl implements MailService {
     String message = """
                   [회원가입 인증]\n
                   아래 링크를 클릭하시면 회원가입 인증이 완료됩니다.\n
-                  http://localhost:8080/api/v1/user/join-auth?email=%s&authCode=%s
-                  """.formatted(email, authCode);
+                  %s?email=%s&authCode=%s
+                  """.formatted(mailUrl, email, authCode);
     mailMessage.setText(message);
 
     return mailMessage;
   }
-
 }
