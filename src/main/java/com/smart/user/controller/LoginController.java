@@ -14,10 +14,11 @@ public class LoginController {
   }
 
   @PostMapping("/login")
-  public String login(@RequestParam String email, @RequestParam String password) {
+  public String login(@RequestParam String email
+      , @RequestParam String password) {
     System.out.println("Username: " + email);
     System.out.println("Password: " + password);
-    return "redirect:/mypage";
+    return "redirect:/login";
   }
 
   @GetMapping("/mypage")
