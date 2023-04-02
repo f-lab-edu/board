@@ -3,14 +3,13 @@
 <head>
     <title>Join Page</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <script th:inline="javascript">
     function send(){
-        const email =$("#email").val();
-        const password =$("#password").val();
-        const name =$("#name").val();
-        const nickname =$("#nickname").val();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const name = document.getElementById('name').value;
+        const nickname = document.getElementById('nickname').value;
 
         const sendDTO = {
             email:email,
@@ -18,14 +17,26 @@
             name:name,
             nickname:nickname
         };
-        $.ajax({
-            url: "/api/v1/user/join",
-            data: JSON.stringify(sendDTO),
-            contentType : 'application/json',
-            type: 'POST',
-        }).done(function (data){
-            console.log(data);
-           alert('회원가입이 완료되었습니다. 메일함에 가서 인증링크를 클릭해주세요.');
+
+        const url = '/api/v1/user/join';
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(sendDTO),
+        };
+
+        fetch(url, options)
+        .then(response => {
+            // 서버 응답 처리
+            console.log(response);
+            alert('회원가입이 완료되었습니다. 메일함에 가서 인증링크를 클릭해주세요.');
+        })
+        .catch(error => {
+            // 오류 처리
+            console.log(error);
+            alert('회원가입이 실패하였습니다.');
         });
     }
 </script>
