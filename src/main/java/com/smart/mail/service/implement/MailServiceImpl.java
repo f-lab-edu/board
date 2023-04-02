@@ -28,13 +28,12 @@ public class MailServiceImpl implements MailService {
 
     mailMessage.setTo(email);
     mailMessage.setSubject("회원가입 인증 메일입니다.");
-    StringBuilder sb = new StringBuilder();
-    sb.append("[회원가입 인증]\n");
-    sb.append("아래 링크를 클릭하시면 회원가입 인증이 완료됩니다\n");
-    sb.append("http://localhost:8080/api/v1/user/join-auth?");
-    sb.append("email=" + email);
-    sb.append("&authCode=" + authCode);
-    mailMessage.setText(sb.toString());
+    String message = """
+                  [회원가입 인증]\n
+                  아래 링크를 클릭하시면 회원가입 인증이 완료됩니다.\n
+                  http://localhost:8080/api/v1/user/join-auth?email=%s&authCode=%s
+                  """.formatted(email, authCode);
+    mailMessage.setText(message);
 
     return mailMessage;
   }
