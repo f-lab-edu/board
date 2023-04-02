@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 import java.util.UUID;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -32,6 +33,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @Transactional
   public void join(UserDto.JoinRequest request) {
     if (userDao.checkUserMail(request.getEmail())) {
       throw new DuplicatedUserEmailException();

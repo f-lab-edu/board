@@ -1,6 +1,7 @@
 package com.smart.mail.service.implement;
 
 import com.smart.mail.service.MailService;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
