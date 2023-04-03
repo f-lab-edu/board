@@ -37,4 +37,10 @@
              )
   </select>
 
+  <update id="updateUserStatus" parameterType="Object">
+    update user
+    set user_status = #{userStatus}
+    where email = #{email}
+  </update>
+
 </mapper>

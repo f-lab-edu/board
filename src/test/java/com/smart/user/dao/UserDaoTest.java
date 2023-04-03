@@ -1,6 +1,7 @@
 package com.smart.user.dao;
 
 import com.smart.user.controller.dto.UserDto.JoinRequest;
+import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -38,7 +39,7 @@ class UserDaoTest {
   }
 
   @AfterEach
-  public void 테스트유저삭제(){
+  public void 테스트유저삭제() {
     userDao.deleteUserByEmail("test@email");
   }
 
@@ -46,8 +47,18 @@ class UserDaoTest {
   public void 유저회원가입() {
     userDao.joinUser(user);
 
-    User retUser = userDao.getUserByEmail("test@email");
+    User retUser = userDao.getUserByEmail(user.getEmail());
     Assertions.assertEquals(user.getUserId(), retUser.getUserId());
+  }
+
+  @Test
+  public void 유저상태업데이트() {
+    userDao.joinUser(user);
+
+    userDao.updateUserStatus(user.getEmail(), Status.NORMAL);
+
+    User retUser = userDao.getUserByEmail(user.getEmail());
+    Assertions.assertEquals(Status.NORMAL, retUser.getUserStatus());
   }
 
   @Test
