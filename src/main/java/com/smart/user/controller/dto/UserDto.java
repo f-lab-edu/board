@@ -12,8 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * dto inner 클래스
- * - dto 클래스 파일의 개수를 줄일 수 있으며 도메인별로 정리가 가능해 응집도가 높아진다는 장점이 있다.
+ * dto inner 클래스 - dto 클래스 파일의 개수를 줄일 수 있으며 도메인별로 정리가 가능해 응집도가 높아진다는 장점이 있다.
  */
 public class UserDto {
 
