@@ -6,5 +6,7 @@ public interface UserService {
 
   void join(UserDto.JoinRequest request);
 
+  void verifyAuthCode(String email, String authCode);
+
   UserDto.Response getUserByEmail(String email);
 }

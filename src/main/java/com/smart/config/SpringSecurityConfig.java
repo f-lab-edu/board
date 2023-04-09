@@ -1,7 +1,5 @@
 package com.smart.config;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,8 +20,8 @@ public class SpringSecurityConfig {
     http.csrf().disable().cors().disable()
         .authorizeHttpRequests(request -> request
             .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-            .requestMatchers("/","/login","/api/v1/user/**","/join").permitAll()
-            .anyRequest().authenticated() //모든 요청 인청요청
+            .requestMatchers("/","/login","/auth","/join","/api/v1/user/**").permitAll()
+            .anyRequest().authenticated() //모든 요청 인증요청
         )
         .formLogin(login -> login
             .loginPage("/login")

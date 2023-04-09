@@ -8,11 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class LoginController {
 
-  @GetMapping("/login")
-  public String showLoginPage() {
-    return "login";
-  }
-
   @PostMapping("/login")
   public String login(@RequestParam String email
       , @RequestParam String password) {
@@ -20,10 +15,4 @@ public class LoginController {
     System.out.println("Password: " + password);
     return "redirect:/login";
   }
-
-  @GetMapping("/mypage")
-  public String showLoginSuccessPage(){
-    return "mypage";
-  }
-
 }

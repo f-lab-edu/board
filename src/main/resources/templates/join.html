@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Join Page</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<script th:inline="javascript">
+    function send(){
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const name = document.getElementById('name').value;
+        const nickname = document.getElementById('nickname').value;
+
+        const sendDTO = {
+            email:email,
+            password:password,
+            name:name,
+            nickname:nickname
+        };
+
+        const url = '/api/v1/user/join';
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(sendDTO),
+        };
+
+        fetch(url, options)
+        .then(response => {
+            console.log(response);
+            alert('회원가입이 완료되었습니다. 메일함에 가서 인증링크를 클릭해주세요.');
+            location.href = '/'; // 메인페이지로 이동
+        })
+        .catch(error => {
+            console.log(error);
+            alert('회원가입이 실패하였습니다.');
+        });
+    }
+</script>
+
+<body>
+<h1>Join</h1>
+<form>
+    <div>
+        <label for="email">email:</label>
+        <input type="text" id="email" name="email" required>
+    </div>
+    <div>
+        <label for="password">password:</label>
+        <input type="password" id="password" name="password" required>
+    </div>
+    <div>
+        <label for="name">name:</label>
+        <input type="text" id="name" name="name" required>
+    </div>
+    <div>
+        <label for="nickname">nickname:</label>
+        <input type="text" id="nickname" name="nickname" required>
+    </div>
+    <button type="button" onclick="send()">Join</button>
+</form>
+</body>
+</html>
