@@ -90,8 +90,8 @@ public class UserDto {
           .password(getPassword())
           .nickname(getNickname())
           .createDate(LocalDateTime.now())
-          .userStatus(Status.NORMAL)
           .role(getRole())
+          .userStatus(Status.UNAUTHORIZED)
           .build();
     }
   }
