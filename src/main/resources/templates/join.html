@@ -29,12 +29,11 @@
 
         fetch(url, options)
         .then(response => {
-            // 서버 응답 처리
             console.log(response);
             alert('회원가입이 완료되었습니다. 메일함에 가서 인증링크를 클릭해주세요.');
+            location.href = '/'; // 메인페이지로 이동
         })
         .catch(error => {
-            // 오류 처리
             console.log(error);
             alert('회원가입이 실패하였습니다.');
         });

@@ -2,6 +2,7 @@ package com.smart.user.dao;
 
 import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
+import java.util.Optional;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

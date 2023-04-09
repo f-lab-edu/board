@@ -9,5 +9,4 @@ public interface UserService {
   void verifyAuthCode(String email, String authCode);
 
   UserDto.Response getUserByEmail(String email);
-
 }

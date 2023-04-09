@@ -46,6 +46,8 @@ public class UserDto {
     @NotBlank
     private Status userStatus;
 
+    private String role;
+
     static public Response toResponse(User user) {
       return Response.builder()
           .userId(user.getUserId())
@@ -56,6 +58,7 @@ public class UserDto {
           .createDate(user.getCreateDate())
           .updateDate(user.getUpdateDate())
           .userStatus(user.getUserStatus())
+          .role(user.getRole())
           .build();
     }
   }
@@ -78,6 +81,7 @@ public class UserDto {
 
     @NotBlank
     private String nickname;
+    private String role;
 
     public User toEntity() {
       return User.builder()
@@ -86,6 +90,7 @@ public class UserDto {
           .password(getPassword())
           .nickname(getNickname())
           .createDate(LocalDateTime.now())
+          .role(getRole())
           .userStatus(Status.UNAUTHORIZED)
           .build();
     }
