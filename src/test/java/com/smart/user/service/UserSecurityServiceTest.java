@@ -2,33 +2,37 @@ package com.smart.user.service;
 
 import com.smart.global.error.NotFoundUserException;
 import com.smart.user.dao.UserDao;
+import java.util.Optional;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
-
+@ExtendWith(MockitoExtension.class)
 public class UserSecurityServiceTest {
   private UserSecurityService userSecurityService;
-
   @Mock
-  private UserDao userDao;
+  private UserService userService;
 
   @BeforeEach
   public void setUp() {
-    MockitoAnnotations.openMocks(this);
-    userSecurityService = new UserSecurityService(userDao, null);
+    userSecurityService = new UserSecurityService(userService, null);
   }
 
   @Test
-  public void testLoadUserByUsernameWithNotFoundUserException() {
-    // given
+  public void testLoadUserByUsernameWithNotFou성ndUserException() {
     String email = "invalidEmail@example.com";
-    when(userDao.getUserByEmail(email)).thenReturn(null);
+    when(userService.getUserByEmail(email)).thenReturn(Optional.empty());
 
-    // when, then
-    assertThrows(NotFoundUserException.class, () -> userSecurityService.loadUserByUsername(email));
+    Assertions.assertThrows(
+        NotFoundUserException.class,
+        () -> userSecurityService.loadUserByUsername(email)
+    );
   }
 }
+

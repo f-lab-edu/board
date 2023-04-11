@@ -1,5 +1,6 @@
 package com.smart.user.service.implement;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -11,12 +12,14 @@ import com.smart.global.error.DuplicatedUserNicknameException;
 import com.smart.global.error.IllegalAuthCodeException;
 import com.smart.global.error.NotFoundUserException;
 import com.smart.mail.event.MailAuthEvent;
+import com.smart.user.controller.dto.UserDto;
 import com.smart.user.controller.dto.UserDto.JoinRequest;
-import com.smart.user.controller.dto.UserDto.Response;
+import com.smart.user.controller.dto.UserDto.UserInfo;
 import com.smart.user.dao.UserDao;
 import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
 import jakarta.servlet.http.HttpSession;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +32,7 @@ import org.springframework.mock.web.MockHttpSession;
 
 /**
  * Mockito ArgumentCaptor : ArgumentCaptor를 사용하여 메서드에 전달된 파라미터를 캡처하여 테스트 할 수 있다.
- * Mockito Verify : 메서드 호출, 호출 횟수, interaction 등을 검증할 수 있다.
+ * Mockito Verify :메서드 호출, 호출 횟수, interaction 등을 검증할 수 있다.
  */
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -152,10 +155,10 @@ class UserServiceImplTest {
   public void 유저찾기성공() {
     when(userDao.getUserByEmail("test@email")).thenReturn(user);
 
-    Response response = userService.getUserByEmail("test@email");
+    Optional<UserInfo> result = userService.getUserByEmail("test@email");
 
     verify(userDao).getUserByEmail("test@email");
-    Assertions.assertEquals("test@email", response.getEmail());
+    assertEquals(user.getEmail(), result.get().getEmail());
   }
 
   @DisplayName("가입되지 않은 이메일로 유저찾기를 실패한다.")
