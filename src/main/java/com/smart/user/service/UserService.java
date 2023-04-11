@@ -12,5 +12,4 @@ public interface UserService {
 
   Optional<UserInfo> getUserByEmail(String email);
 
-
 }
