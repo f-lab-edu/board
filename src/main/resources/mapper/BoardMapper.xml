@@ -4,7 +4,7 @@
 
 <mapper namespace="com.smart.board.dao.BoardDao">
   <select id="getAllBoard" resultType="com.smart.board.controller.dto.BoardDto$Response">
-    select b.boardId, b.title, b.content, b.create_date, b.update_date, u.user_id, u.nickname
+    select b.board_id, b.title, b.content, b.create_date, b.update_date, u.user_id, u.nickname
     from board b
            left join user u on b.user_id = u.user_id;
   </select>
