@@ -1,4 +1,4 @@
-package com.smart.user.controller;
+package com.smart;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
