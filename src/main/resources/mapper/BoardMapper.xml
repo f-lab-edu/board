@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.smart.board.dao.BoardDao">
+  <select id="getAllBoard" resultType="com.smart.board.controller.dto.BoardDto$Response">
+    select b.boardId, b.title, b.content, b.create_date, b.update_date, u.user_id, u.nickname
+    from board b
+           left join user u on b.user_id = u.user_id;
+  </select>
+
+  <select id="getBoardByBoardId" parameterType="Long"
+    resultType="com.smart.board.controller.dto.BoardDto$Response">
+    select b.board_id, b.title, b.content, b.create_date, b.update_date, u.user_id, u.nickname
+    from board b
+           left join user u on b.user_id = u.user_id
+    where board_id = #{boardId};
+  </select>
+
+  <insert id="createBoard" parameterType="com.smart.board.domain.Board" useGeneratedKeys="true"
+    keyProperty="boardId">
+    insert into board (board_id, title, content, create_date, user_id)
+    values (#{boardId}, #{title}, #{content}, #{createDate}, #{userId})
+  </insert>
+
+  <update id="updateBoard" parameterType="com.smart.board.domain.Board">
+    update board
+    set title       = #{title},
+        content     = #{content},
+        update_date = #{updateDate},
+        user_id     = #{userId}
+    where board_id = #{boardId}
+  </update>
+
+  <delete id="deleteByBoardId" parameterType="Long">
+    delete
+    from board
+    where board_id = #{boardId}
+  </delete>
+
+  <select id="checkBoardId" parameterType="Long" resultType="boolean">
+    select exists(
+             select *
+             from board
+             WHERE board_id = #{boardId}
+             )
+  </select>
+
+</mapper>
