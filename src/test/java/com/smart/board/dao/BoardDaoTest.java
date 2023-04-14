@@ -3,8 +3,10 @@ package com.smart.board.dao;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.smart.board.controller.dto.BoardDto;
+import com.smart.board.controller.dto.BoardDto.Response;
 import com.smart.board.controller.dto.BoardDto.UpdateRequest;
 import com.smart.board.domain.Board;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,16 +40,63 @@ public class BoardDaoTest {
   }
 
   @Test
-  @DisplayName("게시글 생성 후 반환된 ID에 해당하는 게시글이 정상적으로 생성 되었는지 확인한다.")
-  public void 게시판게시글생성() {
-    boardDao.createBoard(board);
+  @DisplayName("게시물이 없다면 게시판 전체 조회 시 비어있는 List를 반환한다.")
+  public void getAllBoard_EmptyList_NotExistingBoard(){
+    List<Response> allBoard = boardDao.getAllBoard();
 
-    assertThat(boardDao.checkBoardId(board.getBoardId())).isTrue();
+    assertThat(allBoard.isEmpty()).isTrue();
   }
 
   @Test
-  @DisplayName("게시글 생성 및 업데이트 후 해당하는 게시글을 찾아 정상적으로 업데이트 되었는지 확인한다.")
-  public void 게시판게시글수정() {
+  @DisplayName("게시물 생성 후 게시판 전체 조회 시 게시물이 담긴 List를 반환한다.")
+  public void getAllBoard_ResponseList_ExistingBoard(){
+    boardDao.createBoard(board);
+
+    List<Response> allBoard = boardDao.getAllBoard();
+
+    assertThat(allBoard.isEmpty()).isFalse();
+    assertThat(allBoard.get(0).getBoardId()).isEqualTo(board.getBoardId());
+  }
+
+  @Test
+  @DisplayName("존재하지 않는 ID로 게시판 조회 시 null을 반환한다.")
+  public void getBoardByBoardId_Null_NotExistingBoardId(){
+    Response response = boardDao.getBoardByBoardId(-1L);
+
+    assertThat(response).isNull();
+  }
+
+  @Test
+  @DisplayName("게시물 생성 후 반환된 ID로 게시물 조회 시 게시물을 반환한다.")
+  public void getBoardByBoardId_Response_ExistingBoardId(){
+    boardDao.createBoard(board);
+
+    Response response = boardDao.getBoardByBoardId(board.getBoardId());
+
+    assertThat(response).isNotNull();
+    assertThat(response.getBoardId()).isEqualTo(board.getBoardId());
+  }
+
+  @Test
+  @DisplayName("생성하지 않은 게시글 업데이트하면 당연히 해당 게시물을 찾을 수 없다.")
+  public void updateBoard_NotExistingBoard() {
+    Board updateBoard = UpdateRequest.builder()
+        .boardId(-1L)
+        .title("update title")
+        .content("update content")
+        .userId(board.getUserId())
+        .build()
+        .toEntity();
+
+    boardDao.updateBoard(updateBoard);
+
+    Response response = boardDao.getBoardByBoardId(-1L);
+    assertThat(response).isNull();
+  }
+
+  @Test
+  @DisplayName("게시글 업데이트 후 해당하는 게시글이 정상적으로 수정되었는지 확인한다.")
+  public void updateBoard_ExistingBoard() {
     boardDao.createBoard(board);
     Board updateBoard = UpdateRequest.builder()
         .boardId(board.getBoardId())
@@ -66,8 +115,8 @@ public class BoardDaoTest {
   }
 
   @Test
-  @DisplayName("게시글 생성 및 삭제 후 해당하는 게시글이 정상적으로 삭제되었는지 확인한다.")
-  public void 게시판게시글삭제() {
+  @DisplayName("게시글 삭제 후 해당 게시글이 삭제되었는지 확인한다.")
+  public void deleteByBoardId_ExistingBoardId() {
     boardDao.createBoard(board);
 
     boardDao.deleteByBoardId(board.getBoardId());
