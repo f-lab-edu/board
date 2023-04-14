@@ -101,4 +101,18 @@ public class BoardDto {
     }
   }
 
+  @Getter
+  @NoArgsConstructor(access = AccessLevel.PROTECTED)
+  @AllArgsConstructor
+  @Builder
+  public static class DeleteRequest {
+
+    @NotBlank
+    private Long boardId;
+
+    @NotBlank
+    private Long userId;
+
+  }
+
 }
