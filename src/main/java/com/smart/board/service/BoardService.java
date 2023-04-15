@@ -58,7 +58,7 @@ public class BoardService {
   }
 
   private void checkPermission(Long loginUserId, Long authorUserId) {
-    if (loginUserId != authorUserId) {
+    if (!loginUserId.equals(authorUserId)) {
       throw new PermissionDeniedBoardException();
     }
   }
