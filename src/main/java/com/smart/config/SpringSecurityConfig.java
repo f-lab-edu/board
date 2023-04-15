@@ -20,20 +20,21 @@ public class SpringSecurityConfig {
     http.csrf().disable().cors().disable()
         .authorizeHttpRequests(request -> request
             .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-            .requestMatchers("/","/login","/auth","/join","/api/v1/user/**").permitAll()
+            .requestMatchers("/", "/login", "/auth", "/join", "/api/v1/user/**", "/boards",
+                "/board", "/api/v1/boards", "/api/v1/board/{boardId}").permitAll()
             .anyRequest().authenticated() //모든 요청 인증요청
         )
         .formLogin(login -> login
             .loginPage("/login")
             .usernameParameter("email")
             .passwordParameter("password")
-            .defaultSuccessUrl("/mypage", false)
+            .defaultSuccessUrl("/boards", false)
             .failureUrl("/login?error")// 로그인 실패 시 로그인 페이지에 머무르도록 변경
             .permitAll()
         );
 
     http.logout()
-        .logoutSuccessUrl("/login")
+        .logoutSuccessUrl("/boards")
         .invalidateHttpSession(true);   // 세션 날리기
 
     return http.build();
