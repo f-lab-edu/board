@@ -1,8 +1,8 @@
 package com.smart.board.service;
 
+import com.smart.board.controller.dto.BoardDto.BoardInfo;
 import com.smart.board.controller.dto.BoardDto.CreateRequest;
 import com.smart.board.controller.dto.BoardDto.DeleteRequest;
-import com.smart.board.controller.dto.BoardDto.Response;
 import com.smart.board.controller.dto.BoardDto.UpdateRequest;
 import com.smart.board.dao.BoardDao;
 import com.smart.board.domain.Board;
@@ -20,30 +20,33 @@ public class BoardService {
     this.boardDao = boardDao;
   }
 
-  public List<Response> getAllBoard() {
+  public List<BoardInfo> getAllBoard() {
     return boardDao.getAllBoard();
   }
 
-  public Response getBoardByBoardId(Long boardId) {
-    checkExistBoard(boardId);
-    return boardDao.getBoardByBoardId(boardId);
+  public BoardInfo getBoardByBoardId(Long boardId) {
+    boardDao.updateViewCnt(boardId);
+    BoardInfo boardInfo = boardDao.getBoardByBoardId(boardId).orElseThrow(() -> {
+      throw new NotFoundBoardException();
+    });
+    return boardInfo;
   }
 
-  public Long createBoard(CreateRequest request, Long userId) {
-    Board board = request.toEntity(userId);
+  public Long createBoard(CreateRequest request, Long loginUserId) {
+    Board board = request.toEntity(loginUserId);
     boardDao.createBoard(board);
     return board.getBoardId();
   }
 
-  public Long updateBoard(UpdateRequest request, Long userId) {
-    checkPermission(userId, request.getUserId());
+  public Long updateBoard(UpdateRequest request, Long loginUserId) {
+    checkPermission(loginUserId, request.getUserId());
     checkExistBoard(request.getBoardId());
     boardDao.updateBoard(request.toEntity());
     return request.getBoardId();
   }
 
-  public void deleteByBoardId(DeleteRequest request, Long userId) {
-    checkPermission(userId, request.getUserId());
+  public void deleteByBoardId(DeleteRequest request, Long loginUserId) {
+    checkPermission(loginUserId, request.getUserId());
     checkExistBoard(request.getBoardId());
     boardDao.deleteByBoardId(request.getBoardId());
   }
@@ -54,8 +57,8 @@ public class BoardService {
     }
   }
 
-  private void checkPermission(Long userId, Long userId2) {
-    if (userId2 != userId) {
+  private void checkPermission(Long loginUserId, Long authorUserId) {
+    if (loginUserId != authorUserId) {
       throw new PermissionDeniedBoardException();
     }
   }

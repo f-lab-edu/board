@@ -18,5 +18,6 @@ public class Board {
   private String content;
   private LocalDateTime createDate;
   private LocalDateTime updateDate;
+  private Long viewCount;
   private Long userId;
 }

@@ -8,9 +8,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.smart.board.controller.dto.BoardDto.BoardInfo;
 import com.smart.board.controller.dto.BoardDto.CreateRequest;
 import com.smart.board.controller.dto.BoardDto.DeleteRequest;
-import com.smart.board.controller.dto.BoardDto.Response;
 import com.smart.board.controller.dto.BoardDto.UpdateRequest;
 import com.smart.board.dao.BoardDao;
 import com.smart.board.domain.Board;
@@ -18,6 +18,7 @@ import com.smart.global.error.NotFoundBoardException;
 import com.smart.global.error.PermissionDeniedBoardException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ public class BoardServiceTest {
 
   BoardService boardService;
 
-  Board board;
+  BoardInfo boardInfo;
 
   UpdateRequest updateRequest;
 
@@ -46,11 +47,13 @@ public class BoardServiceTest {
 
   @BeforeEach
   public void create_Test_Data() {
-    board = Board.builder()
+    boardInfo = BoardInfo.builder()
         .boardId(1L)
         .title("title")
         .content("content")
+        .viewCount(1L)
         .userId(1L)
+        .nickname("nickname")
         .build();
 
     updateRequest = UpdateRequest
@@ -73,46 +76,56 @@ public class BoardServiceTest {
   public void getAllBoard_EmptyList_NotExistingBoard() {
     when(boardDao.getAllBoard()).thenReturn(new ArrayList<>());
 
-    List<Response> retResponses = boardService.getAllBoard();
+    List<BoardInfo> boardInfos = boardService.getAllBoard();
 
     verify(boardDao).getAllBoard();
-    assertThat(retResponses.isEmpty()).isTrue();
+    assertThat(boardInfos.isEmpty()).isTrue();
   }
 
-  @DisplayName("모든 게시물 리스트를 반환한다.")
+  @DisplayName("모든 게시물들을 반환한다.")
   @Test
-  public void getAllBoard_ResponseList_ExistingBoard() {
-    Response inputResponse = Response.toResponse(board, "nickname");
-    List<Response> inputResponses = new ArrayList<>();
-    inputResponses.add(inputResponse);
-    when(boardDao.getAllBoard()).thenReturn(inputResponses);
+  public void getAllBoard_BoardInfos_ExistingBoard() {
+    List<BoardInfo> boardInfos = new ArrayList<>();
+    boardInfos.add(boardInfo);
+    when(boardDao.getAllBoard()).thenReturn(boardInfos);
 
-    List<Response> retResponses = boardService.getAllBoard();
+    List<BoardInfo> retBoardInfos = boardService.getAllBoard();
 
     verify(boardDao).getAllBoard();
-    assertThat(inputResponses.size()).isEqualTo(retResponses.size());
-    assertThat(inputResponse).isIn(retResponses);
+    assertThat(boardInfos.size()).isEqualTo(retBoardInfos.size());
+    assertThat(boardInfo).isIn(retBoardInfos);
   }
 
   @DisplayName("해당 ID의 게시물이 없다면 NotFoundBoardException을 던진다.")
   @Test
   public void getBoardByBoardId_ThrowsException_NotExistingBoardId() {
-    when(boardDao.checkBoardId(1L)).thenReturn(false);
 
     assertThatThrownBy(() -> boardService.getBoardByBoardId(1L))
         .isInstanceOf(NotFoundBoardException.class);
   }
 
-  @DisplayName("해당 ID의 게시물을 찾는다.")
+  @DisplayName("해당 ID의 게시물을 조회한다.")
   @Test
-  public void getBoardByBoardId_Response_ExistingBoardId() {
-    when(boardDao.checkBoardId(1L)).thenReturn(true);
-    when(boardDao.getBoardByBoardId(1L)).thenReturn(Response.toResponse(board, "nickname"));
+  public void getBoardByBoardId_BoardInfo_ExistingBoardId() {
+    when(boardDao.getBoardByBoardId(1L)).thenReturn(Optional.ofNullable(boardInfo));
 
-    Response response = boardService.getBoardByBoardId(1L);
+    BoardInfo boardInfo = boardService.getBoardByBoardId(1L);
 
     verify(boardDao).getBoardByBoardId(1L);
-    assertThat(response.getBoardId()).isEqualTo(1L);
+    assertThat(1L).isEqualTo(boardInfo.getBoardId());
+  }
+
+  @DisplayName("게시물을 조회하면 조회수가 증가한다.")
+  @Test
+  public void getBoardByBoardId_UpdateViewCount_ExistingBoardId() {
+    ArgumentCaptor<Long> updateViewCountCaptor = ArgumentCaptor.forClass(Long.class);
+    doNothing().when(boardDao).updateViewCnt(updateViewCountCaptor.capture());
+    when(boardDao.getBoardByBoardId(1L)).thenReturn(Optional.ofNullable(boardInfo));
+
+    boardService.getBoardByBoardId(1L);
+
+    verify(boardDao).updateViewCnt(any(Long.class));
+    assertThat(1L).isEqualTo(updateViewCountCaptor.getValue());
   }
 
   @DisplayName("게시물을 생성한다.")
@@ -192,5 +205,4 @@ public class BoardServiceTest {
     verify(boardDao).deleteByBoardId(any(Long.class));
     assertThat(deleteRequest.getBoardId()).isEqualTo(deleteCaptor.getValue());
   }
-
 }

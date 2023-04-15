@@ -3,19 +3,32 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.smart.board.dao.BoardDao">
-  <select id="getAllBoard" resultType="com.smart.board.controller.dto.BoardDto$Response">
+  <select id="getAllBoard" resultType="com.smart.board.controller.dto.BoardDto$BoardInfo">
     select b.board_id, b.title, b.content, b.create_date, b.update_date, u.user_id, u.nickname
     from board b
            left join user u on b.user_id = u.user_id;
   </select>
 
   <select id="getBoardByBoardId" parameterType="Long"
-    resultType="com.smart.board.controller.dto.BoardDto$Response">
-    select b.board_id, b.title, b.content, b.create_date, b.update_date, u.user_id, u.nickname
+    resultType="com.smart.board.controller.dto.BoardDto$BoardInfo">
+    select b.board_id,
+           b.title,
+           b.content,
+           b.create_date,
+           b.update_date,
+           b.view_count,
+           u.user_id,
+           u.nickname
     from board b
            left join user u on b.user_id = u.user_id
     where board_id = #{boardId};
   </select>
+
+  <update id="updateViewCnt" parameterType="Long">
+    update board
+    set view_count = (select view_count from board where board_id = #{boardId}) + 1
+    where board_id = #{boardId}
+  </update>
 
   <insert id="createBoard" parameterType="com.smart.board.domain.Board" useGeneratedKeys="true"
     keyProperty="boardId">
