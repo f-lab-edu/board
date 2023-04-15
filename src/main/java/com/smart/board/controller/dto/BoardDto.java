@@ -15,7 +15,7 @@ public class BoardDto {
   @NoArgsConstructor(access = AccessLevel.PROTECTED)
   @AllArgsConstructor
   @Builder
-  public static class Response {
+  public static class BoardInfo {
 
     @NotBlank
     private Long boardId;
@@ -32,22 +32,13 @@ public class BoardDto {
     private LocalDateTime updateDate;
 
     @NotBlank
+    private Long viewCount;
+
+    @NotBlank
     private Long userId;
 
     @NotBlank
     private String nickname;
-
-    static public Response toResponse(Board board, String nickname) {
-      return Response.builder()
-          .boardId(board.getBoardId())
-          .title(board.getTitle())
-          .content(board.getContent())
-          .createDate(board.getCreateDate())
-          .updateDate(board.getUpdateDate())
-          .userId(board.getUserId())
-          .nickname(nickname)
-          .build();
-    }
   }
 
   @Getter
@@ -67,6 +58,7 @@ public class BoardDto {
           .title(getTitle())
           .content(getContent())
           .createDate(LocalDateTime.now())
+          .viewCount(0L)
           .userId(loginUserId)
           .build();
     }
@@ -112,7 +104,5 @@ public class BoardDto {
 
     @NotBlank
     private Long userId;
-
   }
-
 }
