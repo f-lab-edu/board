@@ -59,11 +59,12 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public void verifyAuthCode(String email, String authCode) {
-    if(authCode.equals((String) session.getAttribute(email))){
+    if (authCode.equals((String) session.getAttribute(email))) {
       session.removeAttribute(email);
       userDao.updateUserStatus(email, Status.NORMAL);
+    } else {
+      throw new IllegalAuthCodeException();
     }
-    else throw new IllegalAuthCodeException();
   }
 
   @Override
