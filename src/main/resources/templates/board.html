@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Board Detail Page</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<script th:inline="javascript">
+  function deleteBoard(board) {
+    const sendDTO = {
+      boardId: board.boardId,
+      userId: board.userId,
+    };
+
+    const url = '/api/v1/board';
+    const options = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(sendDTO),
+    };
+
+    fetch(url, options)
+    .then(response => {
+      alert('삭제 완료');
+      location.href = '/boards';
+    })
+    .catch(error => {
+      console.log(error);
+      alert('삭제 실패');
+    });
+  }
+</script>
+<body>
+<h1>Board Detail Page</h1>
+
+<div>
+  <label>제목</label>
+  <input type="text" id="title" name="title" th:value="${board.title}" readonly>
+</div>
+
+<div>
+  <label>작성자</label>
+  <input type="text" id="nickname" name="nickname" th:value="${board.nickname}" readonly>
+</div>
+
+<div>
+  <label>조회수</label>
+  <input type="text" id="viewCount" name="viewCount" th:value="${board.viewCount}" readonly>
+</div>
+
+<div>
+  <label>등록일</label>
+  <input type="text" id="createDate" name="createDate" th:value="${board.createDate}" readonly>
+</div>
+
+<div>
+  <label>글 내용</label>
+  <textarea id="content" name="content" th:text="${board.content}" readonly></textarea>
+</div>
+
+<hr>
+
+<div class="row">
+  <button th:onclick="|location.href='@{/boards}'|">목록으로</button>
+  <span th:if="${userDetails != null && userDetails.userId == board.userId}">
+      <button
+          th:onclick="|location.href='@{/board/update(boardId = ${board.boardId})}'|">수정</button>
+      <button th:onclick="deleteBoard([[${board}]])">삭제</button>
+    </span>
+</div>
+
+</body>
+</html>

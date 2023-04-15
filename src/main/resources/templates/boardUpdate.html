@@ -1,0 +1,77 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Board Update Page</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<script th:inline="javascript">
+  function updateBoard(board) {
+    const title = document.getElementById('title').value;
+    const content = document.getElementById('content').value;
+
+    const sendDTO = {
+      boardId: board.boardId,
+      title: title,
+      content: content,
+      userId: board.userId,
+    };
+
+    const url = '/api/v1/board';
+    const options = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(sendDTO),
+    };
+
+    fetch(url, options)
+    .then(response => {
+      alert('수정 완료');
+      location.href = '/board?boardId=' + board.boardId;
+    })
+    .catch(error => {
+      console.log(error);
+      alert('수정 실패');
+    });
+  }
+</script>
+<body>
+<h1>Board Update Page</h1>
+
+<div>
+  <label>제목</label>
+  <input type="text" id="title" name="title" th:value="${board.title}">
+</div>
+
+<div>
+  <label>작성자</label>
+  <input type="text" id="nickname" name="nickname" th:value="${board.nickname}" readonly>
+</div>
+
+<div>
+  <label>조회수</label>
+  <input type="text" id="viewCount" name="viewCount" th:value="${board.viewCount}" readonly>
+</div>
+
+<div>
+  <label>등록일</label>
+  <input type="text" id="createDate" name="createDate" th:value="${board.createDate}" readonly>
+</div>
+
+<div>
+  <label>글 내용</label>
+  <textarea id="content" name="content" th:text="${board.content}"></textarea>
+</div>
+
+<hr>
+
+<div class="row">
+  <span th:if="${userDetails != null && userDetails.userId == board.userId}">
+    <button type="button" th:onclick="updateBoard([[${board}]])">저장하기</button>
+  </span>
+  <button th:onclick="|location.href='@{/boards}'|">목록으로</button>
+</div>
+
+</body>
+</html>
