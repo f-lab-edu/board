@@ -25,7 +25,7 @@ public class UserSecurityServiceTest {
   }
 
   @Test
-  public void testLoadUserByUsernameWithNotFou성ndUserException() {
+  public void testLoadUserByUsernameWithNotFoundUserException() {
     String email = "invalidEmail@example.com";
     when(userService.getUserByEmail(email)).thenReturn(Optional.empty());
 
