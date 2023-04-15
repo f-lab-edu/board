@@ -2,6 +2,7 @@ package com.smart.board.controller.dto;
 
 import com.smart.board.domain.Board;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,7 @@ public class BoardDto {
   @Builder
   public static class BoardInfo {
 
-    @NotBlank
+    @NotNull
     private Long boardId;
 
     @NotBlank
@@ -31,10 +32,10 @@ public class BoardDto {
 
     private LocalDateTime updateDate;
 
-    @NotBlank
+    @NotNull
     private Long viewCount;
 
-    @NotBlank
+    @NotNull
     private Long userId;
 
     @NotBlank
@@ -70,7 +71,7 @@ public class BoardDto {
   @Builder
   public static class UpdateRequest {
 
-    @NotBlank
+    @NotNull
     private Long boardId;
 
     @NotBlank
@@ -79,7 +80,7 @@ public class BoardDto {
     @NotBlank
     private String content;
 
-    @NotBlank
+    @NotNull
     private Long userId;
 
     public Board toEntity() {
@@ -99,10 +100,10 @@ public class BoardDto {
   @Builder
   public static class DeleteRequest {
 
-    @NotBlank
+    @NotNull
     private Long boardId;
 
-    @NotBlank
+    @NotNull
     private Long userId;
   }
 }
