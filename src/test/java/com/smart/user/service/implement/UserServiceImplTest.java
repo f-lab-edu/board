@@ -1,6 +1,6 @@
 package com.smart.user.service.implement;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -12,14 +12,12 @@ import com.smart.global.error.DuplicatedUserNicknameException;
 import com.smart.global.error.IllegalAuthCodeException;
 import com.smart.global.error.NotFoundUserException;
 import com.smart.mail.event.MailAuthEvent;
-import com.smart.user.controller.dto.UserDto;
 import com.smart.user.controller.dto.UserDto.JoinRequest;
 import com.smart.user.controller.dto.UserDto.UserInfo;
 import com.smart.user.dao.UserDao;
 import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
 import jakarta.servlet.http.HttpSession;
-import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -87,7 +85,7 @@ class UserServiceImplTest {
     userService.join(joinRequest);
 
     verify(eventPublisher).publishEvent(any(MailAuthEvent.class));
-    Assertions.assertEquals(joinRequest.getEmail(), mailEventCaptor.getValue().getEmail());
+    assertEquals(joinRequest.getEmail(), mailEventCaptor.getValue().getEmail());
   }
 
   @DisplayName("회원가입을 성공하여 인증코드를 세션에 저장한다.")
@@ -107,7 +105,7 @@ class UserServiceImplTest {
     userService.join(joinRequest);
 
     verify(userDao).joinUser(any(User.class));
-    Assertions.assertEquals(joinRequest.getEmail(), userCaptor.getValue().getEmail());
+    assertEquals(joinRequest.getEmail(), userCaptor.getValue().getEmail());
   }
 
   @DisplayName("중복닉네임으로 회원가입을 실패한다.")
