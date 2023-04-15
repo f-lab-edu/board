@@ -155,10 +155,10 @@ class UserServiceImplTest {
   public void 유저찾기성공() {
     when(userDao.getUserByEmail("test@email")).thenReturn(user);
 
-    Optional<UserInfo> result = userService.getUserByEmail("test@email");
+    UserInfo result = userService.getUserByEmail("test@email");
 
     verify(userDao).getUserByEmail("test@email");
-    assertEquals(user.getEmail(), result.get().getEmail());
+    assertEquals(user.getEmail(), result.getEmail());
   }
 
   @DisplayName("가입되지 않은 이메일로 유저찾기를 실패한다.")

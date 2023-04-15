@@ -3,6 +3,7 @@ package com.smart.user.service.implement;
 import com.smart.global.error.DuplicatedUserEmailException;
 import com.smart.global.error.DuplicatedUserNicknameException;
 import com.smart.global.error.IllegalAuthCodeException;
+import com.smart.global.error.NotFoundUserException;
 import com.smart.mail.event.MailAuthEvent;
 import com.smart.user.controller.dto.UserDto;
 import com.smart.user.controller.dto.UserDto.UserInfo;
@@ -68,8 +69,11 @@ public class UserServiceImpl implements UserService {
     }
   }
   @Override
-  public Optional<UserInfo> getUserByEmail(String email) {
+  public UserInfo getUserByEmail(String email) {
     User user = userDao.getUserByEmail(email);
-    return Optional.ofNullable(UserDto.UserInfo.from(user));
+    if (user == null) {
+      throw new NotFoundUserException();
+    }
+    return UserDto.UserInfo.from(user);
   }
 }

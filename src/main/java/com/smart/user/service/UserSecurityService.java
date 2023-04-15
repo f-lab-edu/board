@@ -21,8 +21,7 @@ public class UserSecurityService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String email) {
-    UserInfo userInfo = userService.getUserByEmail(email)
-        .orElseThrow(() -> new NotFoundUserException());
+    UserInfo userInfo = userService.getUserByEmail(email);
 
     return buildUserDetails(userInfo);
   }

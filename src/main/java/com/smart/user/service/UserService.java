@@ -10,6 +10,6 @@ public interface UserService {
 
   void verifyAuthCode(String email, String authCode);
 
-  Optional<UserInfo> getUserByEmail(String email);
+  UserInfo getUserByEmail(String email);
 
 }

@@ -29,7 +29,7 @@ public class UserController {
   }
 
   @GetMapping("/{email}/exist")
-  public Optional<UserInfo> getUser(@PathVariable("email") String email) {
+  public UserInfo getUser(@PathVariable("email") String email) {
     return userService.getUserByEmail(email);
   }
 
