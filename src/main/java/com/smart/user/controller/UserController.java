@@ -1,11 +1,11 @@
 package com.smart.user.controller;
 
+import com.smart.global.error.NotFoundUserException;
 import com.smart.user.controller.dto.UserDto;
 import com.smart.user.controller.dto.UserDto.UserInfo;
 import com.smart.user.service.UserService;
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.util.Optional;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +29,13 @@ public class UserController {
   }
 
   @GetMapping("/{email}/exist")
-  public UserInfo getUser(@PathVariable("email") String email) {
-    return userService.getUserByEmail(email);
+  public ResponseEntity<UserInfo> getUser(@PathVariable("email") String email) {
+    try {
+      UserInfo userInfo = userService.getUserByEmail(email);
+      return ResponseEntity.ok(userInfo);
+    } catch (NotFoundUserException e) {
+      return ResponseEntity.notFound().build();
+    }
   }
 
   @PostMapping("/join")

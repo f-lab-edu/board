@@ -1,6 +1,5 @@
 package com.smart.user.service.implement;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -18,6 +17,7 @@ import com.smart.user.dao.UserDao;
 import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
 import jakarta.servlet.http.HttpSession;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +30,7 @@ import org.springframework.mock.web.MockHttpSession;
 
 /**
  * Mockito ArgumentCaptor : ArgumentCaptor를 사용하여 메서드에 전달된 파라미터를 캡처하여 테스트 할 수 있다.
- * Mockito Verify :메서드 호출, 호출 횟수, interaction 등을 검증할 수 있다.
+ * Mockito Verify : 메서드 호출, 호출 횟수, interaction 등을 검증할 수 있다.
  */
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -85,7 +85,7 @@ class UserServiceImplTest {
     userService.join(joinRequest);
 
     verify(eventPublisher).publishEvent(any(MailAuthEvent.class));
-    assertEquals(joinRequest.getEmail(), mailEventCaptor.getValue().getEmail());
+    Assertions.assertEquals(joinRequest.getEmail(), mailEventCaptor.getValue().getEmail());
   }
 
   @DisplayName("회원가입을 성공하여 인증코드를 세션에 저장한다.")
@@ -105,7 +105,7 @@ class UserServiceImplTest {
     userService.join(joinRequest);
 
     verify(userDao).joinUser(any(User.class));
-    assertEquals(joinRequest.getEmail(), userCaptor.getValue().getEmail());
+    Assertions.assertEquals(joinRequest.getEmail(), userCaptor.getValue().getEmail());
   }
 
   @DisplayName("중복닉네임으로 회원가입을 실패한다.")
@@ -151,18 +151,18 @@ class UserServiceImplTest {
   @DisplayName("가입된 이메일로 유저찾기를 성공한다.")
   @Test
   public void 유저찾기성공() {
-    when(userDao.getUserByEmail("test@email")).thenReturn(user);
+    when(userDao.getUserByEmail("test@email")).thenReturn(Optional.of(user));
 
-    UserInfo result = userService.getUserByEmail("test@email");
+    UserInfo userInfo = userService.getUserByEmail("test@email");
 
     verify(userDao).getUserByEmail("test@email");
-    assertEquals(user.getEmail(), result.getEmail());
+    Assertions.assertEquals("test@email", userInfo.getEmail());
   }
 
   @DisplayName("가입되지 않은 이메일로 유저찾기를 실패한다.")
   @Test
   public void 유저찾기실패() {
-    when(userDao.getUserByEmail("test@email")).thenReturn(null);
+    when(userDao.getUserByEmail("test@email")).thenReturn(Optional.empty());
 
     Assertions
         .assertThrows(NotFoundUserException.class, () -> userService.getUserByEmail("test@email"));

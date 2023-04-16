@@ -1,6 +1,5 @@
 package com.smart.user.service;
 
-import com.smart.global.error.NotFoundUserException;
 import com.smart.user.controller.dto.UserDto.UserInfo;
 import com.smart.user.domain.CustomUserDetails;
 import java.util.Arrays;
@@ -25,8 +24,6 @@ public class UserSecurityService implements UserDetailsService {
 
     return buildUserDetails(userInfo);
   }
-
-
 
   private CustomUserDetails buildUserDetails(UserInfo userInfo) {
     Collection<? extends GrantedAuthority> authorities = Arrays.asList(
