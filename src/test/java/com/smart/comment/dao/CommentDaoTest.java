@@ -25,7 +25,7 @@ public class CommentDaoTest {
   Comment comment;
 
   @BeforeEach
-  public void 테스트댓글생성() {
+  public void create_Test_Data() {
     comment = CommentDto.CreateRequest
         .builder()
         .content("content")
@@ -35,7 +35,7 @@ public class CommentDaoTest {
   }
 
   @AfterEach
-  public void 테스트댓글삭제() {
+  public void delete_Test_Data() {
     commentDao.deleteByCommentId(comment.getBoardId());
   }
 
