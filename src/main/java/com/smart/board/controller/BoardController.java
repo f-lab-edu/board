@@ -1,19 +1,15 @@
 package com.smart.board.controller;
 
 import com.smart.board.controller.dto.BoardDto;
-import com.smart.board.controller.dto.BoardDto.BoardInfo;
 import com.smart.board.controller.dto.BoardDto.DeleteRequest;
 import com.smart.board.service.BoardService;
 import com.smart.user.domain.CustomUserDetails;
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,16 +27,6 @@ public class BoardController {
     this.boardService = boardService;
   }
 
-  @GetMapping("/boards")
-  public List<BoardInfo> getAllBoard() {
-    return boardService.getAllBoard();
-  }
-
-  @GetMapping("/board/{boardId}")
-  public BoardDto.BoardInfo getBoard(@PathVariable("boardId") Long boardId) {
-    return boardService.getBoardByBoardId(boardId);
-  }
-
   @PostMapping("/board")
   @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity<Void> createBoard(@RequestBody @Valid BoardDto.CreateRequest request,
@@ -51,7 +37,6 @@ public class BoardController {
   }
 
   @PutMapping("/board")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
   public void updateBoard(@RequestBody @Valid BoardDto.UpdateRequest request,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
 
@@ -59,7 +44,6 @@ public class BoardController {
   }
 
   @DeleteMapping("/board")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteBoard(@RequestBody @Valid DeleteRequest request,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
 

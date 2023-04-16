@@ -1,9 +1,11 @@
 package com.smart.board.controller.dto;
 
 import com.smart.board.domain.Board;
+import com.smart.comment.controller.dto.CommentDto.CommentInfo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,6 +42,17 @@ public class BoardDto {
 
     @NotBlank
     private String nickname;
+  }
+
+  @Getter
+  @NoArgsConstructor(access = AccessLevel.PROTECTED)
+  @AllArgsConstructor
+  @Builder
+  public static class BoardDetail {
+
+    private BoardInfo boardInfo;
+
+    private List<CommentInfo> commentInfos;
   }
 
   @Getter

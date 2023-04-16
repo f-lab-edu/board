@@ -26,7 +26,7 @@ public class BoardDaoTest {
   Board board;
 
   @BeforeEach
-  public void 테스트게시물생성() {
+  public void create_Test_Data() {
     board = BoardDto.CreateRequest
         .builder()
         .title("title")
@@ -36,7 +36,7 @@ public class BoardDaoTest {
   }
 
   @AfterEach
-  public void 테스트게시물삭제() {
+  public void delete_Test_Data() {
     boardDao.deleteByBoardId(board.getBoardId());
   }
 
