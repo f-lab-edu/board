@@ -5,6 +5,92 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 </head>
 <script th:inline="javascript">
+  function create(board){
+
+    const comment = document.getElementById('input-content').value;
+
+    const sendDTO = {
+      boardId: board.boardId,
+      content: comment,
+    };
+
+    const url = '/api/v1/comment';
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(sendDTO),
+    };
+
+    fetch(url, options)
+    .then(response => {
+      alert('작성 완료');
+      location.reload()
+    })
+    .catch(error => {
+      console.log(error);
+      alert('작성 실패');
+    });
+  }
+
+  function updateComment(comment){
+    const content = document.getElementById('commentContent-'+comment.commentId).value;
+
+    const sendDTO = {
+      commentId: comment.commentId,
+      content: content,
+      userId: comment.userId,
+    };
+
+    const url = '/api/v1/comment';
+    const options = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(sendDTO),
+    };
+
+    fetch(url, options)
+    .then(response => {
+      alert('수정 완료');
+      location.reload()
+    })
+    .catch(error => {
+      console.log(error);
+      alert('수정 실패');
+    });
+
+  }
+
+  function deleteComment(comment){
+
+    const sendDTO = {
+      commentId: comment.commentId,
+      userId: comment.userId,
+    };
+
+    const url = '/api/v1/comment';
+    const options = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(sendDTO),
+    };
+
+    fetch(url, options)
+    .then(response => {
+      alert('삭제 완료');
+      location.reload()
+    })
+    .catch(error => {
+      console.log(error);
+      alert('삭제 실패');
+    });
+  }
+
   function deleteBoard(board) {
     const sendDTO = {
       boardId: board.boardId,
@@ -61,13 +147,41 @@
 
 <hr>
 
+<h3>Comment</h3>
+<div th:each="comment: ${comments}">
+  <label th:text="${comment.nickname}"/>
+  <span th:if="${userDetails == null || userDetails.userId != comment.userId}">
+    <input type="text" th:value="${comment.content}" readonly/>
+  </span>
+  <span th:if="${userDetails != null && userDetails.userId == comment.userId}">
+    <input type="text" th:value="${comment.content}" th:id="'commentContent-' + ${comment.commentId}"/>
+    <button th:onclick="updateComment([[${comment}]])">수정</button>
+    <button th:onclick="deleteComment([[${comment}]])">삭제</button>
+  </span>
+  <span th:if="${comment.updateDate}==null">
+    <label th:text="${comment.createDate}"/>
+  </span>
+  <span th:if="${comment.updateDate}!=null">
+    <label th:text="${comment.updateDate}"/>
+  </span>
+</div>
+
+<div th:if="${userDetails != null}">
+  <hr>
+  <h3>Comment 작성</h3>
+  <label th:text="${userDetails.nickname}"/>
+  <input type="text" id="input-content" name="input-content"/>
+  <button th:onclick="create([[${board}]])">작성</button>
+</div>
+
+<hr>
+
 <div class="row">
   <button th:onclick="|location.href='@{/boards}'|">목록으로</button>
   <span th:if="${userDetails != null && userDetails.userId == board.userId}">
-      <button
-          th:onclick="|location.href='@{/board/update(boardId = ${board.boardId})}'|">수정</button>
-      <button th:onclick="deleteBoard([[${board}]])">삭제</button>
-    </span>
+    <button th:onclick="|location.href='@{/board/update(boardId = ${board.boardId})}'|">수정</button>
+    <button th:onclick="deleteBoard([[${board}]])">삭제</button>
+  </span>
 </div>
 
 </body>
