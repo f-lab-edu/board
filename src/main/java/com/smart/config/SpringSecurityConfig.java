@@ -3,6 +3,7 @@ package com.smart.config;
 import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,7 +22,7 @@ public class SpringSecurityConfig {
         .authorizeHttpRequests(request -> request
             .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
             .requestMatchers("/", "/login", "/auth", "/join", "/api/v1/user/**", "/boards",
-                "/board", "/api/v1/boards", "/api/v1/board/{boardId}").permitAll()
+                "/board").permitAll()
             .anyRequest().authenticated() //모든 요청 인증요청
         )
         .formLogin(login -> login
