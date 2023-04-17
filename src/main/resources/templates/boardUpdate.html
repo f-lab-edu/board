@@ -68,7 +68,7 @@
 
 <div class="row">
   <button type="button" th:onclick="updateBoard([[${board}]])">저장하기</button>
-  <button th:onclick="|location.href='@{/boards}'|">목록으로</button>
+  <button th:onclick="|location.href='@{/board(boardId = ${board.boardId})}'|">취소</button>
 </div>
 
 </body>
