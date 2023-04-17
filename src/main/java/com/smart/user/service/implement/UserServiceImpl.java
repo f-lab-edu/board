@@ -70,8 +70,8 @@ public class UserServiceImpl implements UserService {
   }
   @Override
   public UserInfo getUserByEmail(String email) {
-    Optional<User> optionalUser = userDao.getUserByEmail(email);
-    User user = optionalUser.orElseThrow(NotFoundUserException::new);
+    User user = userDao.getUserByEmail(email)
+        .orElseThrow(NotFoundUserException::new);
     return UserDto.UserInfo.from(user);
   }
 }
