@@ -3,6 +3,7 @@ package com.smart.user.dao;
 import com.smart.user.controller.dto.UserDto.JoinRequest;
 import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,8 +48,8 @@ class UserDaoTest {
   public void 유저회원가입() {
     userDao.joinUser(user);
 
-    User retUser = userDao.getUserByEmail(user.getEmail());
-    Assertions.assertEquals(user.getUserId(), retUser.getUserId());
+    Optional<User> retUser = userDao.getUserByEmail(user.getEmail());
+    Assertions.assertEquals(user.getUserId(), retUser.get().getUserId());
   }
 
   @Test
@@ -57,9 +58,10 @@ class UserDaoTest {
 
     userDao.updateUserStatus(user.getEmail(), Status.NORMAL);
 
-    User retUser = userDao.getUserByEmail(user.getEmail());
-    Assertions.assertEquals(Status.NORMAL, retUser.getUserStatus());
+    Optional<User> retUser = userDao.getUserByEmail(user.getEmail());
+    Assertions.assertEquals(Status.NORMAL, retUser.get().getUserStatus());
   }
+
 
   @Test
   public void 중복이메일체크() {

@@ -1,6 +1,8 @@
 package com.smart.user.service;
 
 import com.smart.user.controller.dto.UserDto;
+import com.smart.user.controller.dto.UserDto.UserInfo;
+import java.util.Optional;
 
 public interface UserService {
 
@@ -8,5 +10,6 @@ public interface UserService {
 
   void verifyAuthCode(String email, String authCode);
 
-  UserDto.Response getUserByEmail(String email);
+  UserInfo getUserByEmail(String email);
+
 }

@@ -6,11 +6,13 @@ import com.smart.global.error.IllegalAuthCodeException;
 import com.smart.global.error.NotFoundUserException;
 import com.smart.mail.event.MailAuthEvent;
 import com.smart.user.controller.dto.UserDto;
+import com.smart.user.controller.dto.UserDto.UserInfo;
 import com.smart.user.dao.UserDao;
 import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
 import com.smart.user.service.UserService;
 import jakarta.servlet.http.HttpSession;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -66,13 +68,10 @@ public class UserServiceImpl implements UserService {
       throw new IllegalAuthCodeException();
     }
   }
-
   @Override
-  public UserDto.Response getUserByEmail(String email) {
-    User user = userDao.getUserByEmail(email);
-    if (user == null) {
-      throw new NotFoundUserException();
-    }
-    return UserDto.Response.toResponse(user);
+  public UserInfo getUserByEmail(String email) {
+    User user = userDao.getUserByEmail(email)
+        .orElseThrow(NotFoundUserException::new);
+    return UserDto.UserInfo.from(user);
   }
 }
