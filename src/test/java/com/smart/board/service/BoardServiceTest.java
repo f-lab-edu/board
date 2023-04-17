@@ -104,42 +104,39 @@ public class BoardServiceTest {
   @Test
   public void getBoardByBoardId_ThrowsException_NotExistingBoardId() {
 
-    assertThatThrownBy(() -> boardService.getBoardByBoardId(1L))
+    assertThatThrownBy(() -> boardService.getBoardByBoardId(boardInfo.getBoardId()))
         .isInstanceOf(NotFoundBoardException.class);
   }
 
   @DisplayName("해당 ID의 게시물을 조회한다.")
   @Test
   public void getBoardByBoardId_BoardInfo_ExistingBoardId() {
-    when(boardDao.getBoardByBoardId(1L)).thenReturn(Optional.ofNullable(boardInfo));
+    when(boardDao.getBoardByBoardId(boardInfo.getBoardId())).thenReturn(Optional.ofNullable(boardInfo));
 
-    BoardInfo boardInfo = boardService.getBoardByBoardId(1L);
+    BoardInfo retBoardInfo = boardService.getBoardByBoardId(boardInfo.getBoardId());
 
-    verify(boardDao).getBoardByBoardId(1L);
-    assertThat(1L).isEqualTo(boardInfo.getBoardId());
+    verify(boardDao).getBoardByBoardId(boardInfo.getBoardId());
+    assertThat(retBoardInfo.getBoardId()).isEqualTo(boardInfo.getBoardId());
   }
 
   @DisplayName("게시물 상세를 조회하면 조회수가 증가한다.")
   @Test
   public void getBoardDetailByBoardId_UpdateViewCount_ExistingBoardId() {
-    ArgumentCaptor<Long> updateViewCountCaptor = ArgumentCaptor.forClass(Long.class);
-    doNothing().when(boardDao).updateViewCnt(updateViewCountCaptor.capture());
-    when(boardDao.getBoardByBoardId(1L)).thenReturn(Optional.ofNullable(boardInfo));
+    when(boardDao.getBoardByBoardId(boardInfo.getBoardId())).thenReturn(Optional.ofNullable(boardInfo));
 
-    boardService.getBoardDetailByBoardId(1L);
+    boardService.getBoardDetailByBoardId(boardInfo.getBoardId());
 
-    verify(boardDao).updateViewCnt(any(Long.class));
-    assertThat(1L).isEqualTo(updateViewCountCaptor.getValue());
+    verify(boardDao).updateViewCnt(boardInfo.getBoardId());
   }
 
   @DisplayName("게시물 상세를 조회하면 댓글도 함께 조회한다.")
   @Test
   public void getBoardDetailByBoardId_GetComments_ExistingBoardId() {
-    when(boardDao.getBoardByBoardId(1L)).thenReturn(Optional.ofNullable(boardInfo));
+    when(boardDao.getBoardByBoardId(boardInfo.getBoardId())).thenReturn(Optional.ofNullable(boardInfo));
 
-    boardService.getBoardDetailByBoardId(1L);
+    boardService.getBoardDetailByBoardId(boardInfo.getBoardId());
 
-    verify(commentDao).getCommentsByBoardId(1L);
+    verify(commentDao).getCommentsByBoardId(boardInfo.getBoardId());
   }
 
   @DisplayName("게시물을 생성한다.")
@@ -170,7 +167,7 @@ public class BoardServiceTest {
   @DisplayName("존재하지 않는 게시물을 업데이트하면 NotFoundBoardException을 던진다.")
   @Test
   public void updateBoard_ThrowException_NotExistingBoard() {
-    when(boardDao.checkBoardId(1L)).thenReturn(false);
+    when(boardDao.checkBoardId(updateRequest.getBoardId())).thenReturn(false);
 
     assertThatThrownBy(() -> boardService.updateBoard(updateRequest, 1L))
         .isInstanceOf(NotFoundBoardException.class);
@@ -179,7 +176,7 @@ public class BoardServiceTest {
   @DisplayName("존재하는 게시물을 업데이트한다.")
   @Test
   public void updateBoard_ExistingBoard() {
-    when(boardDao.checkBoardId(1L)).thenReturn(true);
+    when(boardDao.checkBoardId(updateRequest.getBoardId())).thenReturn(true);
     ArgumentCaptor<Board> updateCaptor = ArgumentCaptor.forClass(Board.class);
     doNothing().when(boardDao).updateBoard(updateCaptor.capture());
 
@@ -201,7 +198,7 @@ public class BoardServiceTest {
   @DisplayName("존재하지 않는 게시물을 삭제하면 NotFoundBoardException을 던진다.")
   @Test
   public void deleteByBoardId_ThrowException_NotExistingBoard() {
-    when(boardDao.checkBoardId(1L)).thenReturn(false);
+    when(boardDao.checkBoardId(deleteRequest.getBoardId())).thenReturn(false);
 
     assertThatThrownBy(() -> boardService.deleteByBoardId(deleteRequest, 1L))
         .isInstanceOf(NotFoundBoardException.class);
@@ -210,26 +207,20 @@ public class BoardServiceTest {
   @DisplayName("존재하는 게시물을 삭제한다.")
   @Test
   public void deleteByBoardId_ExistingBoard() {
-    when(boardDao.checkBoardId(1L)).thenReturn(true);
-    ArgumentCaptor<Long> deleteCaptor = ArgumentCaptor.forClass(Long.class);
-    doNothing().when(boardDao).deleteByBoardId(deleteCaptor.capture());
+    when(boardDao.checkBoardId(deleteRequest.getBoardId())).thenReturn(true);
 
     boardService.deleteByBoardId(deleteRequest, 1L);
 
-    verify(boardDao).deleteByBoardId(any(Long.class));
-    assertThat(deleteRequest.getBoardId()).isEqualTo(deleteCaptor.getValue());
+    verify(boardDao).deleteByBoardId(deleteRequest.getBoardId());
   }
 
   @DisplayName("존재하는 게시물을 삭제 시 댓글도 삭제한다.")
   @Test
   public void deleteByBoardId_DeleteComments_ExistingBoard() {
-    when(boardDao.checkBoardId(1L)).thenReturn(true);
-    ArgumentCaptor<Long> deleteCaptor = ArgumentCaptor.forClass(Long.class);
-    doNothing().when(commentDao).deleteByBoardId(deleteCaptor.capture());
+    when(boardDao.checkBoardId(deleteRequest.getBoardId())).thenReturn(true);
 
     boardService.deleteByBoardId(deleteRequest, 1L);
 
-    verify(commentDao).deleteByBoardId(any(Long.class));
-    assertThat(deleteRequest.getBoardId()).isEqualTo(deleteCaptor.getValue());
+    verify(commentDao).deleteByBoardId(deleteRequest.getBoardId());
   }
 }

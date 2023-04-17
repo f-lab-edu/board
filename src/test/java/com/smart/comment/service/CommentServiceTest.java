@@ -87,7 +87,7 @@ public class CommentServiceTest {
   @DisplayName("존재하지 않는 댓글을 업데이트하면 NotFoundCommentException을 던진다.")
   @Test
   public void updateComment_ThrowException_NotExistingComment() {
-    when(commentDao.checkCommentId(1L)).thenReturn(false);
+    when(commentDao.checkCommentId(updateRequest.getCommentId())).thenReturn(false);
 
     assertThatThrownBy(() -> commentService.updateComment(updateRequest, 1L))
         .isInstanceOf(NotFoundCommentException.class);
@@ -96,7 +96,7 @@ public class CommentServiceTest {
   @DisplayName("존재하는 댓글을 업데이트한다.")
   @Test
   public void updateComment_ExistingComment() {
-    when(commentDao.checkCommentId(1L)).thenReturn(true);
+    when(commentDao.checkCommentId(updateRequest.getCommentId())).thenReturn(true);
     ArgumentCaptor<Comment> updateCaptor = ArgumentCaptor.forClass(Comment.class);
     doNothing().when(commentDao).updateComment(updateCaptor.capture());
 
@@ -117,7 +117,7 @@ public class CommentServiceTest {
   @DisplayName("존재하지 않는 댓글을 삭제하면 NotFoundCommentException을 던진다.")
   @Test
   public void deleteByCommentId_ThrowException_NotExistingComment() {
-    when(commentDao.checkCommentId(1L)).thenReturn(false);
+    when(commentDao.checkCommentId(deleteRequest.getCommentId())).thenReturn(false);
 
     assertThatThrownBy(() -> commentService.deleteByCommentId(deleteRequest, 1L))
         .isInstanceOf(NotFoundCommentException.class);
@@ -126,13 +126,10 @@ public class CommentServiceTest {
   @DisplayName("존재하는 댓글을 삭제한다.")
   @Test
   public void deleteByCommentId_ExistingBoard() {
-    when(commentDao.checkCommentId(1L)).thenReturn(true);
-    ArgumentCaptor<Long> deleteCaptor = ArgumentCaptor.forClass(Long.class);
-    doNothing().when(commentDao).deleteByCommentId(deleteCaptor.capture());
+    when(commentDao.checkCommentId(deleteRequest.getCommentId())).thenReturn(true);
 
     commentService.deleteByCommentId(deleteRequest, 1L);
 
-    verify(commentDao).deleteByCommentId(any(Long.class));
-    assertThat(deleteRequest.getCommentId()).isEqualTo(deleteCaptor.getValue());
+    verify(commentDao).deleteByCommentId(deleteRequest.getCommentId());
   }
 }

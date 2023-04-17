@@ -87,7 +87,7 @@ public class BoardDaoTest {
     boardDao.updateViewCnt(board.getBoardId());
     BoardInfo boardInfo = boardDao.getBoardByBoardId(board.getBoardId()).get();
 
-    assertThat(boardInfo.getViewCount()).isEqualTo(1L);
+    assertThat(boardInfo.getViewCount()).isEqualTo(board.getViewCount()+1);
   }
 
   @Test
