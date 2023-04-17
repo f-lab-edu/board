@@ -39,7 +39,7 @@ public class BoardDaoTest {
   }
 
   @Test
-  @DisplayName("게시물 생성 후 게시판 전체 조회 시 게시물이 담긴 List를 반환한다.")
+  @DisplayName("게시물 생성 후 게시글 전체 조회 시 게시물이 담긴 List를 반환한다.")
   public void getAllBoard_BoardInfos_ExistingBoard() {
     boardDao.createBoard(board);
 
@@ -49,7 +49,7 @@ public class BoardDaoTest {
   }
 
   @Test
-  @DisplayName("존재하지 않는 ID로 게시판 조회 시 null을 반환한다.")
+  @DisplayName("존재하지 않는 ID로 게시글 조회 시 null을 반환한다.")
   public void getBoardByBoardId_Null_NotExistingBoardId() {
     Optional<BoardDto.BoardInfo> optionalBoardInfo = boardDao.getBoardByBoardId(-1L);
 

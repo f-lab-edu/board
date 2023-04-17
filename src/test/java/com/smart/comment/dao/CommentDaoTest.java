@@ -39,7 +39,7 @@ public class CommentDaoTest {
   }
 
   @Test
-  @DisplayName("댓글 생성 후 게시판 ID로 댓글 조회 시 댓글이 담긴 List를 반환한다.")
+  @DisplayName("댓글 생성 후 게시글 ID로 댓글 조회 시 댓글이 담긴 List를 반환한다.")
   public void getCommentsByBoardId_CommentInfos_ExistingComments() {
     commentDao.createComment(comment);
 
@@ -49,7 +49,7 @@ public class CommentDaoTest {
   }
 
   @Test
-  @DisplayName("존재하지 않는 게시판 ID로 댓글 조회 시 비어있는 List를 반환한다.")
+  @DisplayName("존재하지 않는 게시글 ID로 댓글 조회 시 비어있는 List를 반환한다.")
   public void getCommentsByBoardId_EmptyList_NotExistingBoardId() {
     List<CommentDto.CommentInfo> commentInfos = commentDao.getCommentsByBoardId(-1L);
 
