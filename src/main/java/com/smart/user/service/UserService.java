@@ -2,7 +2,7 @@ package com.smart.user.service;
 
 import com.smart.user.controller.dto.UserDto;
 import com.smart.user.controller.dto.UserDto.UserInfo;
-import java.util.Optional;
+import com.smart.user.domain.User;
 
 public interface UserService {
 
@@ -12,4 +12,7 @@ public interface UserService {
 
   UserInfo getUserByEmail(String email);
 
+  boolean updateUserInfo(User user);
+
+  boolean isDuplicateNickName(String nickname);
 }

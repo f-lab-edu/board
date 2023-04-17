@@ -1,11 +1,19 @@
 package com.smart.user.controller;
 
+import com.smart.user.domain.CustomUserDetails;
+import com.smart.user.service.UserSecurityService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@RequiredArgsConstructor
 public class UserViewController {
+
+  private final UserSecurityService userSecurityService;
 
   @GetMapping("/join")
   public String showJoinPage() {
@@ -23,8 +31,17 @@ public class UserViewController {
   }
 
   @GetMapping("/mypage")
-  public String showLoginSuccessPage(){
+  public String showLoginSuccessPage(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    UserDetails loadedUserDetails = userSecurityService.loadUserByUsername(userDetails.getEmail());
+    model.addAttribute("user", loadedUserDetails);
     return "mypage";
+  }
+
+  @GetMapping("/edit")
+  public String edit(Model model
+      ,@AuthenticationPrincipal CustomUserDetails userDetails) {
+    model.addAttribute("user", userDetails);
+    return "user_edit";
   }
 
 }

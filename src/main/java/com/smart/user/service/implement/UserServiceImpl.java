@@ -74,4 +74,19 @@ public class UserServiceImpl implements UserService {
         .orElseThrow(NotFoundUserException::new);
     return UserDto.UserInfo.from(user);
   }
+
+  @Override
+  public boolean updateUserInfo(User user) {
+    boolean isNicknameDuplicated = userDao.checkUserNickname(user.getNickname());
+    if (isNicknameDuplicated) {
+      throw new DuplicatedUserNicknameException();
+    }
+    return userDao.updateUserInfoByEmail(user);
+  }
+
+
+  @Override
+  public boolean isDuplicateNickName(String nickname) {
+    return userDao.checkUserNickname(nickname);
+  }
 }

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>회원정보 수정</title>
+  <script>
+    let isNicknameDuplicated = true;
+
+    function updateUser() {
+      const nickname = document.getElementById('nickname').value;
+      const password = document.getElementById('password').value;
+      const email = document.getElementById('email').textContent;
+      const data = {
+        nickname: nickname,
+        email: email
+      };
+      if (password !== '') {  // 비밀번호가 빈 문자열이 아닌 경우에만 data에 추가
+        data.password = password;
+      }
+
+      fetch('/api/v1/user/update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+      .then((response) => {
+        if(response.ok) {
+          alert('정보가 변경되었습니다.');
+        } else {
+          throw new Error('응답이 올바르지 않습니다.');
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        alert('변경에 실패하였습니다.');
+      });
+    }
+
+
+    function checkNickname() {
+      const nickname = document.getElementById('nickname').value;
+
+      fetch(`/api/v1/user/checkNickname?nickname=` + nickname)
+      .then(response => response.json())
+      .then(data => {
+        if (data === true) {
+          // 중복된 닉네임
+          alert('중복된 닉네임입니다. 다른 닉네임을 입력해주세요.');
+        } else {
+          // 중복되지 않은 닉네임
+          isNicknameDuplicated = false;
+          console.log(isNicknameDuplicated);
+          const message = document.getElementById('message');
+          message.innerHTML = '닉네임 사용이 가능합니다.';
+        }
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    }
+
+    function onClickModifyButton() {
+      if (isNicknameDuplicated) {
+        alert('닉네임 중복 확인이 필요합니다.');
+      } else {
+        updateUser();
+      }
+    }
+  </script>
+</head>
+<body>
+<h1>회원정보 수정</h1>
+<!-- 현재 회원정보 보여주기 -->
+<p>이름: <span th:text="${user.name}"></span></p>
+<p>이메일: <span id="email" th:text="${user.email}"></span></p>
+<!-- 회원정보 수정 입력 폼 제공 -->
+  <label for="nickname">닉네임:</label>
+  <input type="text" id="nickname" name="nickname" th:value="${user.nickname}" required>
+  <button type="button" onclick="checkNickname()">중복 체크</button>
+  <span id="message"></span>
+  <br><br>
+    <label for="password">비밀번호:</label>
+    <input type="password" id="password" name="password" required><br><br>
+<button onclick="onClickModifyButton()" type="submit">수정</button>
+<a href="/mypage">마이페이지로 돌아가기</a>
+</body>
+</html>

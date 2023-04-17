@@ -169,4 +169,13 @@ class UserServiceImplTest {
     verify(userDao).getUserByEmail("test@email");
   }
 
+  @Test
+  public void 유저정보변경성공() {
+    when(userDao.checkUserNickname("nickname")).thenReturn(false);
+    when(userDao.updateUserInfoByEmail(user)).thenReturn(true);
+
+    boolean isUpdated = userService.updateUserInfo(user);
+
+    Assertions.assertTrue(isUpdated);
+  }
 }

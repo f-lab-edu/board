@@ -43,4 +43,16 @@
     where email = #{email}
   </update>
 
+  <update id="updateUserInfoByEmail" parameterType="com.smart.user.domain.User">
+    UPDATE USER
+    SET
+    <if test="nickname != null and nickname != ''">
+        nickname = #{nickname},
+    </if>
+    <if test="password != null and password != ''">
+        password = #{password},
+    </if>
+    update_date = CURRENT_DATE
+    WHERE email = #{email}
+  </update>
 </mapper>

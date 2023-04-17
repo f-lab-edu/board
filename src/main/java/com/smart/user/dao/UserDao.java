@@ -20,4 +20,6 @@ public interface UserDao {
   boolean checkUserNickname(String nickname);
 
   void updateUserStatus(@Param("email")String email, @Param("userStatus") Status userStatus);
+
+  boolean updateUserInfoByEmail(User user);
 }

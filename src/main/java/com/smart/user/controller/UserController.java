@@ -3,6 +3,7 @@ package com.smart.user.controller;
 import com.smart.global.error.NotFoundUserException;
 import com.smart.user.controller.dto.UserDto;
 import com.smart.user.controller.dto.UserDto.UserInfo;
+import com.smart.user.domain.User;
 import com.smart.user.service.UserService;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,5 +54,18 @@ public class UserController {
     HttpHeaders headers = new HttpHeaders();
     headers.setLocation(URI.create("/auth"));
     return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+  }
+
+  @PutMapping("/update")
+  public ResponseEntity<Boolean> updateUserNickname(@RequestBody User user) {
+    boolean isUpdated = userService.updateUserInfo(user);
+    return ResponseEntity.ok(isUpdated);
+  }
+
+  @GetMapping("/checkNickname")
+  public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
+    //닉네임 중복체크
+    boolean isDuplicated = userService.isDuplicateNickName(nickname);
+    return ResponseEntity.ok(isDuplicated);
   }
 }
