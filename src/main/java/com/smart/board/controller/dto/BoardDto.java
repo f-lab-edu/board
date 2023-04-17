@@ -1,7 +1,7 @@
 package com.smart.board.controller.dto;
 
 import com.smart.board.domain.Board;
-import com.smart.comment.controller.dto.CommentDto.CommentInfo;
+import com.smart.comment.controller.dto.CommentDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -52,7 +52,7 @@ public class BoardDto {
 
     private BoardInfo boardInfo;
 
-    private List<CommentInfo> commentInfos;
+    private List<CommentDto.CommentInfo> commentInfos;
   }
 
   @Getter

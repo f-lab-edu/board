@@ -1,7 +1,6 @@
 package com.smart.board.controller;
 
 import com.smart.board.controller.dto.BoardDto;
-import com.smart.board.controller.dto.BoardDto.DeleteRequest;
 import com.smart.board.service.BoardService;
 import com.smart.user.domain.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -44,7 +43,7 @@ public class BoardController {
   }
 
   @DeleteMapping("/board")
-  public void deleteBoard(@RequestBody @Valid DeleteRequest request,
+  public void deleteBoard(@RequestBody @Valid BoardDto.DeleteRequest request,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
 
     boardService.deleteByBoardId(request, userDetails.getUserId());

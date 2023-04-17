@@ -1,6 +1,6 @@
 package com.smart.board.controller;
 
-import com.smart.board.controller.dto.BoardDto.BoardDetail;
+import com.smart.board.controller.dto.BoardDto;
 import com.smart.board.service.BoardService;
 import com.smart.comment.service.CommentService;
 import com.smart.user.domain.CustomUserDetails;
@@ -31,7 +31,7 @@ public class BoardViewController {
   @GetMapping("/board")
   public String showBoardDetailPage(Long boardId,
       @AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
-    BoardDetail boardDetail = boardService.getBoardDetailByBoardId(boardId);
+    BoardDto.BoardDetail boardDetail = boardService.getBoardDetailByBoardId(boardId);
     model.addAttribute("board", boardDetail.getBoardInfo());
     model.addAttribute("comments", boardDetail.getCommentInfos());
     model.addAttribute("userDetails", userDetails);

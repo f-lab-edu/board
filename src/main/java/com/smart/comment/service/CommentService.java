@@ -1,8 +1,6 @@
 package com.smart.comment.service;
 
-import com.smart.comment.controller.dto.CommentDto.CreateRequest;
-import com.smart.comment.controller.dto.CommentDto.DeleteRequest;
-import com.smart.comment.controller.dto.CommentDto.UpdateRequest;
+import com.smart.comment.controller.dto.CommentDto;
 import com.smart.comment.dao.CommentDao;
 import com.smart.comment.domain.Comment;
 import com.smart.global.error.NotFoundCommentException;
@@ -20,14 +18,14 @@ public class CommentService {
   }
 
   @Transactional
-  public Long createComment(CreateRequest request, Long loginUserId) {
+  public Long createComment(CommentDto.CreateRequest request, Long loginUserId) {
     Comment comment = request.toEntity(loginUserId);
     commentDao.createComment(comment);
     return comment.getCommentId();
   }
 
   @Transactional
-  public Long updateComment(UpdateRequest request, Long loginUserId) {
+  public Long updateComment(CommentDto.UpdateRequest request, Long loginUserId) {
     checkPermission(loginUserId, request.getUserId());
     checkExistComment(request.getCommentId());
     commentDao.updateComment(request.toEntity());
@@ -35,7 +33,7 @@ public class CommentService {
   }
 
   @Transactional
-  public void deleteByCommentId(DeleteRequest request, Long loginUserId) {
+  public void deleteByCommentId(CommentDto.DeleteRequest request, Long loginUserId) {
     checkPermission(loginUserId, request.getUserId());
     checkExistComment(request.getCommentId());
     commentDao.deleteByCommentId(request.getCommentId());

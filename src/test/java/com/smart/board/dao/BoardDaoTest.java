@@ -3,8 +3,6 @@ package com.smart.board.dao;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.smart.board.controller.dto.BoardDto;
-import com.smart.board.controller.dto.BoardDto.BoardInfo;
-import com.smart.board.controller.dto.BoardDto.UpdateRequest;
 import com.smart.board.domain.Board;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +43,7 @@ public class BoardDaoTest {
   public void getAllBoard_BoardInfos_ExistingBoard() {
     boardDao.createBoard(board);
 
-    List<BoardInfo> boardInfos = boardDao.getAllBoard();
+    List<BoardDto.BoardInfo> boardInfos = boardDao.getAllBoard();
 
     assertThat(boardInfos.isEmpty()).isFalse();
   }
@@ -53,7 +51,7 @@ public class BoardDaoTest {
   @Test
   @DisplayName("존재하지 않는 ID로 게시판 조회 시 null을 반환한다.")
   public void getBoardByBoardId_Null_NotExistingBoardId() {
-    Optional<BoardInfo> optionalBoardInfo = boardDao.getBoardByBoardId(-1L);
+    Optional<BoardDto.BoardInfo> optionalBoardInfo = boardDao.getBoardByBoardId(-1L);
 
     assertThat(optionalBoardInfo.isEmpty()).isTrue();
   }
@@ -63,7 +61,7 @@ public class BoardDaoTest {
   public void getBoardByBoardId_BoardInfo_ExistingBoardId() {
     boardDao.createBoard(board);
 
-    BoardInfo boardInfo = boardDao.getBoardByBoardId(board.getBoardId()).get();
+    BoardDto.BoardInfo boardInfo = boardDao.getBoardByBoardId(board.getBoardId()).get();
 
     assertThat(boardInfo).isNotNull();
     assertThat(boardInfo.getBoardId()).isEqualTo(board.getBoardId());
@@ -74,7 +72,7 @@ public class BoardDaoTest {
   public void updateViewCnt_NotExistingBoardId() {
     boardDao.updateViewCnt(-1L);
 
-    Optional<BoardInfo> optionalBoardInfo = boardDao.getBoardByBoardId(-1L);
+    Optional<BoardDto.BoardInfo> optionalBoardInfo = boardDao.getBoardByBoardId(-1L);
 
     assertThat(optionalBoardInfo.isEmpty()).isTrue();
   }
@@ -85,7 +83,7 @@ public class BoardDaoTest {
     boardDao.createBoard(board);
 
     boardDao.updateViewCnt(board.getBoardId());
-    BoardInfo boardInfo = boardDao.getBoardByBoardId(board.getBoardId()).get();
+    BoardDto.BoardInfo boardInfo = boardDao.getBoardByBoardId(board.getBoardId()).get();
 
     assertThat(boardInfo.getViewCount()).isEqualTo(board.getViewCount()+1);
   }
@@ -93,7 +91,7 @@ public class BoardDaoTest {
   @Test
   @DisplayName("생성하지 않은 게시글 업데이트하면 당연히 해당 게시물을 찾을 수 없다.")
   public void updateBoard_NotExistingBoard() {
-    Board updateBoard = UpdateRequest.builder()
+    Board updateBoard = BoardDto.UpdateRequest.builder()
         .boardId(-1L)
         .title("update title")
         .content("update content")
@@ -103,7 +101,7 @@ public class BoardDaoTest {
 
     boardDao.updateBoard(updateBoard);
 
-    Optional<BoardInfo> optionalBoardInfo = boardDao.getBoardByBoardId(-1L);
+    Optional<BoardDto.BoardInfo> optionalBoardInfo = boardDao.getBoardByBoardId(-1L);
     assertThat(optionalBoardInfo.isEmpty()).isTrue();
   }
 
@@ -111,7 +109,7 @@ public class BoardDaoTest {
   @DisplayName("게시글 업데이트 후 해당하는 게시글이 정상적으로 수정되었는지 확인한다.")
   public void updateBoard_ExistingBoard() {
     boardDao.createBoard(board);
-    Board updateBoard = UpdateRequest.builder()
+    Board updateBoard = BoardDto.UpdateRequest.builder()
         .boardId(board.getBoardId())
         .title("update title")
         .content("update content")
@@ -121,7 +119,7 @@ public class BoardDaoTest {
 
     boardDao.updateBoard(updateBoard);
 
-    BoardInfo boardInfo = boardDao.getBoardByBoardId(board.getBoardId()).get();
+    BoardDto.BoardInfo boardInfo = boardDao.getBoardByBoardId(board.getBoardId()).get();
     assertThat(boardInfo.getBoardId()).isEqualTo(updateBoard.getBoardId());
     assertThat(boardInfo.getTitle()).isEqualTo(updateBoard.getTitle());
     assertThat(boardInfo.getContent()).isEqualTo(updateBoard.getContent());

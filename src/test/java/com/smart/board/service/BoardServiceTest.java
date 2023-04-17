@@ -8,10 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.smart.board.controller.dto.BoardDto.BoardInfo;
-import com.smart.board.controller.dto.BoardDto.CreateRequest;
-import com.smart.board.controller.dto.BoardDto.DeleteRequest;
-import com.smart.board.controller.dto.BoardDto.UpdateRequest;
+import com.smart.board.controller.dto.BoardDto;
 import com.smart.board.dao.BoardDao;
 import com.smart.board.domain.Board;
 import com.smart.comment.dao.CommentDao;
@@ -36,11 +33,11 @@ public class BoardServiceTest {
 
   BoardService boardService;
 
-  BoardInfo boardInfo;
+  BoardDto.BoardInfo boardInfo;
 
-  UpdateRequest updateRequest;
+  BoardDto.UpdateRequest updateRequest;
 
-  DeleteRequest deleteRequest;
+  BoardDto.DeleteRequest deleteRequest;
 
   @BeforeEach
   public void inject_Mock() {
@@ -51,7 +48,7 @@ public class BoardServiceTest {
 
   @BeforeEach
   public void create_Test_Data() {
-    boardInfo = BoardInfo.builder()
+    boardInfo = BoardDto.BoardInfo.builder()
         .boardId(1L)
         .title("title")
         .content("content")
@@ -60,7 +57,7 @@ public class BoardServiceTest {
         .nickname("nickname")
         .build();
 
-    updateRequest = UpdateRequest
+    updateRequest = BoardDto.UpdateRequest
         .builder()
         .boardId(1L)
         .title("update title")
@@ -68,7 +65,7 @@ public class BoardServiceTest {
         .userId(1L)
         .build();
 
-    deleteRequest = DeleteRequest
+    deleteRequest = BoardDto.DeleteRequest
         .builder()
         .boardId(1L)
         .userId(1L)
@@ -80,7 +77,7 @@ public class BoardServiceTest {
   public void getAllBoard_EmptyList_NotExistingBoard() {
     when(boardDao.getAllBoard()).thenReturn(new ArrayList<>());
 
-    List<BoardInfo> boardLists = boardService.getAllBoard();
+    List<BoardDto.BoardInfo> boardLists = boardService.getAllBoard();
 
     verify(boardDao).getAllBoard();
     assertThat(boardLists.isEmpty()).isTrue();
@@ -89,11 +86,11 @@ public class BoardServiceTest {
   @DisplayName("모든 게시물들을 반환한다.")
   @Test
   public void getAllBoard_BoardInfos_ExistingBoard() {
-    List<BoardInfo> boardInfos = new ArrayList<>();
+    List<BoardDto.BoardInfo> boardInfos = new ArrayList<>();
     boardInfos.add(boardInfo);
     when(boardDao.getAllBoard()).thenReturn(boardInfos);
 
-    List<BoardInfo> retBoardLists = boardService.getAllBoard();
+    List<BoardDto.BoardInfo> retBoardLists = boardService.getAllBoard();
 
     verify(boardDao).getAllBoard();
     assertThat(boardInfos.size()).isEqualTo(retBoardLists.size());
@@ -113,7 +110,7 @@ public class BoardServiceTest {
   public void getBoardByBoardId_BoardInfo_ExistingBoardId() {
     when(boardDao.getBoardByBoardId(boardInfo.getBoardId())).thenReturn(Optional.ofNullable(boardInfo));
 
-    BoardInfo retBoardInfo = boardService.getBoardByBoardId(boardInfo.getBoardId());
+    BoardDto.BoardInfo retBoardInfo = boardService.getBoardByBoardId(boardInfo.getBoardId());
 
     verify(boardDao).getBoardByBoardId(boardInfo.getBoardId());
     assertThat(retBoardInfo.getBoardId()).isEqualTo(boardInfo.getBoardId());
@@ -145,7 +142,7 @@ public class BoardServiceTest {
     ArgumentCaptor<Board> createCaptor = ArgumentCaptor.forClass(Board.class);
     doNothing().when(boardDao).createBoard(createCaptor.capture());
 
-    CreateRequest createRequest = CreateRequest
+    BoardDto.CreateRequest createRequest = BoardDto.CreateRequest
         .builder()
         .title("title")
         .content("content")

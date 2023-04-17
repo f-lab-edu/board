@@ -1,13 +1,9 @@
 package com.smart.board.service;
 
-import com.smart.board.controller.dto.BoardDto.BoardDetail;
-import com.smart.board.controller.dto.BoardDto.BoardInfo;
-import com.smart.board.controller.dto.BoardDto.CreateRequest;
-import com.smart.board.controller.dto.BoardDto.DeleteRequest;
-import com.smart.board.controller.dto.BoardDto.UpdateRequest;
+import com.smart.board.controller.dto.BoardDto;
 import com.smart.board.dao.BoardDao;
 import com.smart.board.domain.Board;
-import com.smart.comment.controller.dto.CommentDto.CommentInfo;
+import com.smart.comment.controller.dto.CommentDto;
 import com.smart.comment.dao.CommentDao;
 import com.smart.global.error.NotFoundBoardException;
 import com.smart.global.error.PermissionDeniedException;
@@ -26,38 +22,38 @@ public class BoardService {
     this.commentDao = commentDao;
   }
 
-  public List<BoardInfo> getAllBoard() {
+  public List<BoardDto.BoardInfo> getAllBoard() {
     return boardDao.getAllBoard();
   }
 
-  public BoardInfo getBoardByBoardId(Long boardId) {
-    BoardInfo boardInfo = boardDao.getBoardByBoardId(boardId).orElseThrow(() -> {
+  public BoardDto.BoardInfo getBoardByBoardId(Long boardId) {
+    BoardDto.BoardInfo boardInfo = boardDao.getBoardByBoardId(boardId).orElseThrow(() -> {
       throw new NotFoundBoardException();
     });
     return boardInfo;
   }
 
-  public BoardDetail getBoardDetailByBoardId(Long boardId) {
+  public BoardDto.BoardDetail getBoardDetailByBoardId(Long boardId) {
     boardDao.updateViewCnt(boardId);
-    BoardInfo boardInfo = boardDao.getBoardByBoardId(boardId).orElseThrow(() -> {
+    BoardDto.BoardInfo boardInfo = boardDao.getBoardByBoardId(boardId).orElseThrow(() -> {
       throw new NotFoundBoardException();
     });
-    List<CommentInfo> commentInfos = commentDao.getCommentsByBoardId(boardId);
-    return BoardDetail.builder()
+    List<CommentDto.CommentInfo> commentInfos = commentDao.getCommentsByBoardId(boardId);
+    return BoardDto.BoardDetail.builder()
         .boardInfo(boardInfo)
         .commentInfos(commentInfos)
         .build();
   }
 
   @Transactional
-  public Long createBoard(CreateRequest request, Long loginUserId) {
+  public Long createBoard(BoardDto.CreateRequest request, Long loginUserId) {
     Board board = request.toEntity(loginUserId);
     boardDao.createBoard(board);
     return board.getBoardId();
   }
 
   @Transactional
-  public Long updateBoard(UpdateRequest request, Long loginUserId) {
+  public Long updateBoard(BoardDto.UpdateRequest request, Long loginUserId) {
     checkPermission(loginUserId, request.getUserId());
     checkExistBoard(request.getBoardId());
     boardDao.updateBoard(request.toEntity());
@@ -65,7 +61,7 @@ public class BoardService {
   }
 
   @Transactional
-  public void deleteByBoardId(DeleteRequest request, Long loginUserId) {
+  public void deleteByBoardId(BoardDto.DeleteRequest request, Long loginUserId) {
     checkPermission(loginUserId, request.getUserId());
     checkExistBoard(request.getBoardId());
     commentDao.deleteByBoardId(request.getBoardId());

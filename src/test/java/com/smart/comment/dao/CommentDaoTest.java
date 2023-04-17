@@ -3,7 +3,6 @@ package com.smart.comment.dao;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.smart.comment.controller.dto.CommentDto;
-import com.smart.comment.controller.dto.CommentDto.CommentInfo;
 import com.smart.comment.domain.Comment;
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +43,7 @@ public class CommentDaoTest {
   public void getCommentsByBoardId_CommentInfos_ExistingComments() {
     commentDao.createComment(comment);
 
-    List<CommentInfo> commentInfos = commentDao.getCommentsByBoardId(comment.getBoardId());
+    List<CommentDto.CommentInfo> commentInfos = commentDao.getCommentsByBoardId(comment.getBoardId());
 
     assertThat(commentInfos.isEmpty()).isFalse();
   }
@@ -52,7 +51,7 @@ public class CommentDaoTest {
   @Test
   @DisplayName("존재하지 않는 게시판 ID로 댓글 조회 시 비어있는 List를 반환한다.")
   public void getCommentsByBoardId_EmptyList_NotExistingBoardId() {
-    List<CommentInfo> commentInfos = commentDao.getCommentsByBoardId(-1L);
+    List<CommentDto.CommentInfo> commentInfos = commentDao.getCommentsByBoardId(-1L);
 
     assertThat(commentInfos.isEmpty()).isTrue();
   }
@@ -72,7 +71,7 @@ public class CommentDaoTest {
   public void getCommentByCommentId_CommentInfo_ExistingCommentId() {
     commentDao.createComment(comment);
 
-    CommentInfo commentInfo = commentDao.getCommentByCommentId(comment.getCommentId()).get();
+    CommentDto.CommentInfo commentInfo = commentDao.getCommentByCommentId(comment.getCommentId()).get();
 
     assertThat(commentInfo).isNotNull();
     assertThat(commentInfo.getCommentId()).isEqualTo(comment.getCommentId());
@@ -90,7 +89,7 @@ public class CommentDaoTest {
 
     commentDao.updateComment(updateComment);
 
-    Optional<CommentInfo> optionalCommentInfo = commentDao.getCommentByCommentId(-1L);
+    Optional<CommentDto.CommentInfo> optionalCommentInfo = commentDao.getCommentByCommentId(-1L);
     assertThat(optionalCommentInfo.isEmpty()).isTrue();
   }
 
@@ -107,7 +106,7 @@ public class CommentDaoTest {
 
     commentDao.updateComment(updateComment);
 
-    CommentInfo commentInfo = commentDao.getCommentByCommentId(comment.getCommentId()).get();
+    CommentDto.CommentInfo commentInfo = commentDao.getCommentByCommentId(comment.getCommentId()).get();
     assertThat(commentInfo.getCommentId()).isEqualTo(updateComment.getCommentId());
     assertThat(commentInfo.getContent()).isEqualTo(updateComment.getContent());
   }
