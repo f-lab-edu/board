@@ -39,17 +39,13 @@ public class BoardViewController {
   }
 
   @GetMapping("/board/create")
-  public String showBoardCreatePage(@AuthenticationPrincipal CustomUserDetails userDetails,
-      Model model) {
-    model.addAttribute("userDetails", userDetails);
+  public String showBoardCreatePage() {
     return "boardCreate";
   }
 
   @GetMapping("/board/update")
-  public String showBoardUpdatePage(Long boardId,
-      @AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+  public String showBoardUpdatePage(Long boardId, Model model) {
     model.addAttribute("board", boardService.getBoardByBoardId(boardId));
-    model.addAttribute("userDetails", userDetails);
     return "boardUpdate";
   }
 }

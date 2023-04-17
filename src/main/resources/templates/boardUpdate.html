@@ -67,9 +67,7 @@
 <hr>
 
 <div class="row">
-  <span th:if="${userDetails != null && userDetails.userId == board.userId}">
-    <button type="button" th:onclick="updateBoard([[${board}]])">저장하기</button>
-  </span>
+  <button type="button" th:onclick="updateBoard([[${board}]])">저장하기</button>
   <button th:onclick="|location.href='@{/boards}'|">목록으로</button>
 </div>
 
