@@ -14,5 +14,5 @@ public interface UserService {
 
   boolean updateUserInfo(User user);
 
-  boolean isDuplicateNickName(String nickname);
+  boolean isDuplicateNickname(String nickname);
 }

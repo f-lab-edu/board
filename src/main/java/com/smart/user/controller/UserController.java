@@ -62,10 +62,10 @@ public class UserController {
     return ResponseEntity.ok(isUpdated);
   }
 
-  @GetMapping("/checkNickname")
+  @GetMapping("/check-nickname")
   public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
     //닉네임 중복체크
-    boolean isDuplicated = userService.isDuplicateNickName(nickname);
+    boolean isDuplicated = userService.isDuplicateNickname(nickname);
     return ResponseEntity.ok(isDuplicated);
   }
 }

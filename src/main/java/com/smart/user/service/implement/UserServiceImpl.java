@@ -12,7 +12,6 @@ import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
 import com.smart.user.service.UserService;
 import jakarta.servlet.http.HttpSession;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -86,7 +85,7 @@ public class UserServiceImpl implements UserService {
 
 
   @Override
-  public boolean isDuplicateNickName(String nickname) {
+  public boolean isDuplicateNickname(String nickname) {
     return userDao.checkUserNickname(nickname);
   }
 }
