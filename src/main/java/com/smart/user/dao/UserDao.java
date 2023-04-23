@@ -1,5 +1,6 @@
 package com.smart.user.dao;
 
+import com.smart.user.controller.dto.UserDto.UserInfo;
 import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
 import java.util.Optional;

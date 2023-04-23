@@ -6,7 +6,7 @@ import com.smart.user.domain.User;
 
 public interface UserService {
 
-  void join(UserDto.JoinRequest request);
+  User join(UserDto.JoinRequest request);
 
   void verifyAuthCode(String email, String authCode);
 

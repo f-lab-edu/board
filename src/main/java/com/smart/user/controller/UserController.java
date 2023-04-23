@@ -41,9 +41,9 @@ public class UserController {
   }
 
   @PostMapping("/join")
-  @ResponseStatus(HttpStatus.CREATED)
-  public void join(@RequestBody @Valid UserDto.JoinRequest request) {
-    userService.join(request);
+  public ResponseEntity<User> join(@RequestBody @Valid UserDto.JoinRequest request) {
+    User user = userService.join(request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(user);
   }
 
   @GetMapping("/join-auth")

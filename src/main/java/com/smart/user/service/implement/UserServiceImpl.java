@@ -35,18 +35,21 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public void join(UserDto.JoinRequest request) {
+  public User join(UserDto.JoinRequest request) {
     if (userDao.checkUserMail(request.getEmail())) {
       throw new DuplicatedUserEmailException();
     }
     if (userDao.checkUserNickname(request.getNickname())) {
       throw new DuplicatedUserNicknameException();
     }
-    userDao.joinUser(request.toEntity());
 
     String code = makeAuthCode();
     saveAuthCode(request.getEmail(), code);
     eventPublisher.publishEvent(new MailAuthEvent(request.getEmail(), code));
+
+    User user = request.toEntity();
+    userDao.joinUser(user);
+    return user;
   }
 
   private String makeAuthCode() {
