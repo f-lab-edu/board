@@ -44,6 +44,7 @@ public class UserServiceImpl implements UserService {
     }
 
     String code = makeAuthCode();
+    System.out.println("code:"+code);
     saveAuthCode(request.getEmail(), code);
     eventPublisher.publishEvent(new MailAuthEvent(request.getEmail(), code));
 
@@ -62,14 +63,16 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void verifyAuthCode(String email, String authCode) {
-    if (authCode.equals((String) session.getAttribute(email))) {
-      session.removeAttribute(email);
-      userDao.updateUserStatus(email, Status.NORMAL);
-    } else {
+  public boolean verifyAuthCode(String email, String authCode) {
+    String storedAuthCode = (String) session.getAttribute(email);
+    if (storedAuthCode == null || !storedAuthCode.equals(authCode)) {
       throw new IllegalAuthCodeException();
     }
+    session.removeAttribute(email);
+    userDao.updateUserStatus(email, Status.NORMAL);
+    return true;
   }
+
   @Override
   public UserInfo getUserByEmail(String email) {
     User user = userDao.getUserByEmail(email)

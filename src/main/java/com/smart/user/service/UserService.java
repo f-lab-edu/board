@@ -8,7 +8,7 @@ public interface UserService {
 
   User join(UserDto.JoinRequest request);
 
-  void verifyAuthCode(String email, String authCode);
+  boolean verifyAuthCode(String email, String authCode);
 
   UserInfo getUserByEmail(String email);
 
