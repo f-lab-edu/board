@@ -1,4 +1,4 @@
-package com.smart.board.dao;
+package com.smart.board.repository;
 
 import com.smart.board.controller.dto.post.PostReadDto;
 import com.smart.board.domain.Post;
@@ -7,19 +7,19 @@ import java.util.Optional;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface PostDao {
+public interface PostRepository {
 
-  List<PostReadDto> getAllPost();
+  List<PostReadDto> findAll();
 
-  Optional<PostReadDto> getPostByPostId(Long postId);
+  Optional<PostReadDto> findByPostId(Long postId);
 
   void updateViewCnt(Long postId);
 
-  void createPost(Post post);
+  void save(Post post);
 
-  void updatePost(Post post);
+  void update(Post post);
 
   void deleteByPostId(Long postId);
 
-  boolean checkPostId(Long postId);
+  boolean existsByPostId(Long postId);
 }

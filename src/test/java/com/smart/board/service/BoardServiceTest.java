@@ -18,8 +18,8 @@ import com.smart.board.controller.dto.post.PostCreateDto;
 import com.smart.board.controller.dto.post.PostDeleteDto;
 import com.smart.board.controller.dto.post.PostReadDto;
 import com.smart.board.controller.dto.post.PostUpdateDto;
-import com.smart.board.dao.CommentDao;
-import com.smart.board.dao.PostDao;
+import com.smart.board.repository.CommentRepository;
+import com.smart.board.repository.PostRepository;
 import com.smart.board.domain.Comment;
 import com.smart.board.domain.Post;
 import com.smart.global.error.NotFoundEntityException;
@@ -38,27 +38,27 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class BoardServiceTest {
 
-  PostDao postDao;
+  PostRepository postRepository;
 
-  CommentDao commentDao;
+  CommentRepository commentRepository;
 
   BoardService boardService;
 
   @BeforeEach
   public void inject_Mock() {
-    postDao = mock(PostDao.class);
-    commentDao = mock(CommentDao.class);
-    boardService = new BoardService(postDao, commentDao);
+    postRepository = mock(PostRepository.class);
+    commentRepository = mock(CommentRepository.class);
+    boardService = new BoardService(postRepository, commentRepository);
   }
 
   @DisplayName("게시물 없다면 비어있는 게시판 목록을 반환한다.")
   @Test
   public void getBoardList_EmptyList_NotExistingPost() {
-    when(postDao.getAllPost()).thenReturn(new ArrayList<>());
+    when(postRepository.findAll()).thenReturn(new ArrayList<>());
 
     BoardListDto boardList = boardService.getBoardList();
 
-    verify(postDao).getAllPost();
+    verify(postRepository).findAll();
     assertThat(boardList.getPostDtos().isEmpty()).isTrue();
   }
 
@@ -68,11 +68,11 @@ public class BoardServiceTest {
     List<PostReadDto> postReadDtos = new ArrayList<>();
     PostReadDto postReadDto = PostReadDto.builder().build();
     postReadDtos.add(postReadDto);
-    when(postDao.getAllPost()).thenReturn(postReadDtos);
+    when(postRepository.findAll()).thenReturn(postReadDtos);
 
     BoardListDto boardList = boardService.getBoardList();
 
-    verify(postDao).getAllPost();
+    verify(postRepository).findAll();
     assertThat(boardList.getPostDtos().size()).isEqualTo(postReadDtos.size());
     assertThat(postReadDto).isIn(boardList.getPostDtos());
   }
@@ -91,11 +91,11 @@ public class BoardServiceTest {
     PostReadDto testPostReadDto = PostReadDto.builder()
         .postId(1L)
         .build();
-    when(postDao.getPostByPostId(1L)).thenReturn(Optional.ofNullable(testPostReadDto));
+    when(postRepository.findByPostId(1L)).thenReturn(Optional.ofNullable(testPostReadDto));
 
     PostReadDto retPostReadDto = boardService.getPostByPostId(1L);
 
-    verify(postDao).getPostByPostId(1L);
+    verify(postRepository).findByPostId(1L);
     assertThat(retPostReadDto.getPostId()).isEqualTo(1L);
   }
 
@@ -105,11 +105,11 @@ public class BoardServiceTest {
     PostReadDto testPostReadDto = PostReadDto.builder()
         .postId(1L)
         .build();
-    when(postDao.getPostByPostId(1L)).thenReturn(Optional.ofNullable(testPostReadDto));
+    when(postRepository.findByPostId(1L)).thenReturn(Optional.ofNullable(testPostReadDto));
 
     boardService.getBoardDetailByPostId(1L);
 
-    verify(postDao).updateViewCnt(1L);
+    verify(postRepository).updateViewCnt(1L);
   }
 
   @DisplayName("게시판 상세를 조회하면 해당 게시물을 조회한다.")
@@ -118,11 +118,11 @@ public class BoardServiceTest {
     PostReadDto testPostReadDto = PostReadDto.builder()
         .postId(1L)
         .build();
-    when(postDao.getPostByPostId(1L)).thenReturn(Optional.ofNullable(testPostReadDto));
+    when(postRepository.findByPostId(1L)).thenReturn(Optional.ofNullable(testPostReadDto));
 
     BoardDetailDto boardDetailDto = boardService.getBoardDetailByPostId(1L);
 
-    verify(postDao).getPostByPostId(1L);
+    verify(postRepository).findByPostId(1L);
     assertThat(boardDetailDto.getPostDto().getPostId()).isEqualTo(1L);
   }
 
@@ -133,16 +133,16 @@ public class BoardServiceTest {
     PostReadDto testPostReadDto = PostReadDto.builder()
         .postId(1L)
         .build();
-    when(postDao.getPostByPostId(1L)).thenReturn(Optional.ofNullable(testPostReadDto));
+    when(postRepository.findByPostId(1L)).thenReturn(Optional.ofNullable(testPostReadDto));
     CommentReadDto commentReadDto = CommentReadDto.builder()
         .commentId(1L)
         .postId(1L)
         .build();
-    when(commentDao.getCommentsByPostId(1L)).thenReturn(Arrays.asList(commentReadDto));
+    when(commentRepository.findByPostId(1L)).thenReturn(Arrays.asList(commentReadDto));
 
     BoardDetailDto boardDetailDto = boardService.getBoardDetailByPostId(1L);
 
-    verify(commentDao).getCommentsByPostId(1L);
+    verify(commentRepository).findByPostId(1L);
     assertThat(commentReadDto).isIn(boardDetailDto.getCommentDtos());
   }
 
@@ -150,7 +150,7 @@ public class BoardServiceTest {
   @Test
   public void createPost() {
     ArgumentCaptor<Post> createCaptor = ArgumentCaptor.forClass(Post.class);
-    doNothing().when(postDao).createPost(createCaptor.capture());
+    doNothing().when(postRepository).save(createCaptor.capture());
 
     PostCreateDto createDto = PostCreateDto
         .builder()
@@ -159,7 +159,7 @@ public class BoardServiceTest {
         .build();
     boardService.createPost(createDto, 1L);
 
-    verify(postDao).createPost(any(Post.class));
+    verify(postRepository).save(any(Post.class));
     assertThat(createDto.getTitle()).isEqualTo(createCaptor.getValue().getTitle());
     assertThat(createDto.getContent()).isEqualTo(createCaptor.getValue().getContent());
   }
@@ -183,7 +183,7 @@ public class BoardServiceTest {
         .userId(1L)
         .build();
 
-    when(postDao.checkPostId(updateDto.getPostId())).thenReturn(false);
+    when(postRepository.existsByPostId(updateDto.getPostId())).thenReturn(false);
 
     assertThatThrownBy(() -> boardService.updatePost(updateDto, 1L))
         .isInstanceOf(NotFoundEntityException.class);
@@ -199,13 +199,13 @@ public class BoardServiceTest {
         .userId(1L)
         .build();
 
-    when(postDao.checkPostId(updateDto.getPostId())).thenReturn(true);
+    when(postRepository.existsByPostId(updateDto.getPostId())).thenReturn(true);
     ArgumentCaptor<Post> updateCaptor = ArgumentCaptor.forClass(Post.class);
-    doNothing().when(postDao).updatePost(updateCaptor.capture());
+    doNothing().when(postRepository).update(updateCaptor.capture());
 
     boardService.updatePost(updateDto, 1L);
 
-    verify(postDao).updatePost(any(Post.class));
+    verify(postRepository).update(any(Post.class));
     assertThat(updateDto.getPostId()).isEqualTo(updateCaptor.getValue().getPostId());
     assertThat(updateDto.getTitle()).isEqualTo(updateCaptor.getValue().getTitle());
     assertThat(updateDto.getContent()).isEqualTo(updateCaptor.getValue().getContent());
@@ -228,7 +228,7 @@ public class BoardServiceTest {
         .postId(1L)
         .userId(1L)
         .build();
-    when(postDao.checkPostId(deleteDto.getPostId())).thenReturn(false);
+    when(postRepository.existsByPostId(deleteDto.getPostId())).thenReturn(false);
 
     assertThatThrownBy(() -> boardService.deletePost(deleteDto, 1L))
         .isInstanceOf(NotFoundEntityException.class);
@@ -241,11 +241,11 @@ public class BoardServiceTest {
         .postId(1L)
         .userId(1L)
         .build();
-    when(postDao.checkPostId(deleteDto.getPostId())).thenReturn(true);
+    when(postRepository.existsByPostId(deleteDto.getPostId())).thenReturn(true);
 
     boardService.deletePost(deleteDto, 1L);
 
-    verify(postDao).deleteByPostId(deleteDto.getPostId());
+    verify(postRepository).deleteByPostId(deleteDto.getPostId());
   }
 
   @DisplayName("존재하는 게시물을 삭제 시 댓글도 삭제한다.")
@@ -255,18 +255,18 @@ public class BoardServiceTest {
         .postId(1L)
         .userId(1L)
         .build();
-    when(postDao.checkPostId(deleteDto.getPostId())).thenReturn(true);
+    when(postRepository.existsByPostId(deleteDto.getPostId())).thenReturn(true);
 
     boardService.deletePost(deleteDto, 1L);
 
-    verify(commentDao).deleteByPostId(deleteDto.getPostId());
+    verify(commentRepository).deleteByPostId(deleteDto.getPostId());
   }
 
   @DisplayName("댓글을 생성한다.")
   @Test
   public void createComment() {
     ArgumentCaptor<Comment> createCaptor = ArgumentCaptor.forClass(Comment.class);
-    doNothing().when(commentDao).createComment(createCaptor.capture());
+    doNothing().when(commentRepository).save(createCaptor.capture());
 
     CommentCreateDto createDto = CommentCreateDto
         .builder()
@@ -274,7 +274,7 @@ public class BoardServiceTest {
         .build();
     boardService.createComment(createDto, 1L);
 
-    verify(commentDao).createComment(any(Comment.class));
+    verify(commentRepository).save(any(Comment.class));
     assertThat(createDto.getContent()).isEqualTo(createCaptor.getValue().getContent());
   }
 
@@ -296,7 +296,7 @@ public class BoardServiceTest {
         .commentId(1L)
         .build();
 
-    when(commentDao.checkCommentId(updateDto.getCommentId())).thenReturn(false);
+    when(commentRepository.existsByCommentId(updateDto.getCommentId())).thenReturn(false);
 
     assertThatThrownBy(() -> boardService.updateComment(updateDto, 1L))
         .isInstanceOf(NotFoundEntityException.class);
@@ -311,13 +311,13 @@ public class BoardServiceTest {
         .commentId(1L)
         .build();
 
-    when(commentDao.checkCommentId(updateDto.getCommentId())).thenReturn(true);
+    when(commentRepository.existsByCommentId(updateDto.getCommentId())).thenReturn(true);
     ArgumentCaptor<Comment> updateCaptor = ArgumentCaptor.forClass(Comment.class);
-    doNothing().when(commentDao).updateComment(updateCaptor.capture());
+    doNothing().when(commentRepository).update(updateCaptor.capture());
 
     boardService.updateComment(updateDto, 1L);
 
-    verify(commentDao).updateComment(any(Comment.class));
+    verify(commentRepository).update(any(Comment.class));
     assertThat(updateDto.getCommentId()).isEqualTo(updateCaptor.getValue().getCommentId());
     assertThat(updateDto.getContent()).isEqualTo(updateCaptor.getValue().getContent());
   }
@@ -340,7 +340,7 @@ public class BoardServiceTest {
         .commentId(1L)
         .userId(1L)
         .build();
-    when(commentDao.checkCommentId(deleteDto.getCommentId())).thenReturn(false);
+    when(commentRepository.existsByCommentId(deleteDto.getCommentId())).thenReturn(false);
 
     assertThatThrownBy(() -> boardService.deleteComment(deleteDto, 1L))
         .isInstanceOf(NotFoundEntityException.class);
@@ -353,10 +353,10 @@ public class BoardServiceTest {
         .commentId(1L)
         .userId(1L)
         .build();
-    when(commentDao.checkCommentId(deleteDto.getCommentId())).thenReturn(true);
+    when(commentRepository.existsByCommentId(deleteDto.getCommentId())).thenReturn(true);
 
     boardService.deleteComment(deleteDto, 1L);
 
-    verify(commentDao).deleteByCommentId(deleteDto.getCommentId());
+    verify(commentRepository).deleteByCommentId(deleteDto.getCommentId());
   }
 }

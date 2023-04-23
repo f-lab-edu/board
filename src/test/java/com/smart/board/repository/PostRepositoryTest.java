@@ -1,4 +1,4 @@
-package com.smart.board.dao;
+package com.smart.board.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,10 +18,10 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 
 @MybatisTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class PostDaoTest {
+public class PostRepositoryTest {
 
   @Autowired
-  private PostDao postDao;
+  private PostRepository postRepository;
 
   Post post;
 
@@ -37,21 +37,21 @@ public class PostDaoTest {
 
   @AfterEach
   public void delete_Test_Data() {
-    postDao.deleteByPostId(post.getPostId());
+    postRepository.deleteByPostId(post.getPostId());
   }
 
   @Test
   @DisplayName("게시물 생성 후 게시글 전체 조회 시 게시물이 담긴 List를 반환한다.")
   public void getAllPost_PostReadDtos_ExistingPost() {
-    postDao.createPost(post);
+    postRepository.save(post);
 
-    List<PostReadDto> allPost = postDao.getAllPost();
+    List<PostReadDto> allPost = postRepository.findAll();
   }
 
   @Test
   @DisplayName("존재하지 않는 ID로 게시글 조회 시 null을 반환한다.")
   public void getPostByPostId_Null_NotExistingPostId() {
-    Optional<PostReadDto> optionalPostReadDto = postDao.getPostByPostId(-1L);
+    Optional<PostReadDto> optionalPostReadDto = postRepository.findByPostId(-1L);
 
     assertThat(optionalPostReadDto.isEmpty()).isTrue();
   }
@@ -59,9 +59,9 @@ public class PostDaoTest {
   @Test
   @DisplayName("게시물 생성 후 반환된 ID로 게시물을 조회한다.")
   public void getPostByPostId_PostReadDto_ExistingPostId() {
-    postDao.createPost(post);
+    postRepository.save(post);
 
-    PostReadDto postReadDto = postDao.getPostByPostId(post.getPostId()).get();
+    PostReadDto postReadDto = postRepository.findByPostId(post.getPostId()).get();
 
     assertThat(postReadDto).isNotNull();
     assertThat(postReadDto.getPostId()).isEqualTo(post.getPostId());
@@ -70,9 +70,9 @@ public class PostDaoTest {
   @Test
   @DisplayName("존재하지 않는 게시물 조회수를 업데이트 한다.")
   public void updateViewCnt_NotExistingPostId() {
-    postDao.updateViewCnt(-1L);
+    postRepository.updateViewCnt(-1L);
 
-    Optional<PostReadDto> optionalPostReadDto = postDao.getPostByPostId(-1L);
+    Optional<PostReadDto> optionalPostReadDto = postRepository.findByPostId(-1L);
 
     assertThat(optionalPostReadDto.isEmpty()).isTrue();
   }
@@ -80,10 +80,10 @@ public class PostDaoTest {
   @Test
   @DisplayName("게시물 생성 후 반환된 ID로 게시물 조회수를 업데이트 한다.")
   public void updateViewCnt_ExistingPostId() {
-    postDao.createPost(post);
+    postRepository.save(post);
 
-    postDao.updateViewCnt(post.getPostId());
-    PostReadDto postReadDto = postDao.getPostByPostId(post.getPostId()).get();
+    postRepository.updateViewCnt(post.getPostId());
+    PostReadDto postReadDto = postRepository.findByPostId(post.getPostId()).get();
 
     assertThat(postReadDto.getViewCount()).isEqualTo(post.getViewCount() + 1);
   }
@@ -99,16 +99,16 @@ public class PostDaoTest {
         .build()
         .toEntity();
 
-    postDao.updatePost(updatePost);
+    postRepository.update(updatePost);
 
-    Optional<PostReadDto> optionalPostReadDto = postDao.getPostByPostId(-1L);
+    Optional<PostReadDto> optionalPostReadDto = postRepository.findByPostId(-1L);
     assertThat(optionalPostReadDto.isEmpty()).isTrue();
   }
 
   @Test
   @DisplayName("게시글 업데이트 후 해당하는 게시글이 정상적으로 수정되었는지 확인한다.")
   public void updateBoard_ExistingBoard() {
-    postDao.createPost(post);
+    postRepository.save(post);
     Post updateBoard = PostUpdateDto.builder()
         .postId(post.getPostId())
         .title("update title")
@@ -117,9 +117,9 @@ public class PostDaoTest {
         .build()
         .toEntity();
 
-    postDao.updatePost(updateBoard);
+    postRepository.update(updateBoard);
 
-    PostReadDto postReadDto = postDao.getPostByPostId(post.getPostId()).get();
+    PostReadDto postReadDto = postRepository.findByPostId(post.getPostId()).get();
     assertThat(postReadDto.getPostId()).isEqualTo(updateBoard.getPostId());
     assertThat(postReadDto.getTitle()).isEqualTo(updateBoard.getTitle());
     assertThat(postReadDto.getContent()).isEqualTo(updateBoard.getContent());
@@ -128,10 +128,10 @@ public class PostDaoTest {
   @Test
   @DisplayName("게시글 삭제 후 해당 게시글이 삭제되었는지 확인한다.")
   public void deleteByPostId_ExistingPostId() {
-    postDao.createPost(post);
+    postRepository.save(post);
 
-    postDao.deleteByPostId(post.getPostId());
+    postRepository.deleteByPostId(post.getPostId());
 
-    assertThat(postDao.checkPostId(post.getPostId())).isFalse();
+    assertThat(postRepository.existsByPostId(post.getPostId())).isFalse();
   }
 }

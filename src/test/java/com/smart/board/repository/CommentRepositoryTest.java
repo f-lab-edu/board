@@ -1,4 +1,4 @@
-package com.smart.board.dao;
+package com.smart.board.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,10 +18,10 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 
 @MybatisTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class CommentDaoTest {
+public class CommentRepositoryTest {
 
   @Autowired
-  private CommentDao commentDao;
+  private CommentRepository commentRepository;
 
   Comment comment;
 
@@ -37,16 +37,16 @@ public class CommentDaoTest {
 
   @AfterEach
   public void delete_Test_Data() {
-    commentDao.deleteByCommentId(comment.getCommentId());
+    commentRepository.deleteByCommentId(comment.getCommentId());
   }
 
   @Test
   @DisplayName("댓글 생성 후 게시글 ID로 댓글 조회 시 댓글이 담긴 List를 반환한다.")
   public void getCommentsByPostId_CommentInfos_ExistingComments() {
-    commentDao.createComment(comment);
+    commentRepository.save(comment);
 
-    List<CommentReadDto> commentReadDtos = commentDao
-        .getCommentsByPostId(comment.getPostId());
+    List<CommentReadDto> commentReadDtos = commentRepository
+        .findByPostId(comment.getPostId());
 
     assertThat(commentReadDtos.isEmpty()).isFalse();
   }
@@ -54,7 +54,7 @@ public class CommentDaoTest {
   @Test
   @DisplayName("존재하지 않는 게시글 ID로 댓글 조회 시 비어있는 List를 반환한다.")
   public void getCommentsByPostId_EmptyList_NotExistingPostId() {
-    List<CommentReadDto> commentReadDtos = commentDao.getCommentsByPostId(-1L);
+    List<CommentReadDto> commentReadDtos = commentRepository.findByPostId(-1L);
 
     assertThat(commentReadDtos.isEmpty()).isTrue();
   }
@@ -62,19 +62,19 @@ public class CommentDaoTest {
   @Test
   @DisplayName("게시글에 해당하는 댓글 삭제 후 댓글이 전부 삭제되었는지 확인한다.")
   public void deleteByPostId_EmptyList_ExistingPostId() {
-    commentDao.createComment(comment);
+    commentRepository.save(comment);
 
-    commentDao.deleteByPostId(comment.getPostId());
+    commentRepository.deleteByPostId(comment.getPostId());
 
-    assertThat(commentDao.getCommentsByPostId(comment.getPostId())).isEmpty();
+    assertThat(commentRepository.findByPostId(comment.getPostId())).isEmpty();
   }
 
   @Test
   @DisplayName("댓글 생성 후 반환된 ID로 댓글을 조회한다.")
   public void getCommentByCommentId_CommentInfo_ExistingCommentId() {
-    commentDao.createComment(comment);
+    commentRepository.save(comment);
 
-    CommentReadDto commentReadDto = commentDao.getCommentByCommentId(comment.getCommentId())
+    CommentReadDto commentReadDto = commentRepository.findByCommentId(comment.getCommentId())
         .get();
 
     assertThat(commentReadDto).isNotNull();
@@ -91,16 +91,16 @@ public class CommentDaoTest {
         .build()
         .toEntity();
 
-    commentDao.updateComment(updateComment);
+    commentRepository.update(updateComment);
 
-    Optional<CommentReadDto> optionalCommentReadDto = commentDao.getCommentByCommentId(-1L);
+    Optional<CommentReadDto> optionalCommentReadDto = commentRepository.findByCommentId(-1L);
     assertThat(optionalCommentReadDto.isEmpty()).isTrue();
   }
 
   @Test
   @DisplayName("댓글을 업데이트 후 해당하는 댓글이 정상적으로 수정되었는지 확인한다.")
   public void updateComment_ExistingComment() {
-    commentDao.createComment(comment);
+    commentRepository.save(comment);
     Comment updateComment = CommentUpdateDto.builder()
         .commentId(comment.getCommentId())
         .content("update content")
@@ -108,9 +108,9 @@ public class CommentDaoTest {
         .build()
         .toEntity();
 
-    commentDao.updateComment(updateComment);
+    commentRepository.update(updateComment);
 
-    CommentReadDto commentReadDto = commentDao.getCommentByCommentId(comment.getCommentId())
+    CommentReadDto commentReadDto = commentRepository.findByCommentId(comment.getCommentId())
         .get();
     assertThat(commentReadDto.getCommentId()).isEqualTo(updateComment.getCommentId());
     assertThat(commentReadDto.getContent()).isEqualTo(updateComment.getContent());
@@ -119,10 +119,10 @@ public class CommentDaoTest {
   @Test
   @DisplayName("댓글 삭제 후 해당 댓글이 삭제되었는지 확인한다.")
   public void deleteByCommentId_ExistingComment() {
-    commentDao.createComment(comment);
+    commentRepository.save(comment);
 
-    commentDao.deleteByCommentId(comment.getCommentId());
+    commentRepository.deleteByCommentId(comment.getCommentId());
 
-    assertThat(commentDao.checkCommentId(comment.getCommentId())).isFalse();
+    assertThat(commentRepository.existsByCommentId(comment.getCommentId())).isFalse();
   }
 }

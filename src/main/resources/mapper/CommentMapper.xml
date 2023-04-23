@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.smart.board.dao.CommentDao">
+<mapper namespace="com.smart.board.repository.CommentRepository">
 
-  <select id="getCommentsByPostId" parameterType="Long"
+  <select id="findByPostId" parameterType="Long"
     resultType="com.smart.board.controller.dto.comment.CommentReadDto">
     select c.comment_id,
            c.content,
@@ -24,7 +24,7 @@
     where post_id = #{postId}
   </delete>
 
-  <select id="getCommentByCommentId" parameterType="Long"
+  <select id="findByCommentId" parameterType="Long"
     resultType="com.smart.board.controller.dto.comment.CommentReadDto">
     select c.comment_id,
            c.content,
@@ -38,14 +38,14 @@
     where comment_id = #{commentId};
   </select>
 
-  <insert id="createComment" parameterType="com.smart.board.domain.Comment"
+  <insert id="save" parameterType="com.smart.board.domain.Comment"
     useGeneratedKeys="true"
     keyProperty="commentId">
     insert into comment (comment_id, content, create_date, post_id, user_id)
     values (#{commentId}, #{content}, #{createDate}, #{postId}, #{userId})
   </insert>
 
-  <update id="updateComment" parameterType="com.smart.board.domain.Comment">
+  <update id="update" parameterType="com.smart.board.domain.Comment">
     update comment
     set content     = #{content},
         update_date = #{updateDate},
@@ -59,7 +59,7 @@
     where comment_id = #{commentId}
   </delete>
 
-  <select id="checkCommentId" parameterType="Long" resultType="boolean">
+  <select id="existsByCommentId" parameterType="Long" resultType="boolean">
     select exists(
              select *
              from comment
