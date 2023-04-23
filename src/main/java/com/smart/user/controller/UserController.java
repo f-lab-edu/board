@@ -47,22 +47,29 @@ public class UserController {
   public ResponseEntity<String> join(@RequestParam String email, @RequestParam String authCode) {
     boolean verified = userService.verifyAuthCode(email, authCode);
     if(verified){
-      return ResponseEntity.ok("이메일 인증이 완료되었습니다.");
+      return ResponseEntity.ok()
+          .body("이메일 인증이 완료되었습니다.");
     }else {
-      return ResponseEntity.badRequest().body("이메일 인증에 실패했습니다.");
+      return ResponseEntity.badRequest()
+          .body("이메일 인증에 실패했습니다.");
     }
   }
 
   @PutMapping("/update")
   public ResponseEntity<Boolean> updateUserNickname(@RequestBody User user) {
     boolean isUpdated = userService.updateUserInfo(user);
-    return ResponseEntity.ok(isUpdated);
+    return ResponseEntity.ok()
+        .body(isUpdated);
   }
 
-  @GetMapping("/check-nickname")
-  public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
-    //닉네임 중복체크
+  @GetMapping("/users/nickname/{nickname}/exist")
+  public ResponseEntity<Boolean> checkNickname(@PathVariable String nickname) {
     boolean isDuplicated = userService.isDuplicateNickname(nickname);
-    return ResponseEntity.ok(isDuplicated);
+    if (isDuplicated) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    } else {
+      return ResponseEntity.ok().build();
+    }
   }
+
 }

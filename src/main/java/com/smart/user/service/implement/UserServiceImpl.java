@@ -44,7 +44,6 @@ public class UserServiceImpl implements UserService {
     }
 
     String code = makeAuthCode();
-    System.out.println("code:"+code);
     saveAuthCode(request.getEmail(), code);
     eventPublisher.publishEvent(new MailAuthEvent(request.getEmail(), code));
 
