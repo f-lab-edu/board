@@ -42,7 +42,7 @@ public class CommentRepositoryTest {
 
   @Test
   @DisplayName("댓글 생성 후 게시글 ID로 댓글 조회 시 댓글이 담긴 List를 반환한다.")
-  public void getCommentsByPostId_CommentInfos_ExistingComments() {
+  public void findByPostId_CommentReadDtos_ExistingComments() {
     commentRepository.save(comment);
 
     List<CommentReadDto> commentReadDtos = commentRepository
@@ -53,7 +53,7 @@ public class CommentRepositoryTest {
 
   @Test
   @DisplayName("존재하지 않는 게시글 ID로 댓글 조회 시 비어있는 List를 반환한다.")
-  public void getCommentsByPostId_EmptyList_NotExistingPostId() {
+  public void findByPostId_EmptyList_NotExistingPostId() {
     List<CommentReadDto> commentReadDtos = commentRepository.findByPostId(-1L);
 
     assertThat(commentReadDtos.isEmpty()).isTrue();
@@ -71,7 +71,7 @@ public class CommentRepositoryTest {
 
   @Test
   @DisplayName("댓글 생성 후 반환된 ID로 댓글을 조회한다.")
-  public void getCommentByCommentId_CommentInfo_ExistingCommentId() {
+  public void findByCommentId_CommentReadDto_ExistingCommentId() {
     commentRepository.save(comment);
 
     CommentReadDto commentReadDto = commentRepository.findByCommentId(comment.getCommentId())
@@ -83,7 +83,7 @@ public class CommentRepositoryTest {
 
   @Test
   @DisplayName("생성하지 않은 댓글을 업데이트하면 당연히 해당 댓글을 찾을 수 없다.")
-  public void updateComment_NotExistingComment() {
+  public void update_NotExistingComment() {
     Comment updateComment = CommentUpdateDto.builder()
         .commentId(-1L)
         .content("update content")
@@ -99,7 +99,7 @@ public class CommentRepositoryTest {
 
   @Test
   @DisplayName("댓글을 업데이트 후 해당하는 댓글이 정상적으로 수정되었는지 확인한다.")
-  public void updateComment_ExistingComment() {
+  public void update_ExistingComment() {
     commentRepository.save(comment);
     Comment updateComment = CommentUpdateDto.builder()
         .commentId(comment.getCommentId())

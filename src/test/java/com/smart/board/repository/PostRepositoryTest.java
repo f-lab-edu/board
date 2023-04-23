@@ -42,7 +42,7 @@ public class PostRepositoryTest {
 
   @Test
   @DisplayName("게시물 생성 후 게시글 전체 조회 시 게시물이 담긴 List를 반환한다.")
-  public void getAllPost_PostReadDtos_ExistingPost() {
+  public void findAll_PostReadDtos_ExistingPost() {
     postRepository.save(post);
 
     List<PostReadDto> allPost = postRepository.findAll();
@@ -50,7 +50,7 @@ public class PostRepositoryTest {
 
   @Test
   @DisplayName("존재하지 않는 ID로 게시글 조회 시 null을 반환한다.")
-  public void getPostByPostId_Null_NotExistingPostId() {
+  public void findByPostId_Null_NotExistingPostId() {
     Optional<PostReadDto> optionalPostReadDto = postRepository.findByPostId(-1L);
 
     assertThat(optionalPostReadDto.isEmpty()).isTrue();
@@ -58,7 +58,7 @@ public class PostRepositoryTest {
 
   @Test
   @DisplayName("게시물 생성 후 반환된 ID로 게시물을 조회한다.")
-  public void getPostByPostId_PostReadDto_ExistingPostId() {
+  public void findByPostId_PostReadDto_ExistingPostId() {
     postRepository.save(post);
 
     PostReadDto postReadDto = postRepository.findByPostId(post.getPostId()).get();
@@ -69,28 +69,27 @@ public class PostRepositoryTest {
 
   @Test
   @DisplayName("존재하지 않는 게시물 조회수를 업데이트 한다.")
-  public void updateViewCnt_NotExistingPostId() {
+  public void updateViewCnt_NotExistingPost() {
     postRepository.updateViewCnt(-1L);
 
     Optional<PostReadDto> optionalPostReadDto = postRepository.findByPostId(-1L);
-
     assertThat(optionalPostReadDto.isEmpty()).isTrue();
   }
 
   @Test
   @DisplayName("게시물 생성 후 반환된 ID로 게시물 조회수를 업데이트 한다.")
-  public void updateViewCnt_ExistingPostId() {
+  public void updateViewCnt_ExistingPost() {
     postRepository.save(post);
 
     postRepository.updateViewCnt(post.getPostId());
-    PostReadDto postReadDto = postRepository.findByPostId(post.getPostId()).get();
 
+    PostReadDto postReadDto = postRepository.findByPostId(post.getPostId()).get();
     assertThat(postReadDto.getViewCount()).isEqualTo(post.getViewCount() + 1);
   }
 
   @Test
   @DisplayName("생성하지 않은 게시글 업데이트하면 당연히 해당 게시물을 찾을 수 없다.")
-  public void updateBoard_NotExistingBoard() {
+  public void update_NotExistingPost() {
     Post updatePost = PostUpdateDto.builder()
         .postId(-1L)
         .title("update title")
@@ -107,7 +106,7 @@ public class PostRepositoryTest {
 
   @Test
   @DisplayName("게시글 업데이트 후 해당하는 게시글이 정상적으로 수정되었는지 확인한다.")
-  public void updateBoard_ExistingBoard() {
+  public void update_ExistingPost() {
     postRepository.save(post);
     Post updateBoard = PostUpdateDto.builder()
         .postId(post.getPostId())
@@ -127,7 +126,7 @@ public class PostRepositoryTest {
 
   @Test
   @DisplayName("게시글 삭제 후 해당 게시글이 삭제되었는지 확인한다.")
-  public void deleteByPostId_ExistingPostId() {
+  public void deleteByPostId_ExistingPost() {
     postRepository.save(post);
 
     postRepository.deleteByPostId(post.getPostId());
