@@ -5,18 +5,18 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 </head>
 <script th:inline="javascript">
-  function updateBoard(board) {
+  function updatePost(post) {
     const title = document.getElementById('title').value;
     const content = document.getElementById('content').value;
 
     const sendDTO = {
-      boardId: board.boardId,
+      postId: post.postId,
       title: title,
       content: content,
-      userId: board.userId,
+      userId: post.userId,
     };
 
-    const url = '/api/v1/board';
+    const url = '/api/v1/poast';
     const options = {
       method: 'PUT',
       headers: {
@@ -28,7 +28,7 @@
     fetch(url, options)
     .then(response => {
       alert('수정 완료');
-      location.href = '/board?boardId=' + board.boardId;
+      location.href = '/board?postId=' + post.postId;
     })
     .catch(error => {
       console.log(error);
@@ -41,34 +41,34 @@
 
 <div>
   <label>제목</label>
-  <input type="text" id="title" name="title" th:value="${board.title}">
+  <input type="text" id="title" name="title" th:value="${post.title}">
 </div>
 
 <div>
   <label>작성자</label>
-  <input type="text" id="nickname" name="nickname" th:value="${board.nickname}" readonly>
+  <input type="text" id="nickname" name="nickname" th:value="${post.nickname}" readonly>
 </div>
 
 <div>
   <label>조회수</label>
-  <input type="text" id="viewCount" name="viewCount" th:value="${board.viewCount}" readonly>
+  <input type="text" id="viewCount" name="viewCount" th:value="${post.viewCount}" readonly>
 </div>
 
 <div>
   <label>등록일</label>
-  <input type="text" id="createDate" name="createDate" th:value="${board.createDate}" readonly>
+  <input type="text" id="createDate" name="createDate" th:value="${post.createDate}" readonly>
 </div>
 
 <div>
   <label>글 내용</label>
-  <textarea id="content" name="content" th:text="${board.content}"></textarea>
+  <textarea id="content" name="content" th:text="${post.content}"></textarea>
 </div>
 
 <hr>
 
 <div class="row">
-  <button type="button" th:onclick="updateBoard([[${board}]])">저장하기</button>
-  <button th:onclick="|location.href='@{/board(boardId = ${board.boardId})}'|">취소</button>
+  <button type="button" th:onclick="updatePost([[${post}]])">저장하기</button>
+  <button th:onclick="|location.href='@{/board(postId = ${post.postId})}'|">취소</button>
 </div>
 
 </body>

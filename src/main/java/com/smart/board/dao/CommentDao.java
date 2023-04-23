@@ -1,7 +1,7 @@
-package com.smart.comment.dao;
+package com.smart.board.dao;
 
-import com.smart.comment.controller.dto.CommentDto;
-import com.smart.comment.domain.Comment;
+import com.smart.board.controller.dto.comment.CommentReadDto;
+import com.smart.board.domain.Comment;
 import java.util.List;
 import java.util.Optional;
 import org.apache.ibatis.annotations.Mapper;
@@ -9,11 +9,11 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface CommentDao {
 
-  List<CommentDto.CommentInfo> getCommentsByBoardId(Long boardId);
+  List<CommentReadDto> getCommentsByPostId(Long postId);
 
-  void deleteByBoardId(Long boardId);
+  void deleteByPostId(Long postId);
 
-  Optional<CommentDto.CommentInfo> getCommentByCommentId(Long commentId);
+  Optional<CommentReadDto> getCommentByCommentId(Long commentId);
 
   void createComment(Comment comment);
 

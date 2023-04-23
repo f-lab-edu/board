@@ -1,8 +1,7 @@
 package com.smart.board.controller;
 
-import com.smart.board.controller.dto.BoardDto;
+import com.smart.board.controller.dto.BoardDetailDto;
 import com.smart.board.service.BoardService;
-import com.smart.comment.service.CommentService;
 import com.smart.user.domain.CustomUserDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -13,27 +12,25 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class BoardViewController {
 
   private final BoardService boardService;
-  private final CommentService commentService;
 
-  public BoardViewController(BoardService boardService, CommentService commentService) {
+  public BoardViewController(BoardService boardService) {
     this.boardService = boardService;
-    this.commentService = commentService;
   }
 
   @GetMapping("/boards")
   public String showBoardsPage(Model model,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
-    model.addAttribute("boards", boardService.getAllBoard());
+    model.addAttribute("boardList", boardService.getBoardList());
     model.addAttribute("userDetails", userDetails);
     return "boards";
   }
 
   @GetMapping("/board")
-  public String showBoardDetailPage(Long boardId,
+  public String showBoardDetailPage(Long postId,
       @AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
-    BoardDto.BoardDetail boardDetail = boardService.getBoardDetailByBoardId(boardId);
-    model.addAttribute("board", boardDetail.getBoardInfo());
-    model.addAttribute("comments", boardDetail.getCommentInfos());
+    BoardDetailDto boardDetail = boardService.getBoardDetailByPostId(postId);
+    model.addAttribute("post", boardDetail.getPostDto());
+    model.addAttribute("comments", boardDetail.getCommentDtos());
     model.addAttribute("userDetails", userDetails);
     return "board";
   }
@@ -44,8 +41,8 @@ public class BoardViewController {
   }
 
   @GetMapping("/board/update")
-  public String showBoardUpdatePage(Long boardId, Model model) {
-    model.addAttribute("board", boardService.getBoardByBoardId(boardId));
+  public String showBoardUpdatePage(Long postId, Model model) {
+    model.addAttribute("post", boardService.getPostByPostId(postId));
     return "boardUpdate";
   }
 }

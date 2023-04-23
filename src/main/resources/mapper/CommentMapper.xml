@@ -2,35 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.smart.comment.dao.CommentDao">
+<mapper namespace="com.smart.board.dao.CommentDao">
 
-  <select id="getCommentsByBoardId" parameterType="Long"
-    resultType="com.smart.comment.controller.dto.CommentDto$CommentInfo">
+  <select id="getCommentsByPostId" parameterType="Long"
+    resultType="com.smart.board.controller.dto.comment.CommentReadDto">
     select c.comment_id,
            c.content,
            c.create_date,
            c.update_date,
-           c.board_id,
+           c.post_id,
            u.user_id,
            u.nickname
     from comment c
            left join user u on c.user_id = u.user_id
-    where board_id = #{boardId};
+    where post_id = #{postId};
   </select>
 
-  <delete id="deleteByBoardId" parameterType="Long">
+  <delete id="deleteByPostId" parameterType="Long">
     delete
     from comment
-    where board_id = #{boardId}
+    where post_id = #{postId}
   </delete>
 
   <select id="getCommentByCommentId" parameterType="Long"
-    resultType="com.smart.comment.controller.dto.CommentDto$CommentInfo">
+    resultType="com.smart.board.controller.dto.comment.CommentReadDto">
     select c.comment_id,
            c.content,
            c.create_date,
            c.update_date,
-           c.board_id,
+           c.post_id,
            u.user_id,
            u.nickname
     from comment c
@@ -38,14 +38,14 @@
     where comment_id = #{commentId};
   </select>
 
-  <insert id="createComment" parameterType="com.smart.comment.domain.Comment"
+  <insert id="createComment" parameterType="com.smart.board.domain.Comment"
     useGeneratedKeys="true"
     keyProperty="commentId">
-    insert into comment (comment_id, content, create_date, board_id, user_id)
-    values (#{commentId}, #{content}, #{createDate}, #{boardId}, #{userId})
+    insert into comment (comment_id, content, create_date, post_id, user_id)
+    values (#{commentId}, #{content}, #{createDate}, #{postId}, #{userId})
   </insert>
 
-  <update id="updateComment" parameterType="com.smart.comment.domain.Comment">
+  <update id="updateComment" parameterType="com.smart.board.domain.Comment">
     update comment
     set content     = #{content},
         update_date = #{updateDate},

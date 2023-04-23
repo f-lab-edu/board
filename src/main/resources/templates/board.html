@@ -5,12 +5,12 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 </head>
 <script th:inline="javascript">
-  function create(board){
+  function create(post){
 
     const comment = document.getElementById('input-content').value;
 
     const sendDTO = {
-      boardId: board.boardId,
+      postId: post.postId,
       content: comment,
     };
 
@@ -91,13 +91,13 @@
     });
   }
 
-  function deleteBoard(board) {
+  function deletePost(post) {
     const sendDTO = {
-      boardId: board.boardId,
-      userId: board.userId,
+      postId: post.postId,
+      userId: post.userId,
     };
 
-    const url = '/api/v1/board';
+    const url = '/api/v1/post';
     const options = {
       method: 'DELETE',
       headers: {
@@ -122,27 +122,27 @@
 
 <div>
   <label>제목</label>
-  <input type="text" id="title" name="title" th:value="${board.title}" readonly>
+  <input type="text" id="title" name="title" th:value="${post.title}" readonly>
 </div>
 
 <div>
   <label>작성자</label>
-  <input type="text" id="nickname" name="nickname" th:value="${board.nickname}" readonly>
+  <input type="text" id="nickname" name="nickname" th:value="${post.nickname}" readonly>
 </div>
 
 <div>
   <label>조회수</label>
-  <input type="text" id="viewCount" name="viewCount" th:value="${board.viewCount}" readonly>
+  <input type="text" id="viewCount" name="viewCount" th:value="${post.viewCount}" readonly>
 </div>
 
 <div>
   <label>등록일</label>
-  <input type="text" id="createDate" name="createDate" th:value="${board.createDate}" readonly>
+  <input type="text" id="createDate" name="createDate" th:value="${post.createDate}" readonly>
 </div>
 
 <div>
   <label>글 내용</label>
-  <textarea id="content" name="content" th:text="${board.content}" readonly></textarea>
+  <textarea id="content" name="content" th:text="${post.content}" readonly></textarea>
 </div>
 
 <hr>
@@ -171,16 +171,16 @@
   <h3>Comment 작성</h3>
   <label th:text="${userDetails.nickname}"/>
   <input type="text" id="input-content" name="input-content"/>
-  <button th:onclick="create([[${board}]])">작성</button>
+  <button th:onclick="create([[${post}]])">작성</button>
 </div>
 
 <hr>
 
 <div class="row">
   <button th:onclick="|location.href='@{/boards}'|">목록으로</button>
-  <span th:if="${userDetails != null && userDetails.userId == board.userId}">
-    <button th:onclick="|location.href='@{/board/update(boardId = ${board.boardId})}'|">수정</button>
-    <button th:onclick="deleteBoard([[${board}]])">삭제</button>
+  <span th:if="${userDetails != null && userDetails.userId == post.userId}">
+    <button th:onclick="|location.href='@{/board/update(postId = ${post.postId})}'|">수정</button>
+    <button th:onclick="deletePost([[${post}]])">삭제</button>
   </span>
 </div>
 

@@ -1,9 +1,11 @@
-package com.smart.comment.dao;
+package com.smart.board.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.smart.comment.controller.dto.CommentDto;
-import com.smart.comment.domain.Comment;
+import com.smart.board.controller.dto.comment.CommentCreateDto;
+import com.smart.board.controller.dto.comment.CommentReadDto;
+import com.smart.board.controller.dto.comment.CommentUpdateDto;
+import com.smart.board.domain.Comment;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
@@ -25,35 +27,36 @@ public class CommentDaoTest {
 
   @BeforeEach
   public void create_Test_Data() {
-    comment = CommentDto.CreateRequest
+    comment = CommentCreateDto
         .builder()
         .content("content")
-        .boardId(1L)
+        .postId(1L)
         .build()
         .toEntity(1L);
   }
 
   @AfterEach
   public void delete_Test_Data() {
-    commentDao.deleteByCommentId(comment.getBoardId());
+    commentDao.deleteByCommentId(comment.getCommentId());
   }
 
   @Test
   @DisplayName("댓글 생성 후 게시글 ID로 댓글 조회 시 댓글이 담긴 List를 반환한다.")
-  public void getCommentsByBoardId_CommentInfos_ExistingComments() {
+  public void getCommentsByPostId_CommentInfos_ExistingComments() {
     commentDao.createComment(comment);
 
-    List<CommentDto.CommentInfo> commentInfos = commentDao.getCommentsByBoardId(comment.getBoardId());
+    List<CommentReadDto> commentReadDtos = commentDao
+        .getCommentsByPostId(comment.getPostId());
 
-    assertThat(commentInfos.isEmpty()).isFalse();
+    assertThat(commentReadDtos.isEmpty()).isFalse();
   }
 
   @Test
   @DisplayName("존재하지 않는 게시글 ID로 댓글 조회 시 비어있는 List를 반환한다.")
-  public void getCommentsByBoardId_EmptyList_NotExistingBoardId() {
-    List<CommentDto.CommentInfo> commentInfos = commentDao.getCommentsByBoardId(-1L);
+  public void getCommentsByPostId_EmptyList_NotExistingBoardId() {
+    List<CommentReadDto> commentReadDtos = commentDao.getCommentsByPostId(-1L);
 
-    assertThat(commentInfos.isEmpty()).isTrue();
+    assertThat(commentReadDtos.isEmpty()).isTrue();
   }
 
   @Test
@@ -61,9 +64,9 @@ public class CommentDaoTest {
   public void deleteByBoardId_EmptyList_ExistingBoardId() {
     commentDao.createComment(comment);
 
-    commentDao.deleteByBoardId(comment.getBoardId());
+    commentDao.deleteByPostId(comment.getPostId());
 
-    assertThat(commentDao.getCommentsByBoardId(comment.getBoardId())).isEmpty();
+    assertThat(commentDao.getCommentsByPostId(comment.getPostId())).isEmpty();
   }
 
   @Test
@@ -71,16 +74,17 @@ public class CommentDaoTest {
   public void getCommentByCommentId_CommentInfo_ExistingCommentId() {
     commentDao.createComment(comment);
 
-    CommentDto.CommentInfo commentInfo = commentDao.getCommentByCommentId(comment.getCommentId()).get();
+    CommentReadDto commentReadDto = commentDao.getCommentByCommentId(comment.getCommentId())
+        .get();
 
-    assertThat(commentInfo).isNotNull();
-    assertThat(commentInfo.getCommentId()).isEqualTo(comment.getCommentId());
+    assertThat(commentReadDto).isNotNull();
+    assertThat(commentReadDto.getCommentId()).isEqualTo(comment.getCommentId());
   }
 
   @Test
   @DisplayName("생성하지 않은 댓글을 업데이트하면 당연히 해당 댓글을 찾을 수 없다.")
   public void updateComment_NotExistingComment() {
-    Comment updateComment = CommentDto.UpdateRequest.builder()
+    Comment updateComment = CommentUpdateDto.builder()
         .commentId(-1L)
         .content("update content")
         .userId(comment.getUserId())
@@ -89,15 +93,15 @@ public class CommentDaoTest {
 
     commentDao.updateComment(updateComment);
 
-    Optional<CommentDto.CommentInfo> optionalCommentInfo = commentDao.getCommentByCommentId(-1L);
-    assertThat(optionalCommentInfo.isEmpty()).isTrue();
+    Optional<CommentReadDto> optionalCommentReadDto = commentDao.getCommentByCommentId(-1L);
+    assertThat(optionalCommentReadDto.isEmpty()).isTrue();
   }
 
   @Test
   @DisplayName("댓글을 업데이트 후 해당하는 댓글이 정상적으로 수정되었는지 확인한다.")
   public void updateComment_ExistingComment() {
     commentDao.createComment(comment);
-    Comment updateComment = CommentDto.UpdateRequest.builder()
+    Comment updateComment = CommentUpdateDto.builder()
         .commentId(comment.getCommentId())
         .content("update content")
         .userId(comment.getUserId())
@@ -106,9 +110,10 @@ public class CommentDaoTest {
 
     commentDao.updateComment(updateComment);
 
-    CommentDto.CommentInfo commentInfo = commentDao.getCommentByCommentId(comment.getCommentId()).get();
-    assertThat(commentInfo.getCommentId()).isEqualTo(updateComment.getCommentId());
-    assertThat(commentInfo.getContent()).isEqualTo(updateComment.getContent());
+    CommentReadDto commentReadDto = commentDao.getCommentByCommentId(comment.getCommentId())
+        .get();
+    assertThat(commentReadDto.getCommentId()).isEqualTo(updateComment.getCommentId());
+    assertThat(commentReadDto.getContent()).isEqualTo(updateComment.getContent());
   }
 
   @Test

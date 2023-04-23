@@ -1,5 +1,7 @@
-package com.smart.board.domain;
+package com.smart.board.controller.dto.comment;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -9,15 +11,28 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
 @AllArgsConstructor
-public class Board {
+@Builder
+public class CommentReadDto {
 
-  private Long boardId;
-  private String title;
+  @NotNull
+  private Long commentId;
+
+  @NotBlank
   private String content;
+
+  @NotBlank
   private LocalDateTime createDate;
+
   private LocalDateTime updateDate;
-  private Long viewCount;
+
+  @NotNull
+  private Long boardId;
+
+  @NotNull
   private Long userId;
+
+  @NotBlank
+  private String nickname;
+
 }

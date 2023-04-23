@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 </head>
 <script th:inline="javascript">
-  function createBoard() {
+  function createPost() {
     const title = document.getElementById('title').value;
     const content = document.getElementById('content').value;
 
@@ -14,7 +14,7 @@
       content: content,
     };
 
-    const url = '/api/v1/board';
+    const url = '/api/v1/post';
     const options = {
       method: 'POST',
       headers: {
@@ -26,7 +26,7 @@
     fetch(url, options)
     .then(response => {
       alert('작성 완료');
-      location.href = response.headers.get('location');
+      location.href = '/boards';
     })
     .catch(error => {
       console.log(error);
@@ -52,7 +52,7 @@
 <hr>
 
 <div class="row">
-  <button type="button" onclick="createBoard()">저장하기</button>
+  <button type="button" onclick="createPost()">저장하기</button>
   <button th:onclick="|location.href='@{/boards}'|">목록으로</button>
 </div>
 

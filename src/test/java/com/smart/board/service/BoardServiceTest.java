@@ -8,11 +8,19 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.smart.board.controller.dto.BoardDto;
-import com.smart.board.dao.BoardDao;
-import com.smart.board.domain.Board;
-import com.smart.comment.dao.CommentDao;
-import com.smart.global.error.NotFoundBoardException;
+import com.smart.board.controller.dto.BoardListDto;
+import com.smart.board.controller.dto.comment.CommentCreateDto;
+import com.smart.board.controller.dto.comment.CommentDeleteDto;
+import com.smart.board.controller.dto.comment.CommentUpdateDto;
+import com.smart.board.controller.dto.post.PostCreateDto;
+import com.smart.board.controller.dto.post.PostDeleteDto;
+import com.smart.board.controller.dto.post.PostReadDto;
+import com.smart.board.controller.dto.post.PostUpdateDto;
+import com.smart.board.dao.CommentDao;
+import com.smart.board.dao.PostDao;
+import com.smart.board.domain.Comment;
+import com.smart.board.domain.Post;
+import com.smart.global.error.NotFoundEntityException;
 import com.smart.global.error.PermissionDeniedException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,197 +35,305 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class BoardServiceTest {
 
-  BoardDao boardDao;
+  PostDao postDao;
 
   CommentDao commentDao;
 
   BoardService boardService;
 
-  BoardDto.BoardInfo boardInfo;
-
-  BoardDto.UpdateRequest updateRequest;
-
-  BoardDto.DeleteRequest deleteRequest;
-
   @BeforeEach
   public void inject_Mock() {
-    boardDao = mock(BoardDao.class);
+    postDao = mock(PostDao.class);
     commentDao = mock(CommentDao.class);
-    boardService = new BoardService(boardDao, commentDao);
-  }
-
-  @BeforeEach
-  public void create_Test_Data() {
-    boardInfo = BoardDto.BoardInfo.builder()
-        .boardId(1L)
-        .title("title")
-        .content("content")
-        .viewCount(1L)
-        .userId(1L)
-        .nickname("nickname")
-        .build();
-
-    updateRequest = BoardDto.UpdateRequest
-        .builder()
-        .boardId(1L)
-        .title("update title")
-        .content("update content")
-        .userId(1L)
-        .build();
-
-    deleteRequest = BoardDto.DeleteRequest
-        .builder()
-        .boardId(1L)
-        .userId(1L)
-        .build();
+    boardService = new BoardService(postDao, commentDao);
   }
 
   @DisplayName("게시물 없다면 비어있는 게시물 리스트를 반환한다.")
   @Test
-  public void getAllBoard_EmptyList_NotExistingBoard() {
-    when(boardDao.getAllBoard()).thenReturn(new ArrayList<>());
+  public void getBoardList_EmptyList_NotExistingPost() {
+    when(postDao.getAllPost()).thenReturn(new ArrayList<>());
 
-    List<BoardDto.BoardInfo> boardLists = boardService.getAllBoard();
+    BoardListDto boardList = boardService.getBoardList();
 
-    verify(boardDao).getAllBoard();
-    assertThat(boardLists.isEmpty()).isTrue();
+    verify(postDao).getAllPost();
+    assertThat(boardList.getPostDtos().isEmpty()).isTrue();
   }
 
   @DisplayName("모든 게시물들을 반환한다.")
   @Test
-  public void getAllBoard_BoardInfos_ExistingBoard() {
-    List<BoardDto.BoardInfo> boardInfos = new ArrayList<>();
-    boardInfos.add(boardInfo);
-    when(boardDao.getAllBoard()).thenReturn(boardInfos);
+  public void getBoardList_BoardList_ExistingPost() {
+    List<PostReadDto> postReadDtos = new ArrayList<>();
+    PostReadDto postReadDto = PostReadDto.builder().build();
+    postReadDtos.add(postReadDto);
+    when(postDao.getAllPost()).thenReturn(postReadDtos);
 
-    List<BoardDto.BoardInfo> retBoardLists = boardService.getAllBoard();
+    BoardListDto boardList = boardService.getBoardList();
 
-    verify(boardDao).getAllBoard();
-    assertThat(boardInfos.size()).isEqualTo(retBoardLists.size());
-    assertThat(boardInfo).isIn(retBoardLists);
+    verify(postDao).getAllPost();
+    assertThat(boardList.getPostDtos().size()).isEqualTo(postReadDtos.size());
+    assertThat(postReadDto).isIn(boardList.getPostDtos());
   }
 
-  @DisplayName("해당 ID의 게시물이 없다면 NotFoundBoardException을 던진다.")
+  @DisplayName("해당 ID의 게시물이 없다면 NotFoundEntityException을 던진다.")
   @Test
-  public void getBoardByBoardId_ThrowsException_NotExistingBoardId() {
+  public void getPostByPostId_ThrowsException_NotExistingPostId() {
 
-    assertThatThrownBy(() -> boardService.getBoardByBoardId(boardInfo.getBoardId()))
-        .isInstanceOf(NotFoundBoardException.class);
+    assertThatThrownBy(() -> boardService.getPostByPostId(-1L))
+        .isInstanceOf(NotFoundEntityException.class);
   }
 
   @DisplayName("해당 ID의 게시물을 조회한다.")
   @Test
-  public void getBoardByBoardId_BoardInfo_ExistingBoardId() {
-    when(boardDao.getBoardByBoardId(boardInfo.getBoardId())).thenReturn(Optional.ofNullable(boardInfo));
+  public void getPostByPostId_PostReadDto_ExistingPostId() {
+    PostReadDto testPostReadDto = PostReadDto.builder()
+        .postId(1L)
+        .build();
+    when(postDao.getPostByPostId(1L)).thenReturn(Optional.ofNullable(testPostReadDto));
 
-    BoardDto.BoardInfo retBoardInfo = boardService.getBoardByBoardId(boardInfo.getBoardId());
+    PostReadDto retPostReadDto = boardService.getPostByPostId(1L);
 
-    verify(boardDao).getBoardByBoardId(boardInfo.getBoardId());
-    assertThat(retBoardInfo.getBoardId()).isEqualTo(boardInfo.getBoardId());
+    verify(postDao).getPostByPostId(1L);
+    assertThat(retPostReadDto.getPostId()).isEqualTo(1L);
   }
 
   @DisplayName("게시물 상세를 조회하면 조회수가 증가한다.")
   @Test
-  public void getBoardDetailByBoardId_UpdateViewCount_ExistingBoardId() {
-    when(boardDao.getBoardByBoardId(boardInfo.getBoardId())).thenReturn(Optional.ofNullable(boardInfo));
+  public void getBoardDetailByPostId_UpdateViewCount_ExistingPostId() {
+    PostReadDto testPostReadDto = PostReadDto.builder()
+        .postId(1L)
+        .build();
+    when(postDao.getPostByPostId(1L)).thenReturn(Optional.ofNullable(testPostReadDto));
 
-    boardService.getBoardDetailByBoardId(boardInfo.getBoardId());
+    boardService.getBoardDetailByPostId(1L);
 
-    verify(boardDao).updateViewCnt(boardInfo.getBoardId());
+    verify(postDao).updateViewCnt(1L);
   }
+
 
   @DisplayName("게시물 상세를 조회하면 댓글도 함께 조회한다.")
   @Test
   public void getBoardDetailByBoardId_GetComments_ExistingBoardId() {
-    when(boardDao.getBoardByBoardId(boardInfo.getBoardId())).thenReturn(Optional.ofNullable(boardInfo));
+    PostReadDto testPostReadDto = PostReadDto.builder()
+        .postId(1L)
+        .build();
+    when(postDao.getPostByPostId(1L)).thenReturn(Optional.ofNullable(testPostReadDto));
 
-    boardService.getBoardDetailByBoardId(boardInfo.getBoardId());
+    boardService.getBoardDetailByPostId(1L);
 
-    verify(commentDao).getCommentsByBoardId(boardInfo.getBoardId());
+    verify(commentDao).getCommentsByPostId(1L);
   }
 
   @DisplayName("게시물을 생성한다.")
   @Test
-  public void createBoard() {
-    ArgumentCaptor<Board> createCaptor = ArgumentCaptor.forClass(Board.class);
-    doNothing().when(boardDao).createBoard(createCaptor.capture());
+  public void createPost() {
+    ArgumentCaptor<Post> createCaptor = ArgumentCaptor.forClass(Post.class);
+    doNothing().when(postDao).createPost(createCaptor.capture());
 
-    BoardDto.CreateRequest createRequest = BoardDto.CreateRequest
+    PostCreateDto createDto = PostCreateDto
         .builder()
         .title("title")
         .content("content")
         .build();
-    boardService.createBoard(createRequest, 1L);
+    boardService.createPost(createDto, 1L);
 
-    verify(boardDao).createBoard(any(Board.class));
-    assertThat(createRequest.getTitle()).isEqualTo(createCaptor.getValue().getTitle());
-    assertThat(createRequest.getContent()).isEqualTo(createCaptor.getValue().getContent());
+    verify(postDao).createPost(any(Post.class));
+    assertThat(createDto.getTitle()).isEqualTo(createCaptor.getValue().getTitle());
+    assertThat(createDto.getContent()).isEqualTo(createCaptor.getValue().getContent());
   }
 
   @DisplayName("권한이 없는 게시물을 업데이트하면 PermissionDeniedBoardException을 던진다.")
   @Test
-  public void updateBoard_ThrowException_NotEqualToBoardUserId() {
-    assertThatThrownBy(() -> boardService.updateBoard(updateRequest, 2L))
+  public void updatePost_ThrowException_NotEqualToPostUserId() {
+    PostUpdateDto updateDto = PostUpdateDto.builder()
+        .postId(1L)
+        .userId(1L)
+        .build();
+    assertThatThrownBy(() -> boardService.updatePost(updateDto, 2L))
         .isInstanceOf(PermissionDeniedException.class);
   }
 
   @DisplayName("존재하지 않는 게시물을 업데이트하면 NotFoundBoardException을 던진다.")
   @Test
-  public void updateBoard_ThrowException_NotExistingBoard() {
-    when(boardDao.checkBoardId(updateRequest.getBoardId())).thenReturn(false);
+  public void updatePost_ThrowException_NotExistingPost() {
+    PostUpdateDto updateDto = PostUpdateDto.builder()
+        .postId(1L)
+        .userId(1L)
+        .build();
 
-    assertThatThrownBy(() -> boardService.updateBoard(updateRequest, 1L))
-        .isInstanceOf(NotFoundBoardException.class);
+    when(postDao.checkPostId(updateDto.getPostId())).thenReturn(false);
+
+    assertThatThrownBy(() -> boardService.updatePost(updateDto, 1L))
+        .isInstanceOf(NotFoundEntityException.class);
   }
 
   @DisplayName("존재하는 게시물을 업데이트한다.")
   @Test
-  public void updateBoard_ExistingBoard() {
-    when(boardDao.checkBoardId(updateRequest.getBoardId())).thenReturn(true);
-    ArgumentCaptor<Board> updateCaptor = ArgumentCaptor.forClass(Board.class);
-    doNothing().when(boardDao).updateBoard(updateCaptor.capture());
+  public void updatePost_ExistingPost() {
+    PostUpdateDto updateDto = PostUpdateDto.builder()
+        .postId(1L)
+        .title("title")
+        .content("content")
+        .userId(1L)
+        .build();
 
-    Long boardId = boardService.updateBoard(updateRequest, 1L);
+    when(postDao.checkPostId(updateDto.getPostId())).thenReturn(true);
+    ArgumentCaptor<Post> updateCaptor = ArgumentCaptor.forClass(Post.class);
+    doNothing().when(postDao).updatePost(updateCaptor.capture());
 
-    verify(boardDao).updateBoard(any(Board.class));
-    assertThat(boardId).isEqualTo(updateCaptor.getValue().getBoardId());
-    assertThat(updateRequest.getTitle()).isEqualTo(updateCaptor.getValue().getTitle());
-    assertThat(updateRequest.getContent()).isEqualTo(updateCaptor.getValue().getContent());
+    boardService.updatePost(updateDto, 1L);
+
+    verify(postDao).updatePost(any(Post.class));
+    assertThat(updateDto.getPostId()).isEqualTo(updateCaptor.getValue().getPostId());
+    assertThat(updateDto.getTitle()).isEqualTo(updateCaptor.getValue().getTitle());
+    assertThat(updateDto.getContent()).isEqualTo(updateCaptor.getValue().getContent());
   }
 
   @DisplayName("권한이 없는 게시물을 삭제하면 PermissionDeniedBoardException을 던진다.")
   @Test
-  public void deleteByBoardId_ThrowException_NotEqualToBoardUserId() {
-    assertThatThrownBy(() -> boardService.deleteByBoardId(deleteRequest, 2L))
+  public void deletePost_ThrowException_NotEqualToPostUserId() {
+    PostDeleteDto deleteDto = PostDeleteDto.builder()
+        .userId(1L)
+        .build();
+    assertThatThrownBy(() -> boardService.deletePost(deleteDto, 2L))
         .isInstanceOf(PermissionDeniedException.class);
   }
 
   @DisplayName("존재하지 않는 게시물을 삭제하면 NotFoundBoardException을 던진다.")
   @Test
-  public void deleteByBoardId_ThrowException_NotExistingBoard() {
-    when(boardDao.checkBoardId(deleteRequest.getBoardId())).thenReturn(false);
+  public void deletePost_ThrowException_NotExistingPost() {
+    PostDeleteDto deleteDto = PostDeleteDto.builder()
+        .postId(1L)
+        .userId(1L)
+        .build();
+    when(postDao.checkPostId(deleteDto.getPostId())).thenReturn(false);
 
-    assertThatThrownBy(() -> boardService.deleteByBoardId(deleteRequest, 1L))
-        .isInstanceOf(NotFoundBoardException.class);
+    assertThatThrownBy(() -> boardService.deletePost(deleteDto, 1L))
+        .isInstanceOf(NotFoundEntityException.class);
   }
 
   @DisplayName("존재하는 게시물을 삭제한다.")
   @Test
-  public void deleteByBoardId_ExistingBoard() {
-    when(boardDao.checkBoardId(deleteRequest.getBoardId())).thenReturn(true);
+  public void deletePost_ExistingPost() {
+    PostDeleteDto deleteDto = PostDeleteDto.builder()
+        .postId(1L)
+        .userId(1L)
+        .build();
+    when(postDao.checkPostId(deleteDto.getPostId())).thenReturn(true);
 
-    boardService.deleteByBoardId(deleteRequest, 1L);
+    boardService.deletePost(deleteDto, 1L);
 
-    verify(boardDao).deleteByBoardId(deleteRequest.getBoardId());
+    verify(postDao).deleteByPostId(deleteDto.getPostId());
   }
 
   @DisplayName("존재하는 게시물을 삭제 시 댓글도 삭제한다.")
   @Test
-  public void deleteByBoardId_DeleteComments_ExistingBoard() {
-    when(boardDao.checkBoardId(deleteRequest.getBoardId())).thenReturn(true);
+  public void deletePost_DeleteComments_ExistingPost() {
+    PostDeleteDto deleteDto = PostDeleteDto.builder()
+        .postId(1L)
+        .userId(1L)
+        .build();
+    when(postDao.checkPostId(deleteDto.getPostId())).thenReturn(true);
 
-    boardService.deleteByBoardId(deleteRequest, 1L);
+    boardService.deletePost(deleteDto, 1L);
 
-    verify(commentDao).deleteByBoardId(deleteRequest.getBoardId());
+    verify(commentDao).deleteByPostId(deleteDto.getPostId());
+  }
+
+  @DisplayName("댓글을 생성한다.")
+  @Test
+  public void createComment() {
+    ArgumentCaptor<Comment> createCaptor = ArgumentCaptor.forClass(Comment.class);
+    doNothing().when(commentDao).createComment(createCaptor.capture());
+
+    CommentCreateDto createDto = CommentCreateDto
+        .builder()
+        .content("content")
+        .build();
+    boardService.createComment(createDto, 1L);
+
+    verify(commentDao).createComment(any(Comment.class));
+    assertThat(createDto.getContent()).isEqualTo(createCaptor.getValue().getContent());
+  }
+
+  @DisplayName("권한이 없는 댓글을 업데이트하면 PermissionDeniedBoardException을 던진다.")
+  @Test
+  public void updateComment_ThrowException_NotEqualToCommentUserId() {
+    CommentUpdateDto updateDto = CommentUpdateDto.builder()
+        .userId(1L)
+        .build();
+    assertThatThrownBy(() -> boardService.updateComment(updateDto, 2L))
+        .isInstanceOf(PermissionDeniedException.class);
+  }
+
+  @DisplayName("존재하지 않는 댓글을 업데이트하면 NotFoundEntityException을 던진다.")
+  @Test
+  public void updateComment_ThrowException_NotExistingComment() {
+    CommentUpdateDto updateDto = CommentUpdateDto.builder()
+        .userId(1L)
+        .commentId(1L)
+        .build();
+
+    when(commentDao.checkCommentId(updateDto.getCommentId())).thenReturn(false);
+
+    assertThatThrownBy(() -> boardService.updateComment(updateDto, 1L))
+        .isInstanceOf(NotFoundEntityException.class);
+  }
+
+  @DisplayName("존재하는 댓글을 업데이트한다.")
+  @Test
+  public void updateComment_ExistingComment() {
+    CommentUpdateDto updateDto = CommentUpdateDto.builder()
+        .userId(1L)
+        .content("content")
+        .commentId(1L)
+        .build();
+
+    when(commentDao.checkCommentId(updateDto.getCommentId())).thenReturn(true);
+    ArgumentCaptor<Comment> updateCaptor = ArgumentCaptor.forClass(Comment.class);
+    doNothing().when(commentDao).updateComment(updateCaptor.capture());
+
+    boardService.updateComment(updateDto, 1L);
+
+    verify(commentDao).updateComment(any(Comment.class));
+    assertThat(updateDto.getCommentId()).isEqualTo(updateCaptor.getValue().getCommentId());
+    assertThat(updateDto.getContent()).isEqualTo(updateCaptor.getValue().getContent());
+  }
+
+  @DisplayName("권한이 없는 댓글을 삭제하면 PermissionDeniedException을 던진다.")
+  @Test
+  public void deleteComment_ThrowException_NotEqualToCommentUserId() {
+    CommentDeleteDto deleteDto = CommentDeleteDto.builder()
+        .commentId(1L)
+        .userId(1L)
+        .build();
+    assertThatThrownBy(() -> boardService.deleteComment(deleteDto, 2L))
+        .isInstanceOf(PermissionDeniedException.class);
+  }
+
+  @DisplayName("존재하지 않는 댓글을 삭제하면 NotFoundEntityException을 던진다.")
+  @Test
+  public void deleteByComment_ThrowException_NotExistingComment() {
+    CommentDeleteDto deleteDto = CommentDeleteDto.builder()
+        .commentId(1L)
+        .userId(1L)
+        .build();
+    when(commentDao.checkCommentId(deleteDto.getCommentId())).thenReturn(false);
+
+    assertThatThrownBy(() -> boardService.deleteComment(deleteDto, 1L))
+        .isInstanceOf(NotFoundEntityException.class);
+  }
+
+  @DisplayName("존재하는 댓글을 삭제한다.")
+  @Test
+  public void deleteByComment_ExistingComment() {
+    CommentDeleteDto deleteDto = CommentDeleteDto.builder()
+        .commentId(1L)
+        .userId(1L)
+        .build();
+    when(commentDao.checkCommentId(deleteDto.getCommentId())).thenReturn(true);
+
+    boardService.deleteComment(deleteDto, 1L);
+
+    verify(commentDao).deleteByCommentId(deleteDto.getCommentId());
   }
 }
