@@ -35,12 +35,12 @@ public class BoardController {
     this.boardService = boardService;
   }
 
-  @GetMapping("/board-list")
+  @GetMapping("/board")
   public BoardListDto getBoardList() {
     return boardService.getBoardList();
   }
 
-  @GetMapping("/board-detail/{postId}")
+  @GetMapping("/board/{postId}")
   public BoardDetailDto getBoardDetailByPostId(@PathVariable Long postId) {
     return boardService.getBoardDetailByPostId(postId);
   }
