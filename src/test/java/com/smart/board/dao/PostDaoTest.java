@@ -42,7 +42,7 @@ public class PostDaoTest {
 
   @Test
   @DisplayName("게시물 생성 후 게시글 전체 조회 시 게시물이 담긴 List를 반환한다.")
-  public void getAllBoard_BoardInfos_ExistingBoard() {
+  public void getAllPost_PostReadDtos_ExistingPost() {
     postDao.createPost(post);
 
     List<PostReadDto> allPost = postDao.getAllPost();
@@ -58,7 +58,7 @@ public class PostDaoTest {
 
   @Test
   @DisplayName("게시물 생성 후 반환된 ID로 게시물을 조회한다.")
-  public void getBoardByBoardId_BoardInfo_ExistingBoardId() {
+  public void getPostByPostId_PostReadDto_ExistingPostId() {
     postDao.createPost(post);
 
     PostReadDto postReadDto = postDao.getPostByPostId(post.getPostId()).get();
@@ -69,7 +69,7 @@ public class PostDaoTest {
 
   @Test
   @DisplayName("존재하지 않는 게시물 조회수를 업데이트 한다.")
-  public void updateViewCnt_NotExistingBoardId() {
+  public void updateViewCnt_NotExistingPostId() {
     postDao.updateViewCnt(-1L);
 
     Optional<PostReadDto> optionalPostReadDto = postDao.getPostByPostId(-1L);
@@ -79,7 +79,7 @@ public class PostDaoTest {
 
   @Test
   @DisplayName("게시물 생성 후 반환된 ID로 게시물 조회수를 업데이트 한다.")
-  public void updateViewCnt_ExistingBoardId() {
+  public void updateViewCnt_ExistingPostId() {
     postDao.createPost(post);
 
     postDao.updateViewCnt(post.getPostId());
@@ -127,7 +127,7 @@ public class PostDaoTest {
 
   @Test
   @DisplayName("게시글 삭제 후 해당 게시글이 삭제되었는지 확인한다.")
-  public void deleteByBoardId_ExistingBoardId() {
+  public void deleteByPostId_ExistingPostId() {
     postDao.createPost(post);
 
     postDao.deleteByPostId(post.getPostId());

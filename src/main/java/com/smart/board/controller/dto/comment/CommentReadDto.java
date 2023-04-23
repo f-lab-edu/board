@@ -27,7 +27,7 @@ public class CommentReadDto {
   private LocalDateTime updateDate;
 
   @NotNull
-  private Long boardId;
+  private Long postId;
 
   @NotNull
   private Long userId;

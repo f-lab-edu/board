@@ -8,9 +8,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.smart.board.controller.dto.BoardDetailDto;
 import com.smart.board.controller.dto.BoardListDto;
 import com.smart.board.controller.dto.comment.CommentCreateDto;
 import com.smart.board.controller.dto.comment.CommentDeleteDto;
+import com.smart.board.controller.dto.comment.CommentReadDto;
 import com.smart.board.controller.dto.comment.CommentUpdateDto;
 import com.smart.board.controller.dto.post.PostCreateDto;
 import com.smart.board.controller.dto.post.PostDeleteDto;
@@ -23,6 +25,7 @@ import com.smart.board.domain.Post;
 import com.smart.global.error.NotFoundEntityException;
 import com.smart.global.error.PermissionDeniedException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +51,7 @@ public class BoardServiceTest {
     boardService = new BoardService(postDao, commentDao);
   }
 
-  @DisplayName("게시물 없다면 비어있는 게시물 리스트를 반환한다.")
+  @DisplayName("게시물 없다면 비어있는 게시판 목록을 반환한다.")
   @Test
   public void getBoardList_EmptyList_NotExistingPost() {
     when(postDao.getAllPost()).thenReturn(new ArrayList<>());
@@ -59,7 +62,7 @@ public class BoardServiceTest {
     assertThat(boardList.getPostDtos().isEmpty()).isTrue();
   }
 
-  @DisplayName("모든 게시물들을 반환한다.")
+  @DisplayName("게시판 목록을 반환한다.")
   @Test
   public void getBoardList_BoardList_ExistingPost() {
     List<PostReadDto> postReadDtos = new ArrayList<>();
@@ -96,7 +99,7 @@ public class BoardServiceTest {
     assertThat(retPostReadDto.getPostId()).isEqualTo(1L);
   }
 
-  @DisplayName("게시물 상세를 조회하면 조회수가 증가한다.")
+  @DisplayName("게시판 상세를 조회하면 해당 게시물 조회수가 증가한다.")
   @Test
   public void getBoardDetailByPostId_UpdateViewCount_ExistingPostId() {
     PostReadDto testPostReadDto = PostReadDto.builder()
@@ -109,18 +112,38 @@ public class BoardServiceTest {
     verify(postDao).updateViewCnt(1L);
   }
 
-
-  @DisplayName("게시물 상세를 조회하면 댓글도 함께 조회한다.")
+  @DisplayName("게시판 상세를 조회하면 해당 게시물을 조회한다.")
   @Test
-  public void getBoardDetailByBoardId_GetComments_ExistingBoardId() {
+  public void getBoardDetailByPostId_GetPost_ExistingPostId() {
     PostReadDto testPostReadDto = PostReadDto.builder()
         .postId(1L)
         .build();
     when(postDao.getPostByPostId(1L)).thenReturn(Optional.ofNullable(testPostReadDto));
 
-    boardService.getBoardDetailByPostId(1L);
+    BoardDetailDto boardDetailDto = boardService.getBoardDetailByPostId(1L);
+
+    verify(postDao).getPostByPostId(1L);
+    assertThat(boardDetailDto.getPostDto().getPostId()).isEqualTo(1L);
+  }
+
+
+  @DisplayName("게시판 상세를 조회하면 해당 게시물의 댓글을 함께 조회한다.")
+  @Test
+  public void getBoardDetailByPostId_GetComments_ExistingPostId() {
+    PostReadDto testPostReadDto = PostReadDto.builder()
+        .postId(1L)
+        .build();
+    when(postDao.getPostByPostId(1L)).thenReturn(Optional.ofNullable(testPostReadDto));
+    CommentReadDto commentReadDto = CommentReadDto.builder()
+        .commentId(1L)
+        .postId(1L)
+        .build();
+    when(commentDao.getCommentsByPostId(1L)).thenReturn(Arrays.asList(commentReadDto));
+
+    BoardDetailDto boardDetailDto = boardService.getBoardDetailByPostId(1L);
 
     verify(commentDao).getCommentsByPostId(1L);
+    assertThat(commentReadDto).isIn(boardDetailDto.getCommentDtos());
   }
 
   @DisplayName("게시물을 생성한다.")
@@ -152,7 +175,7 @@ public class BoardServiceTest {
         .isInstanceOf(PermissionDeniedException.class);
   }
 
-  @DisplayName("존재하지 않는 게시물을 업데이트하면 NotFoundBoardException을 던진다.")
+  @DisplayName("존재하지 않는 게시물을 업데이트하면 NotFoundEntityException을 던진다.")
   @Test
   public void updatePost_ThrowException_NotExistingPost() {
     PostUpdateDto updateDto = PostUpdateDto.builder()
@@ -198,7 +221,7 @@ public class BoardServiceTest {
         .isInstanceOf(PermissionDeniedException.class);
   }
 
-  @DisplayName("존재하지 않는 게시물을 삭제하면 NotFoundBoardException을 던진다.")
+  @DisplayName("존재하지 않는 게시물을 삭제하면 NotFoundEntityException을 던진다.")
   @Test
   public void deletePost_ThrowException_NotExistingPost() {
     PostDeleteDto deleteDto = PostDeleteDto.builder()

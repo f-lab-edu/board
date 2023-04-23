@@ -53,7 +53,7 @@ public class CommentDaoTest {
 
   @Test
   @DisplayName("존재하지 않는 게시글 ID로 댓글 조회 시 비어있는 List를 반환한다.")
-  public void getCommentsByPostId_EmptyList_NotExistingBoardId() {
+  public void getCommentsByPostId_EmptyList_NotExistingPostId() {
     List<CommentReadDto> commentReadDtos = commentDao.getCommentsByPostId(-1L);
 
     assertThat(commentReadDtos.isEmpty()).isTrue();
@@ -61,7 +61,7 @@ public class CommentDaoTest {
 
   @Test
   @DisplayName("게시글에 해당하는 댓글 삭제 후 댓글이 전부 삭제되었는지 확인한다.")
-  public void deleteByBoardId_EmptyList_ExistingBoardId() {
+  public void deleteByPostId_EmptyList_ExistingPostId() {
     commentDao.createComment(comment);
 
     commentDao.deleteByPostId(comment.getPostId());
