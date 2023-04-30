@@ -1,11 +1,7 @@
 package com.smart.board.repository;
 
-import com.smart.board.controller.dto.comment.CommentReadDto;
 import com.smart.board.domain.Comment;
-import com.smart.board.domain.Post;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public interface CommentRepository {
