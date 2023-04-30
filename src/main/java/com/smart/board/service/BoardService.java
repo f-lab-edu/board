@@ -43,6 +43,7 @@ public class BoardService {
     return postReadDtos;
   }
 
+  @Transactional
   public void updatePostViewCount(Long postId) {
     Post post = postRepository.findByPostId(postId)
         .orElseThrow(() -> new NotFoundEntityException("게시물"));
