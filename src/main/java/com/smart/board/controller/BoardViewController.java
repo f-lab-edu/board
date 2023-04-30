@@ -27,6 +27,7 @@ public class BoardViewController {
   @GetMapping("/board")
   public String showBoardDetailPage(Long postId,
       @AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+    boardService.updatePostViewCount(postId);
     model.addAttribute("post", boardService.getPostByPostId(postId));
     model.addAttribute("comments", boardService.getCommentsByPostId(postId));
     model.addAttribute("userDetails", userDetails);
