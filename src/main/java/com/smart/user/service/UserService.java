@@ -8,11 +8,11 @@ public interface UserService {
 
   User join(UserDto.JoinRequest request);
 
-  boolean verifyAuthCode(String email, String authCode);
+  void verifyAuthCode(String email, String authCode);
 
   UserInfo getUserByEmail(String email);
 
-  boolean updateUserInfo(User user);
+  void updateUserInfo(User user);
 
-  boolean isDuplicateNickname(String nickname);
+  void isDuplicateNickname(String nickname);
 }

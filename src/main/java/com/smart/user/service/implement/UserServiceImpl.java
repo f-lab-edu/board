@@ -62,14 +62,13 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public boolean verifyAuthCode(String email, String authCode) {
+  public void verifyAuthCode(String email, String authCode) {
     String storedAuthCode = (String) session.getAttribute(email);
     if (storedAuthCode == null || !storedAuthCode.equals(authCode)) {
       throw new IllegalAuthCodeException();
     }
     session.removeAttribute(email);
     userDao.updateUserStatus(email, Status.NORMAL);
-    return true;
   }
 
   @Override
@@ -80,17 +79,18 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public boolean updateUserInfo(User user) {
+  public void updateUserInfo(User user) {
     boolean isNicknameDuplicated = userDao.checkUserNickname(user.getNickname());
     if (isNicknameDuplicated) {
       throw new DuplicatedUserNicknameException();
     }
-    return userDao.updateUserInfoByEmail(user);
+    userDao.updateUserInfoByEmail(user);
   }
 
-
   @Override
-  public boolean isDuplicateNickname(String nickname) {
-    return userDao.checkUserNickname(nickname);
+  public void isDuplicateNickname(String nickname) {
+    if(userDao.checkUserNickname(nickname)){
+      throw new DuplicatedUserNicknameException();
+    }
   }
 }

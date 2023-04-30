@@ -1,5 +1,6 @@
 package com.smart.user.service.implement;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -113,8 +114,7 @@ class UserServiceImplTest {
   public void 중복닉네임회원가입실패() {
     when(userDao.checkUserNickname("nickname")).thenReturn(true);
 
-    Assertions
-        .assertThrows(DuplicatedUserNicknameException.class, () -> userService.join(joinRequest));
+    assertThrows(DuplicatedUserNicknameException.class, () -> userService.join(joinRequest));
     verify(userDao).checkUserNickname("nickname");
   }
 
@@ -123,8 +123,7 @@ class UserServiceImplTest {
   public void 중복이메일회원가입실패() {
     when(userDao.checkUserMail("test@email")).thenReturn(true);
 
-    Assertions
-        .assertThrows(DuplicatedUserEmailException.class, () -> userService.join(joinRequest));
+    assertThrows(DuplicatedUserEmailException.class, () -> userService.join(joinRequest));
     verify(userDao).checkUserMail("test@email");
   }
 
@@ -143,8 +142,7 @@ class UserServiceImplTest {
   public void 유저상태업데이트실패() {
     httpSession.setAttribute("test@email", "unAuthCode");
 
-    Assertions
-        .assertThrows(IllegalAuthCodeException.class,
+    assertThrows(IllegalAuthCodeException.class,
             () -> userService.verifyAuthCode("test@email", "authCode"));
   }
 
@@ -164,18 +162,17 @@ class UserServiceImplTest {
   public void 유저찾기실패() {
     when(userDao.getUserByEmail("test@email")).thenReturn(Optional.empty());
 
-    Assertions
-        .assertThrows(NotFoundUserException.class, () -> userService.getUserByEmail("test@email"));
+    assertThrows(NotFoundUserException.class, () -> userService.getUserByEmail("test@email"));
     verify(userDao).getUserByEmail("test@email");
   }
 
   @Test
   public void 유저정보변경성공() {
-    when(userDao.checkUserNickname("nickname")).thenReturn(false);
+    when(userDao.checkUserNickname(user.getNickname())).thenReturn(false);
     when(userDao.updateUserInfoByEmail(user)).thenReturn(true);
 
-    boolean isUpdated = userService.updateUserInfo(user);
+    userService.updateUserInfo(user);
 
-    Assertions.assertTrue(isUpdated);
+    verify(userDao).updateUserInfoByEmail(user);
   }
 }

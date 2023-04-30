@@ -44,32 +44,20 @@ public class UserController {
   }
 
   @GetMapping("/join-auth")
-  public ResponseEntity<String> join(@RequestParam String email, @RequestParam String authCode) {
-    boolean verified = userService.verifyAuthCode(email, authCode);
-    if(verified){
-      return ResponseEntity.ok()
-          .body("이메일 인증이 완료되었습니다.");
-    }else {
-      return ResponseEntity.badRequest()
-          .body("이메일 인증에 실패했습니다.");
-    }
+  public ResponseEntity<Void> join(@RequestParam String email, @RequestParam String authCode) {
+    userService.verifyAuthCode(email, authCode);
+    return ResponseEntity.status(HttpStatus.OK).build();
   }
 
   @PutMapping("/update")
-  public ResponseEntity<Boolean> updateUserNickname(@RequestBody User user) {
-    boolean isUpdated = userService.updateUserInfo(user);
-    return ResponseEntity.ok()
-        .body(isUpdated);
+  public ResponseEntity<Void> updateUserNickname(@RequestBody User user) {
+    userService.updateUserInfo(user);
+    return ResponseEntity.status(HttpStatus.OK).build();
   }
 
   @GetMapping("/users/nickname/{nickname}/exist")
-  public ResponseEntity<Boolean> checkNickname(@PathVariable String nickname) {
-    boolean isDuplicated = userService.isDuplicateNickname(nickname);
-    if (isDuplicated) {
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
-    } else {
-      return ResponseEntity.ok().build();
-    }
+  public ResponseEntity<Void> checkNickname(@PathVariable String nickname) {
+    userService.isDuplicateNickname(nickname);
+    return ResponseEntity.status(HttpStatus.OK).build();
   }
-
 }
