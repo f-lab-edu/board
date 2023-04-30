@@ -20,7 +20,7 @@ public class UserDto {
   @NoArgsConstructor(access = AccessLevel.PROTECTED)
   @AllArgsConstructor
   @Builder
-  public static class Response {
+  public static class UserInfo {
 
     @NotBlank
     private Long userId;
@@ -47,8 +47,8 @@ public class UserDto {
 
     private String role;
 
-    static public Response toResponse(User user) {
-      return Response.builder()
+    static public UserInfo from(User user) {
+      return UserInfo.builder()
           .userId(user.getUserId())
           .name(user.getName())
           .email(user.getEmail())

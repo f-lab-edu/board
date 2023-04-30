@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface UserDao {
 
-  User getUserByEmail(String email);
+  Optional<User> getUserByEmail(String email);
 
   void deleteUserByEmail(String email);
 

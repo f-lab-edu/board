@@ -1,34 +1,44 @@
 package com.smart.user.service;
 
-import com.smart.global.error.NotFoundUserException;
-import com.smart.user.dao.UserDao;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+import com.smart.user.controller.dto.UserDto.UserInfo;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
+@ExtendWith(MockitoExtension.class)
 public class UserSecurityServiceTest {
+  @InjectMocks
   private UserSecurityService userSecurityService;
-
   @Mock
-  private UserDao userDao;
+  private PasswordEncoder passwordEncoder;
+  @Mock
+  private UserService userService;
 
-  @BeforeEach
-  public void setUp() {
-    MockitoAnnotations.openMocks(this);
-    userSecurityService = new UserSecurityService(userDao, null);
-  }
 
   @Test
-  public void testLoadUserByUsernameWithNotFoundUserException() {
-    // given
-    String email = "invalidEmail@example.com";
-    when(userDao.getUserByEmail(email)).thenReturn(null);
+  public void loadUserByUsername() {
+    //given : 이메일이 주어지고
+    var email = "test@gmail.com";
+    var userInfo= UserInfo.builder()
+        .userId(1L)
+        .name("test")
+        .email(email)
+        .password("1234")
+        .role("USER")
+        .build();
 
-    // when, then
-    assertThrows(NotFoundUserException.class, () -> userSecurityService.loadUserByUsername(email));
+    //when : 사용자를 조회했을때
+    when(userService.getUserByEmail(email)).thenReturn(userInfo);
+    when(passwordEncoder.encode(userInfo.getPassword())).thenReturn(userInfo.getPassword());
+    var userDetails = userSecurityService.loadUserByUsername(email);
+
+    //then : 사용자 정보를 확인할 수 있다.
+    assertEquals(email,userDetails.getUsername());
   }
 }
+

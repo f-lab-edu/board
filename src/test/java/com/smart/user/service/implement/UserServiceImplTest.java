@@ -12,11 +12,12 @@ import com.smart.global.error.IllegalAuthCodeException;
 import com.smart.global.error.NotFoundUserException;
 import com.smart.mail.event.MailAuthEvent;
 import com.smart.user.controller.dto.UserDto.JoinRequest;
-import com.smart.user.controller.dto.UserDto.Response;
+import com.smart.user.controller.dto.UserDto.UserInfo;
 import com.smart.user.dao.UserDao;
 import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
 import jakarta.servlet.http.HttpSession;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -150,18 +151,18 @@ class UserServiceImplTest {
   @DisplayName("가입된 이메일로 유저찾기를 성공한다.")
   @Test
   public void 유저찾기성공() {
-    when(userDao.getUserByEmail("test@email")).thenReturn(user);
+    when(userDao.getUserByEmail("test@email")).thenReturn(Optional.of(user));
 
-    Response response = userService.getUserByEmail("test@email");
+    UserInfo userInfo = userService.getUserByEmail("test@email");
 
     verify(userDao).getUserByEmail("test@email");
-    Assertions.assertEquals("test@email", response.getEmail());
+    Assertions.assertEquals("test@email", userInfo.getEmail());
   }
 
   @DisplayName("가입되지 않은 이메일로 유저찾기를 실패한다.")
   @Test
   public void 유저찾기실패() {
-    when(userDao.getUserByEmail("test@email")).thenReturn(null);
+    when(userDao.getUserByEmail("test@email")).thenReturn(Optional.empty());
 
     Assertions
         .assertThrows(NotFoundUserException.class, () -> userService.getUserByEmail("test@email"));
