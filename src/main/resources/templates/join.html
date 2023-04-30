@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <script th:inline="javascript">
-    function send(){
+    function join(){
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const name = document.getElementById('name').value;
@@ -41,7 +41,7 @@
 </script>
 
 <body>
-<h1>Join</h1>
+<h1>Join Page</h1>
 <form>
     <div>
         <label for="email">email:</label>
@@ -59,7 +59,11 @@
         <label for="nickname">nickname:</label>
         <input type="text" id="nickname" name="nickname" required>
     </div>
-    <button type="button" onclick="send()">Join</button>
 </form>
+<hr/>
+<div class="row">
+    <button type="button" onclick="join()">Join</button>
+    <button th:onclick="|location.href='@{/boards}'|">Cancle</button>
+</div>
 </body>
 </html>

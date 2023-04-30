@@ -1,0 +1,175 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Board Detail Page</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<script th:inline="javascript">
+  function create(post) {
+
+    const comment = document.getElementById('input-content').value;
+
+    const sendDTO = {
+      postId: post.postId,
+      content: comment,
+    };
+
+    const url = '/api/v1/comment';
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(sendDTO),
+    };
+
+    fetch(url, options)
+    .then(response => {
+      alert('작성 완료');
+      location.reload()
+    })
+    .catch(error => {
+      console.log(error);
+      alert('작성 실패');
+    });
+  }
+
+  function updateComment(comment) {
+    const content = document.getElementById('commentContent-' + comment.commentId).value;
+
+    const sendDTO = {
+      commentId: comment.commentId,
+      content: content,
+    };
+
+    const url = '/api/v1/comment';
+    const options = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(sendDTO),
+    };
+
+    fetch(url, options)
+    .then(response => {
+      alert('수정 완료');
+      location.reload()
+    })
+    .catch(error => {
+      console.log(error);
+      alert('수정 실패');
+    });
+
+  }
+
+  function deleteComment(comment) {
+    const url = '/api/v1/comment/' + comment.commentId;
+    const options = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    fetch(url, options)
+    .then(response => {
+      alert('삭제 완료');
+      location.reload()
+    })
+    .catch(error => {
+      console.log(error);
+      alert('삭제 실패');
+    });
+  }
+
+  function deletePost(post) {
+    const url = '/api/v1/post/' + post.postId;
+    const options = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    fetch(url, options)
+    .then(response => {
+      alert('삭제 완료');
+      location.href = '/boards';
+    })
+    .catch(error => {
+      console.log(error);
+      alert('삭제 실패');
+    });
+  }
+</script>
+<body>
+<h1>Board Detail Page</h1>
+
+<div>
+  <label>제목</label>
+  <input type="text" id="title" name="title" th:value="${post.title}" readonly>
+</div>
+
+<div>
+  <label>작성자</label>
+  <input type="text" id="nickname" name="nickname" th:value="${post.nickname}" readonly>
+</div>
+
+<div>
+  <label>조회수</label>
+  <input type="text" id="viewCount" name="viewCount" th:value="${post.viewCount}" readonly>
+</div>
+
+<div>
+  <label>등록일</label>
+  <input type="text" id="createDate" name="createDate" th:value="${post.createDate}" readonly>
+</div>
+
+<div>
+  <label>글 내용</label>
+  <textarea id="content" name="content" th:text="${post.content}" readonly></textarea>
+</div>
+
+<hr>
+
+<h3>Comment</h3>
+<div th:each="comment: ${comments}">
+  <label th:text="${comment.nickname}"/>
+  <span th:if="${userDetails == null || userDetails.userId != comment.userId}">
+    <input type="text" th:value="${comment.content}" readonly/>
+  </span>
+  <span th:if="${userDetails != null && userDetails.userId == comment.userId}">
+    <input type="text" th:value="${comment.content}"
+           th:id="'commentContent-' + ${comment.commentId}"/>
+    <button th:onclick="updateComment([[${comment}]])">수정</button>
+    <button th:onclick="deleteComment([[${comment}]])">삭제</button>
+  </span>
+  <span th:if="${comment.updateDate}==null">
+    <label th:text="${comment.createDate}"/>
+  </span>
+  <span th:if="${comment.updateDate}!=null">
+    <label th:text="${comment.updateDate}"/>
+  </span>
+</div>
+
+<div th:if="${userDetails != null}">
+  <hr>
+  <h3>Comment 작성</h3>
+  <label th:text="${userDetails.nickname}"/>
+  <input type="text" id="input-content" name="input-content"/>
+  <button th:onclick="create([[${post}]])">작성</button>
+</div>
+
+<hr>
+
+<div class="row">
+  <button th:onclick="|location.href='@{/boards}'|">목록으로</button>
+  <span th:if="${userDetails != null && userDetails.userId == post.userId}">
+    <button th:onclick="|location.href='@{/board/update(postId = ${post.postId})}'|">수정</button>
+    <button th:onclick="deletePost([[${post}]])">삭제</button>
+  </span>
+</div>
+
+</body>
+</html>
