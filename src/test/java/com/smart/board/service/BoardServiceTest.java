@@ -2,7 +2,6 @@ package com.smart.board.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.mockito.Mockito.verify;
 
 import com.smart.board.controller.dto.comment.CommentCreateDto;
 import com.smart.board.controller.dto.comment.CommentUpdateDto;
@@ -248,7 +247,7 @@ public class BoardServiceTest {
 
     boardService.updateComment(updateDto, userId);
 
-    assertThat(boardService.getCommentsByCommentId(commentId).getContent())
+    assertThat(boardService.getCommentByCommentId(commentId).getContent())
         .isEqualTo(updateDto.getContent());
   }
 
@@ -282,7 +281,7 @@ public class BoardServiceTest {
 
     boardService.deleteComment(commentId, userId);
 
-    assertThatThrownBy(() -> boardService.getCommentsByCommentId(commentId))
+    assertThatThrownBy(() -> boardService.getCommentByCommentId(commentId))
         .isInstanceOf(NotFoundEntityException.class);
   }
 }

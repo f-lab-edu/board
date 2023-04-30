@@ -36,27 +36,23 @@ public class BoardService {
   public List<PostReadDto> getPosts() {
     List<PostReadDto> postReadDtos = new ArrayList<>();
     for (Post post : postRepository.findAll()) {
-      User user = userRepository.findByUserId(post.getUserId())
-          .orElseThrow(() -> new NotFoundEntityException("사용자"));
+      User user = findUserByUserId(post.getUserId());
       postReadDtos.add(PostReadDto.toDto(post, user));
     }
     return postReadDtos;
   }
 
-  @Transactional
-  public void updatePostViewCount(Long postId) {
-    Post post = postRepository.findByPostId(postId)
-        .orElseThrow(() -> new NotFoundEntityException("게시물"));
-    post.updateViewCount();
-    postRepository.update(post);
+  public PostReadDto getPostByPostId(Long postId) {
+    Post post = findPostByPostId(postId);
+    User user = findUserByUserId(post.getUserId());
+    return PostReadDto.toDto(post, user);
   }
 
-  public PostReadDto getPostByPostId(Long postId) {
-    Post post = postRepository.findByPostId(postId)
-        .orElseThrow(() -> new NotFoundEntityException("게시물"));
-    User user = userRepository.findByUserId(post.getUserId())
-        .orElseThrow(() -> new NotFoundEntityException("사용자"));
-    return PostReadDto.toDto(post, user);
+  @Transactional
+  public void updatePostViewCount(Long postId) {
+    Post post = findPostByPostId(postId);
+    post.updateViewCount();
+    postRepository.update(post);
   }
 
   @Transactional
@@ -67,16 +63,14 @@ public class BoardService {
 
   @Transactional
   public void updatePost(PostUpdateDto updateDto, Long loginUserId) {
-    Post post = postRepository.findByPostId(updateDto.getPostId())
-        .orElseThrow(() -> new NotFoundEntityException("게시물"));
+    Post post = findPostByPostId(updateDto.getPostId());
     checkPermission(post.getUserId(), loginUserId);
     postRepository.update(updateDto.toEntity(post));
   }
 
   @Transactional
   public void deletePost(Long postId, Long loginUserId) {
-    Post post = postRepository.findByPostId(postId)
-        .orElseThrow(() -> new NotFoundEntityException("게시물"));
+    Post post = findPostByPostId(postId);
     checkPermission(post.getUserId(), loginUserId);
     commentRepository.deleteByPostId(postId);
     postRepository.deleteByPostId(postId);
@@ -85,18 +79,16 @@ public class BoardService {
   public List<CommentReadDto> getCommentsByPostId(Long postId) {
     List<CommentReadDto> commentReadDtos = new ArrayList<>();
     for (Comment comment : commentRepository.findByPostId(postId)) {
-      User user = userRepository.findByUserId(comment.getUserId())
-          .orElseThrow(() -> new NotFoundEntityException("사용자"));
+      User user = findUserByUserId(comment.getUserId());
       commentReadDtos.add(CommentReadDto.toDto(comment, user));
     }
     return commentReadDtos;
   }
 
-  public CommentReadDto getCommentsByCommentId(Long commentId) {
-    Comment comment = commentRepository.findByCommentId(commentId)
-        .orElseThrow(() -> new NotFoundEntityException("댓글"));
-    User user = userRepository.findByUserId(comment.getUserId())
-        .orElseThrow(() -> new NotFoundEntityException("사용자"));
+  public CommentReadDto getCommentByCommentId(Long commentId) {
+    Comment comment = findCommentByCommentId(commentId);
+    Long userId = comment.getUserId();
+    User user = findUserByUserId(userId);
     return CommentReadDto.toDto(comment, user);
   }
 
@@ -109,18 +101,31 @@ public class BoardService {
 
   @Transactional
   public void updateComment(CommentUpdateDto updateDto, Long loginUserId) {
-    Comment comment = commentRepository.findByCommentId(updateDto.getCommentId())
-        .orElseThrow(() -> new NotFoundEntityException("댓글"));
+    Comment comment = findCommentByCommentId(updateDto.getCommentId());
     checkPermission(comment.getUserId(), loginUserId);
     commentRepository.update(updateDto.toEntity(comment));
   }
 
   @Transactional
   public void deleteComment(Long commentId, Long loginUserId) {
-    Comment comment = commentRepository.findByCommentId(commentId)
-        .orElseThrow(() -> new NotFoundEntityException("댓글"));
+    Comment comment = findCommentByCommentId(commentId);
     checkPermission(comment.getUserId(), loginUserId);
     commentRepository.deleteByCommentId(commentId);
+  }
+
+  private Post findPostByPostId(Long postId) {
+    return postRepository.findByPostId(postId)
+        .orElseThrow(() -> new NotFoundEntityException("게시물"));
+  }
+
+  private User findUserByUserId(Long userId) {
+    return userRepository.findByUserId(userId)
+        .orElseThrow(() -> new NotFoundEntityException("사용자"));
+  }
+
+  private Comment findCommentByCommentId(Long commentId) {
+    return commentRepository.findByCommentId(commentId)
+        .orElseThrow(() -> new NotFoundEntityException("댓글"));
   }
 
   private void checkPermission(Long authorUserId, Long loginUserId) {
