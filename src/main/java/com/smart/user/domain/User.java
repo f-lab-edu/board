@@ -22,4 +22,8 @@ public class User {
   private LocalDateTime updateDate;
   private Status userStatus;
   private String role;
+
+  public void setUserId(Long userId) {
+    this.userId = userId;
+  }
 }
