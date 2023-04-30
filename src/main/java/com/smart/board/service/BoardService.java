@@ -1,21 +1,20 @@
 package com.smart.board.service;
 
-import com.smart.board.controller.dto.BoardDetailDto;
-import com.smart.board.controller.dto.BoardListDto;
 import com.smart.board.controller.dto.comment.CommentCreateDto;
-import com.smart.board.controller.dto.comment.CommentDeleteDto;
 import com.smart.board.controller.dto.comment.CommentReadDto;
 import com.smart.board.controller.dto.comment.CommentUpdateDto;
 import com.smart.board.controller.dto.post.PostCreateDto;
-import com.smart.board.controller.dto.post.PostDeleteDto;
 import com.smart.board.controller.dto.post.PostReadDto;
 import com.smart.board.controller.dto.post.PostUpdateDto;
-import com.smart.board.repository.CommentRepository;
-import com.smart.board.repository.PostRepository;
 import com.smart.board.domain.Comment;
 import com.smart.board.domain.Post;
+import com.smart.board.repository.CommentRepository;
+import com.smart.board.repository.PostRepository;
 import com.smart.global.error.NotFoundEntityException;
 import com.smart.global.error.PermissionDeniedException;
+import com.smart.user.domain.User;
+import com.smart.user.repository.UserRepository;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,60 +24,79 @@ public class BoardService {
 
   private final PostRepository postRepository;
   private final CommentRepository commentRepository;
+  private final UserRepository userRepository;
 
-  public BoardService(PostRepository postRepository, CommentRepository commentRepository) {
+  public BoardService(PostRepository postRepository, CommentRepository commentRepository,
+      UserRepository userRepository) {
     this.postRepository = postRepository;
     this.commentRepository = commentRepository;
+    this.userRepository = userRepository;
   }
 
-  public BoardListDto getBoardList() {
-    List<PostReadDto> postDtos = postRepository.findAll();
-    return BoardListDto.builder()
-        .postDtos(postDtos)
-        .build();
+  public List<PostReadDto> getPosts() {
+    List<PostReadDto> postReadDtos = new ArrayList<>();
+    for (Post post : postRepository.findAll()) {
+      User user = userRepository.findByUserId(post.getUserId())
+          .orElseThrow(() -> new NotFoundEntityException("사용자"));
+      postReadDtos.add(PostReadDto.toDto(post, user));
+    }
+    return postReadDtos;
   }
 
-  public BoardDetailDto getBoardDetailByPostId(Long postId) {
-    postRepository.updateViewCnt(postId);
-    PostReadDto postDto = postRepository.findByPostId(postId)
+  public void updatePostViewCount(Long postId) {
+    Post post = postRepository.findByPostId(postId)
         .orElseThrow(() -> new NotFoundEntityException("게시물"));
-    List<CommentReadDto> commentDtos = commentRepository.findByPostId(postId);
-    return BoardDetailDto.builder()
-        .postDto(postDto)
-        .commentDtos(commentDtos)
-        .build();
+    post.updateViewCount();
+    postRepository.update(post);
   }
 
   public PostReadDto getPostByPostId(Long postId) {
-    return postRepository.findByPostId(postId)
+    Post post = postRepository.findByPostId(postId)
         .orElseThrow(() -> new NotFoundEntityException("게시물"));
+    User user = userRepository.findByUserId(post.getUserId())
+        .orElseThrow(() -> new NotFoundEntityException("사용자"));
+    return PostReadDto.toDto(post, user);
   }
 
   @Transactional
   public Long createPost(PostCreateDto createDto, Long loginUserId) {
     Post post = createDto.toEntity(loginUserId);
-    postRepository.save(post);
-    return post.getPostId();
+    return postRepository.save(post);
   }
 
   @Transactional
   public void updatePost(PostUpdateDto updateDto, Long loginUserId) {
-    checkPermission(updateDto.getUserId(), loginUserId);
-    checkExistPost(updateDto.getPostId());
-    postRepository.update(updateDto.toEntity());
+    Post post = postRepository.findByPostId(updateDto.getPostId())
+        .orElseThrow(() -> new NotFoundEntityException("게시물"));
+    checkPermission(post.getUserId(), loginUserId);
+    postRepository.update(updateDto.toEntity(post));
   }
 
   @Transactional
-  public void deletePost(PostDeleteDto deleteDto, Long loginUserId) {
-    checkPermission(deleteDto.getUserId(), loginUserId);
-    checkExistPost(deleteDto.getPostId());
-    commentRepository.deleteByPostId(deleteDto.getPostId());
-    postRepository.deleteByPostId(deleteDto.getPostId());
+  public void deletePost(Long postId, Long loginUserId) {
+    Post post = postRepository.findByPostId(postId)
+        .orElseThrow(() -> new NotFoundEntityException("게시물"));
+    checkPermission(post.getUserId(), loginUserId);
+    commentRepository.deleteByPostId(postId);
+    postRepository.deleteByPostId(postId);
   }
 
-  public CommentReadDto getCommentByCommentId(Long commentId) {
-    return commentRepository.findByCommentId(commentId)
+  public List<CommentReadDto> getCommentsByPostId(Long postId) {
+    List<CommentReadDto> commentReadDtos = new ArrayList<>();
+    for (Comment comment : commentRepository.findByPostId(postId)) {
+      User user = userRepository.findByUserId(comment.getUserId())
+          .orElseThrow(() -> new NotFoundEntityException("사용자"));
+      commentReadDtos.add(CommentReadDto.toDto(comment, user));
+    }
+    return commentReadDtos;
+  }
+
+  public CommentReadDto getCommentsByCommentId(Long commentId) {
+    Comment comment = commentRepository.findByCommentId(commentId)
         .orElseThrow(() -> new NotFoundEntityException("댓글"));
+    User user = userRepository.findByUserId(comment.getUserId())
+        .orElseThrow(() -> new NotFoundEntityException("사용자"));
+    return CommentReadDto.toDto(comment, user);
   }
 
   @Transactional
@@ -90,28 +108,18 @@ public class BoardService {
 
   @Transactional
   public void updateComment(CommentUpdateDto updateDto, Long loginUserId) {
-    checkPermission(updateDto.getUserId(), loginUserId);
-    checkExistComment(updateDto.getCommentId());
-    commentRepository.update(updateDto.toEntity());
+    Comment comment = commentRepository.findByCommentId(updateDto.getCommentId())
+        .orElseThrow(() -> new NotFoundEntityException("댓글"));
+    checkPermission(comment.getUserId(), loginUserId);
+    commentRepository.update(updateDto.toEntity(comment));
   }
 
   @Transactional
-  public void deleteComment(CommentDeleteDto deleteDto, Long loginUserId) {
-    checkPermission(deleteDto.getUserId(), loginUserId);
-    checkExistComment(deleteDto.getCommentId());
-    commentRepository.deleteByCommentId(deleteDto.getCommentId());
-  }
-
-  private void checkExistPost(Long postId) {
-    if (!postRepository.existsByPostId(postId)) {
-      throw new NotFoundEntityException("게시물");
-    }
-  }
-
-  private void checkExistComment(Long commentId) {
-    if (!commentRepository.existsByCommentId(commentId)) {
-      throw new NotFoundEntityException("댓글");
-    }
+  public void deleteComment(Long commentId, Long loginUserId) {
+    Comment comment = commentRepository.findByCommentId(commentId)
+        .orElseThrow(() -> new NotFoundEntityException("댓글"));
+    checkPermission(comment.getUserId(), loginUserId);
+    commentRepository.deleteByCommentId(commentId);
   }
 
   private void checkPermission(Long authorUserId, Long loginUserId) {

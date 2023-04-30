@@ -1,6 +1,5 @@
 package com.smart.board.controller;
 
-import com.smart.board.controller.dto.BoardDetailDto;
 import com.smart.board.service.BoardService;
 import com.smart.user.domain.CustomUserDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,7 +19,7 @@ public class BoardViewController {
   @GetMapping("/boards")
   public String showBoardsPage(Model model,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
-    model.addAttribute("boardList", boardService.getBoardList());
+    model.addAttribute("boardList", boardService.getPosts());
     model.addAttribute("userDetails", userDetails);
     return "boards";
   }
@@ -28,9 +27,8 @@ public class BoardViewController {
   @GetMapping("/board")
   public String showBoardDetailPage(Long postId,
       @AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
-    BoardDetailDto boardDetail = boardService.getBoardDetailByPostId(postId);
-    model.addAttribute("post", boardDetail.getPostDto());
-    model.addAttribute("comments", boardDetail.getCommentDtos());
+    model.addAttribute("post", boardService.getPostByPostId(postId));
+    model.addAttribute("comments", boardService.getCommentsByPostId(postId));
     model.addAttribute("userDetails", userDetails);
     return "board";
   }

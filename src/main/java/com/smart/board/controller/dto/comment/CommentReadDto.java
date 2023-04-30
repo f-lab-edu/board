@@ -1,5 +1,7 @@
 package com.smart.board.controller.dto.comment;
 
+import com.smart.board.domain.Comment;
+import com.smart.user.domain.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -35,4 +37,15 @@ public class CommentReadDto {
   @NotBlank
   private String nickname;
 
+  public static CommentReadDto toDto(Comment comment, User user) {
+    return CommentReadDto.builder()
+        .commentId(comment.getCommentId())
+        .content(comment.getContent())
+        .createDate(comment.getCreateDate())
+        .updateDate(comment.getUpdateDate())
+        .postId(comment.getPostId())
+        .userId(user.getUserId())
+        .nickname(user.getNickname())
+        .build();
+  }
 }

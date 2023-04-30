@@ -19,4 +19,8 @@ public class Comment {
   private LocalDateTime updateDate;
   private Long postId;
   private Long userId;
+
+  public void setCommentId(Long commentId) {
+    this.commentId = commentId;
+  }
 }

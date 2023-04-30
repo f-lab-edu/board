@@ -20,4 +20,12 @@ public class Post {
   private LocalDateTime updateDate;
   private Long viewCount;
   private Long userId;
+
+  public void setPostId(Long postId) {
+    this.postId = postId;
+  }
+
+  public void updateViewCount() {
+    viewCount++;
+  }
 }

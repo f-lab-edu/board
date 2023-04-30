@@ -25,16 +25,15 @@ public class PostUpdateDto {
   @NotBlank
   private String content;
 
-  @NotNull
-  private Long userId;
-
-  public Post toEntity() {
+  public Post toEntity(Post post) {
     return Post.builder()
         .postId(getPostId())
         .title(getTitle())
         .content(getContent())
+        .createDate(post.getCreateDate())
         .updateDate(LocalDateTime.now())
-        .userId(getUserId())
+        .viewCount(post.getViewCount())
+        .userId(post.getUserId())
         .build();
   }
 }

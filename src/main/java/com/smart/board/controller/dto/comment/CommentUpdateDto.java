@@ -22,15 +22,14 @@ public class CommentUpdateDto {
   @NotBlank
   private String content;
 
-  @NotNull
-  private Long userId;
-
-  public Comment toEntity() {
+  public Comment toEntity(Comment comment) {
     return Comment.builder()
         .commentId(getCommentId())
         .content(getContent())
+        .createDate(comment.getCreateDate())
         .updateDate(LocalDateTime.now())
-        .userId(getUserId())
+        .postId(comment.getPostId())
+        .userId(comment.getUserId())
         .build();
   }
 }

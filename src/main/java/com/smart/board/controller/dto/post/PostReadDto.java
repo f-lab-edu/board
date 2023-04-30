@@ -1,5 +1,7 @@
 package com.smart.board.controller.dto.post;
 
+import com.smart.board.domain.Post;
+import com.smart.user.domain.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -37,5 +39,18 @@ public class PostReadDto {
 
   @NotBlank
   private String nickname;
+
+  public static PostReadDto toDto(Post post, User user) {
+    return PostReadDto.builder()
+        .postId(post.getPostId())
+        .title(post.getTitle())
+        .content(post.getContent())
+        .createDate(post.getCreateDate())
+        .updateDate(post.getUpdateDate())
+        .viewCount(post.getViewCount())
+        .userId(user.getUserId())
+        .nickname(user.getNickname())
+        .build();
+  }
 
 }
