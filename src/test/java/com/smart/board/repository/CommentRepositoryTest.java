@@ -3,7 +3,6 @@ package com.smart.board.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.smart.board.controller.dto.comment.CommentCreateDto;
-import com.smart.board.controller.dto.comment.CommentReadDto;
 import com.smart.board.controller.dto.comment.CommentUpdateDto;
 import com.smart.board.domain.Comment;
 import java.util.List;
@@ -12,18 +11,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
-@MybatisTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CommentRepositoryTest {
 
-  @Autowired
-  private CommentRepository commentRepository;
+  private CommentRepositoryImpl commentRepository = new CommentRepositoryImpl();
 
-  Comment comment;
+  private Comment comment;
 
   @BeforeEach
   public void create_Test_Data() {
@@ -45,18 +38,17 @@ public class CommentRepositoryTest {
   public void findByPostId_CommentReadDtos_ExistingComments() {
     commentRepository.save(comment);
 
-    List<CommentReadDto> commentReadDtos = commentRepository
-        .findByPostId(comment.getPostId());
+    List<Comment> comments = commentRepository.findByPostId(comment.getPostId());
 
-    assertThat(commentReadDtos.isEmpty()).isFalse();
+    assertThat(comments.isEmpty()).isFalse();
   }
 
   @Test
   @DisplayName("존재하지 않는 게시글 ID로 댓글 조회 시 비어있는 List를 반환한다.")
   public void findByPostId_EmptyList_NotExistingPostId() {
-    List<CommentReadDto> commentReadDtos = commentRepository.findByPostId(-1L);
+    List<Comment> comment = commentRepository.findByPostId(-1L);
 
-    assertThat(commentReadDtos.isEmpty()).isTrue();
+    assertThat(comment.isEmpty()).isTrue();
   }
 
   @Test
@@ -74,11 +66,10 @@ public class CommentRepositoryTest {
   public void findByCommentId_CommentReadDto_ExistingCommentId() {
     commentRepository.save(comment);
 
-    CommentReadDto commentReadDto = commentRepository.findByCommentId(comment.getCommentId())
-        .get();
+    Comment retComment = commentRepository.findByCommentId(comment.getCommentId()).get();
 
-    assertThat(commentReadDto).isNotNull();
-    assertThat(commentReadDto.getCommentId()).isEqualTo(comment.getCommentId());
+    assertThat(retComment).isNotNull();
+    assertThat(retComment.getCommentId()).isEqualTo(comment.getCommentId());
   }
 
   @Test
@@ -87,14 +78,13 @@ public class CommentRepositoryTest {
     Comment updateComment = CommentUpdateDto.builder()
         .commentId(-1L)
         .content("update content")
-        .userId(comment.getUserId())
         .build()
-        .toEntity();
+        .toEntity(comment);
 
     commentRepository.update(updateComment);
 
-    Optional<CommentReadDto> optionalCommentReadDto = commentRepository.findByCommentId(-1L);
-    assertThat(optionalCommentReadDto.isEmpty()).isTrue();
+    Optional<Comment> optionalComment = commentRepository.findByCommentId(-1L);
+    assertThat(optionalComment.isEmpty()).isTrue();
   }
 
   @Test
@@ -104,16 +94,14 @@ public class CommentRepositoryTest {
     Comment updateComment = CommentUpdateDto.builder()
         .commentId(comment.getCommentId())
         .content("update content")
-        .userId(comment.getUserId())
         .build()
-        .toEntity();
+        .toEntity(comment);
 
     commentRepository.update(updateComment);
 
-    CommentReadDto commentReadDto = commentRepository.findByCommentId(comment.getCommentId())
-        .get();
-    assertThat(commentReadDto.getCommentId()).isEqualTo(updateComment.getCommentId());
-    assertThat(commentReadDto.getContent()).isEqualTo(updateComment.getContent());
+    Comment retComment = commentRepository.findByCommentId(comment.getCommentId()).get();
+    assertThat(retComment.getCommentId()).isEqualTo(updateComment.getCommentId());
+    assertThat(retComment.getContent()).isEqualTo(updateComment.getContent());
   }
 
   @Test
