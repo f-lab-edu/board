@@ -40,7 +40,7 @@
   </tr>
   </thead>
   <tbody>
-  <tr th:each="post:${boardList.postDtos}">
+  <tr th:each="post:${posts}">
     <td><a th:text="${post.title}" th:href="@{/board(postId = ${post.postId})}"></a></td>
     <td th:text="${post.nickname}">nickname</td>
     <td th:text="${post.createDate}">createDate</td>

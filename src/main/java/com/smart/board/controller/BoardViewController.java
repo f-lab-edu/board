@@ -19,7 +19,7 @@ public class BoardViewController {
   @GetMapping("/boards")
   public String showBoardsPage(Model model,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
-    model.addAttribute("boardList", boardService.getPosts());
+    model.addAttribute("posts", boardService.getPosts());
     model.addAttribute("userDetails", userDetails);
     return "boards";
   }
