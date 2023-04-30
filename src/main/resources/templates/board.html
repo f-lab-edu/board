@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 </head>
 <script th:inline="javascript">
-  function create(post){
+  function create(post) {
 
     const comment = document.getElementById('input-content').value;
 
@@ -34,13 +34,12 @@
     });
   }
 
-  function updateComment(comment){
-    const content = document.getElementById('commentContent-'+comment.commentId).value;
+  function updateComment(comment) {
+    const content = document.getElementById('commentContent-' + comment.commentId).value;
 
     const sendDTO = {
       commentId: comment.commentId,
       content: content,
-      userId: comment.userId,
     };
 
     const url = '/api/v1/comment';
@@ -64,20 +63,13 @@
 
   }
 
-  function deleteComment(comment){
-
-    const sendDTO = {
-      commentId: comment.commentId,
-      userId: comment.userId,
-    };
-
-    const url = '/api/v1/comment';
+  function deleteComment(comment) {
+    const url = '/api/v1/comment/' + comment.commentId;
     const options = {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(sendDTO),
     };
 
     fetch(url, options)
@@ -92,18 +84,12 @@
   }
 
   function deletePost(post) {
-    const sendDTO = {
-      postId: post.postId,
-      userId: post.userId,
-    };
-
-    const url = '/api/v1/post';
+    const url = '/api/v1/post/' + post.postId;
     const options = {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(sendDTO),
     };
 
     fetch(url, options)
@@ -154,7 +140,8 @@
     <input type="text" th:value="${comment.content}" readonly/>
   </span>
   <span th:if="${userDetails != null && userDetails.userId == comment.userId}">
-    <input type="text" th:value="${comment.content}" th:id="'commentContent-' + ${comment.commentId}"/>
+    <input type="text" th:value="${comment.content}"
+           th:id="'commentContent-' + ${comment.commentId}"/>
     <button th:onclick="updateComment([[${comment}]])">수정</button>
     <button th:onclick="deleteComment([[${comment}]])">삭제</button>
   </span>
