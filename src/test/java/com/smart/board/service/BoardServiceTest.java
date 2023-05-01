@@ -14,6 +14,7 @@ import com.smart.board.repository.PostRepository;
 import com.smart.board.repository.PostRepositoryImpl;
 import com.smart.global.error.NotFoundEntityException;
 import com.smart.global.error.PermissionDeniedException;
+import com.smart.user.domain.CustomUserDetails;
 import com.smart.user.domain.User;
 import com.smart.user.repository.UserRepository;
 import com.smart.user.repository.UserRepositoryImpl;
@@ -21,6 +22,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public class BoardServiceTest {
 
@@ -71,7 +73,7 @@ public class BoardServiceTest {
   @DisplayName("해당 ID의 게시물이 없다면 NotFoundEntityException을 던진다.")
   @Test
   public void getPostByPostId_ThrowsException_NotExistingPostId() {
-    assertThatThrownBy(() -> boardService.getPostByPostId(-1L))
+    assertThatThrownBy(() -> boardService.getPostByPostId(-1L, null))
         .isInstanceOf(NotFoundEntityException.class);
   }
 
@@ -85,25 +87,44 @@ public class BoardServiceTest {
         .build();
     Long postId = boardService.createPost(createDto, userId);
 
-    PostReadDto retPostReadDto = boardService.getPostByPostId(postId);
+    PostReadDto retPostReadDto = boardService.getPostByPostId(postId, null);
 
     assertThat(retPostReadDto.getPostId()).isEqualTo(postId);
     assertThat(retPostReadDto.getUserId()).isEqualTo(userId);
   }
 
-  @DisplayName("해당 게시물의 조회수를 증가시킨다.")
+  @DisplayName("본인 글이 아닐경우, 해당 게시물 조회 시 조회수를 증가시킨다.")
   @Test
-  public void getBoardDetailByPostId_UpdateViewCount_ExistingPostId() {
+  public void getPostByPostId_UpdateViewCount_NotOwnPost() {
     PostCreateDto createDto = PostCreateDto
         .builder()
         .title("title")
         .content("content")
         .build();
     Long postId = boardService.createPost(createDto, userId);
+    CustomUserDetails userDetails = new CustomUserDetails();
+    userDetails.setUserId(userId + 1);
 
-    boardService.updatePostViewCount(postId);
+    PostReadDto retPost = boardService.getPostByPostId(postId, userDetails);
 
-    assertThat(boardService.getPostByPostId(postId).getViewCount()).isEqualTo(1L);
+    assertThat(retPost.getViewCount()).isEqualTo(1L);
+  }
+
+  @DisplayName("본인 글일 경우, 해당 게시물 조회 시 조회수를 증가시키지 않는다.")
+  @Test
+  public void getPostByPostId_NotUpdateViewCount_OwnPost() {
+    PostCreateDto createDto = PostCreateDto
+        .builder()
+        .title("title")
+        .content("content")
+        .build();
+    Long postId = boardService.createPost(createDto, userId);
+    CustomUserDetails userDetails = new CustomUserDetails();
+    userDetails.setUserId(userId);
+
+    PostReadDto retPost = boardService.getPostByPostId(postId, userDetails);
+
+    assertThat(retPost.getViewCount()).isEqualTo(0L);
   }
 
   @DisplayName("존재하지 않는 게시물을 업데이트하면 NotFoundEntityException을 던진다.")
@@ -151,8 +172,8 @@ public class BoardServiceTest {
 
     boardService.updatePost(updateDto, userId);
 
-    assertThat(boardService.getPostByPostId(postId).getTitle()).isEqualTo(updateDto.getTitle());
-    assertThat(boardService.getPostByPostId(postId).getContent()).isEqualTo(updateDto.getContent());
+    assertThat(boardService.getPostByPostId(postId, null).getTitle()).isEqualTo(updateDto.getTitle());
+    assertThat(boardService.getPostByPostId(postId, null).getContent()).isEqualTo(updateDto.getContent());
   }
 
   @DisplayName("존재하지 않는 게시물을 삭제하면 NotFoundEntityException을 던진다.")
@@ -188,7 +209,7 @@ public class BoardServiceTest {
 
     boardService.deletePost(postId, userId);
 
-    assertThatThrownBy(() -> boardService.getPostByPostId(postId))
+    assertThatThrownBy(() -> boardService.getPostByPostId(postId, null))
         .isInstanceOf(NotFoundEntityException.class);
   }
 
