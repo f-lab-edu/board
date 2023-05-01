@@ -20,26 +20,21 @@ import com.smart.user.repository.AuthCodeRepository;
 import com.smart.user.repository.AuthCodeRepositoryImpl;
 import com.smart.user.repository.UserRepository;
 import com.smart.user.repository.UserRepositoryImpl;
-import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.mock.web.MockHttpSession;
 
 class UserServiceTest {
 
   private final UserRepository userRepository = new UserRepositoryImpl();
   private final AuthCodeRepository authCodeRepository = new AuthCodeRepositoryImpl();
 
-  private final HttpSession httpSession = new MockHttpSession();
-
   private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
-  private final UserService userService = new UserService(userRepository, eventPublisher,
-      httpSession, authCodeRepository);
+  private final UserService userService = new UserService(userRepository, eventPublisher, authCodeRepository);
 
   private UserSaveDto userSaveDto;
 
@@ -117,7 +112,6 @@ class UserServiceTest {
   @Test
   public void 유저상태업데이트실패() {
     userService.join(userSaveDto);
-    httpSession.setAttribute("test@email", "unAuthCode");
 
     assertThrows(IllegalAuthCodeException.class,
         () -> userService.verifyAuthCode(userSaveDto.getEmail(), "authCode"));
@@ -141,7 +135,7 @@ class UserServiceTest {
   @Test
   public void 유저정보변경성공() {
     // Given
-    Long userId = userService.join(userSaveDto);
+    userService.join(userSaveDto);
     String newNickname = "newNickname";
     UserUpdateDto userUpdateDto = UserUpdateDto
         .builder()

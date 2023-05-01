@@ -12,8 +12,6 @@ import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
 import com.smart.user.repository.AuthCodeRepository;
 import com.smart.user.repository.UserRepository;
-import jakarta.servlet.http.HttpSession;
-import java.util.UUID;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,15 +23,12 @@ public class UserService {
 
   private final ApplicationEventPublisher eventPublisher;
 
-  private final HttpSession session;
-
   private final AuthCodeRepository authCodeRepository;
 
   public UserService(UserRepository userRepository, ApplicationEventPublisher eventPublisher,
-      HttpSession session, AuthCodeRepository authCodeRepository) {
+      AuthCodeRepository authCodeRepository) {
     this.userRepository = userRepository;
     this.eventPublisher = eventPublisher;
-    this.session = session;
     this.authCodeRepository = authCodeRepository;
   }
 
