@@ -38,8 +38,9 @@ public class BoardController {
   }
 
   @GetMapping("/post/{postId}")
-  public PostReadDto getPostByPostId(@PathVariable Long postId) {
-    return boardService.getPostByPostId(postId);
+  public PostReadDto getPostByPostId(@PathVariable Long postId,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    return boardService.getPostByPostId(postId, userDetails);
   }
 
   @PostMapping("/post")

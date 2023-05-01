@@ -12,6 +12,7 @@ import com.smart.board.repository.CommentRepository;
 import com.smart.board.repository.PostRepository;
 import com.smart.global.error.NotFoundEntityException;
 import com.smart.global.error.PermissionDeniedException;
+import com.smart.user.domain.CustomUserDetails;
 import com.smart.user.domain.User;
 import com.smart.user.repository.UserRepository;
 import java.util.ArrayList;
@@ -42,17 +43,19 @@ public class BoardService {
     return postReadDtos;
   }
 
-  public PostReadDto getPostByPostId(Long postId) {
+  @Transactional
+  public PostReadDto getPostByPostId(Long postId, CustomUserDetails userDetails) {
     Post post = findPostByPostId(postId);
+    updateViewCount(post, userDetails);
     User user = findUserByUserId(post.getUserId());
     return PostReadDto.toDto(post, user);
   }
 
-  @Transactional
-  public void updatePostViewCount(Long postId) {
-    Post post = findPostByPostId(postId);
-    post.updateViewCount();
-    postRepository.update(post);
+  private void updateViewCount(Post post, CustomUserDetails userDetails) {
+    if (userDetails != null && !post.getUserId().equals(userDetails.getUserId())) {
+      post.updateViewCount();
+      postRepository.update(post);
+    }
   }
 
   @Transactional
