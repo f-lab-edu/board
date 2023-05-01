@@ -54,7 +54,7 @@ public class BoardService {
   private void updateViewCount(Post post, CustomUserDetails userDetails) {
     if (userDetails != null && !post.getUserId().equals(userDetails.getUserId())) {
       post.updateViewCount();
-      postRepository.update(post);
+      postRepository.save(post);
     }
   }
 
@@ -68,7 +68,7 @@ public class BoardService {
   public void updatePost(PostUpdateDto updateDto, Long loginUserId) {
     Post post = findPostByPostId(updateDto.getPostId());
     checkPermission(post.getUserId(), loginUserId);
-    postRepository.update(updateDto.toEntity(post));
+    postRepository.save(updateDto.toEntity(post));
   }
 
   @Transactional
@@ -106,7 +106,7 @@ public class BoardService {
   public void updateComment(CommentUpdateDto updateDto, Long loginUserId) {
     Comment comment = findCommentByCommentId(updateDto.getCommentId());
     checkPermission(comment.getUserId(), loginUserId);
-    commentRepository.update(updateDto.toEntity(comment));
+    commentRepository.save(updateDto.toEntity(comment));
   }
 
   @Transactional

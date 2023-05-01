@@ -32,19 +32,8 @@ public class PostRepositoryImpl implements PostRepository {
   }
 
   @Override
-  public void update(Post post) {
-    if (posts.containsKey(post.getPostId())) {
-      posts.put(post.getPostId(), post);
-    }
-  }
-
-  @Override
   public void deleteByPostId(Long postId) {
     posts.remove(postId);
   }
 
-  @Override
-  public boolean existsByPostId(Long postId) {
-    return posts.containsKey(postId);
-  }
 }

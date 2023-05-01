@@ -39,13 +39,6 @@ public class CommentRepositoryImpl implements CommentRepository {
   }
 
   @Override
-  public void update(Comment comment) {
-    if (comments.containsKey(comment.getCommentId())) {
-      comments.put(comment.getCommentId(), comment);
-    }
-  }
-
-  @Override
   public void deleteByCommentId(Long commentId) {
     comments.remove(commentId);
   }

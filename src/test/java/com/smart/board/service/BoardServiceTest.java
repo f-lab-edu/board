@@ -22,7 +22,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.core.userdetails.UserDetails;
 
 public class BoardServiceTest {
 
@@ -172,8 +171,10 @@ public class BoardServiceTest {
 
     boardService.updatePost(updateDto, userId);
 
-    assertThat(boardService.getPostByPostId(postId, null).getTitle()).isEqualTo(updateDto.getTitle());
-    assertThat(boardService.getPostByPostId(postId, null).getContent()).isEqualTo(updateDto.getContent());
+    assertThat(boardService.getPostByPostId(postId, null).getTitle())
+        .isEqualTo(updateDto.getTitle());
+    assertThat(boardService.getPostByPostId(postId, null).getContent())
+        .isEqualTo(updateDto.getContent());
   }
 
   @DisplayName("존재하지 않는 게시물을 삭제하면 NotFoundEntityException을 던진다.")
