@@ -26,7 +26,9 @@ public class PostRepositoryImpl implements PostRepository {
 
   @Override
   public Long save(Post post) {
-    post.setPostId(sequence++);
+    if(post.getPostId()==null){
+      post.setPostId(sequence++);
+    }
     posts.put(post.getPostId(), post);
     return post.getPostId();
   }
