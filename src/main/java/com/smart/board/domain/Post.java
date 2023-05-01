@@ -25,7 +25,9 @@ public class Post {
     this.postId = postId;
   }
 
-  public void updateViewCount() {
-    viewCount++;
+  public void updateViewCount(Long userId) {
+    if (!this.userId.equals(userId)) {
+      viewCount++;
+    }
   }
 }

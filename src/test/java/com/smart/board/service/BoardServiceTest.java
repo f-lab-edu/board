@@ -72,7 +72,7 @@ public class BoardServiceTest {
   @DisplayName("해당 ID의 게시물이 없다면 NotFoundEntityException을 던진다.")
   @Test
   public void getPostByPostId_ThrowsException_NotExistingPostId() {
-    assertThatThrownBy(() -> boardService.getPostByPostId(-1L, null))
+    assertThatThrownBy(() -> boardService.getPostByPostId(-1L))
         .isInstanceOf(NotFoundEntityException.class);
   }
 
@@ -86,7 +86,7 @@ public class BoardServiceTest {
         .build();
     Long postId = boardService.createPost(createDto, userId);
 
-    PostReadDto retPostReadDto = boardService.getPostByPostId(postId, null);
+    PostReadDto retPostReadDto = boardService.getPostByPostId(postId);
 
     assertThat(retPostReadDto.getPostId()).isEqualTo(postId);
     assertThat(retPostReadDto.getUserId()).isEqualTo(userId);
@@ -101,12 +101,10 @@ public class BoardServiceTest {
         .content("content")
         .build();
     Long postId = boardService.createPost(createDto, userId);
-    CustomUserDetails userDetails = new CustomUserDetails();
-    userDetails.setUserId(userId + 1);
 
-    PostReadDto retPost = boardService.getPostByPostId(postId, userDetails);
+    boardService.updateViewCount(postId, userId + 1);
 
-    assertThat(retPost.getViewCount()).isEqualTo(1L);
+    assertThat(boardService.getPostByPostId(postId).getViewCount()).isEqualTo(1L);
   }
 
   @DisplayName("본인 글일 경우, 해당 게시물 조회 시 조회수를 증가시키지 않는다.")
@@ -121,9 +119,9 @@ public class BoardServiceTest {
     CustomUserDetails userDetails = new CustomUserDetails();
     userDetails.setUserId(userId);
 
-    PostReadDto retPost = boardService.getPostByPostId(postId, userDetails);
+    boardService.updateViewCount(postId, userId);
 
-    assertThat(retPost.getViewCount()).isEqualTo(0L);
+    assertThat(boardService.getPostByPostId(postId).getViewCount()).isEqualTo(0L);
   }
 
   @DisplayName("존재하지 않는 게시물을 업데이트하면 NotFoundEntityException을 던진다.")
@@ -171,9 +169,9 @@ public class BoardServiceTest {
 
     boardService.updatePost(updateDto, userId);
 
-    assertThat(boardService.getPostByPostId(postId, null).getTitle())
+    assertThat(boardService.getPostByPostId(postId).getTitle())
         .isEqualTo(updateDto.getTitle());
-    assertThat(boardService.getPostByPostId(postId, null).getContent())
+    assertThat(boardService.getPostByPostId(postId).getContent())
         .isEqualTo(updateDto.getContent());
   }
 
@@ -210,7 +208,7 @@ public class BoardServiceTest {
 
     boardService.deletePost(postId, userId);
 
-    assertThatThrownBy(() -> boardService.getPostByPostId(postId, null))
+    assertThatThrownBy(() -> boardService.getPostByPostId(postId))
         .isInstanceOf(NotFoundEntityException.class);
   }
 

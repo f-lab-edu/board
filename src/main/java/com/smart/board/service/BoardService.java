@@ -43,19 +43,17 @@ public class BoardService {
     return postReadDtos;
   }
 
-  @Transactional
-  public PostReadDto getPostByPostId(Long postId, CustomUserDetails userDetails) {
+  public PostReadDto getPostByPostId(Long postId) {
     Post post = findPostByPostId(postId);
-    updateViewCount(post, userDetails);
     User user = findUserByUserId(post.getUserId());
     return PostReadDto.toDto(post, user);
   }
 
-  private void updateViewCount(Post post, CustomUserDetails userDetails) {
-    if (userDetails != null && !post.getUserId().equals(userDetails.getUserId())) {
-      post.updateViewCount();
-      postRepository.save(post);
-    }
+  @Transactional
+  public void updateViewCount(Long postId, Long loginId) {
+    Post post = findPostByPostId(postId);
+    post.updateViewCount(loginId);
+    postRepository.save(post);
   }
 
   @Transactional

@@ -40,7 +40,10 @@ public class BoardController {
   @GetMapping("/post/{postId}")
   public PostReadDto getPostByPostId(@PathVariable Long postId,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
-    return boardService.getPostByPostId(postId, userDetails);
+    if (userDetails != null) {
+      boardService.updateViewCount(postId, userDetails.getUserId());
+    }
+    return boardService.getPostByPostId(postId);
   }
 
   @PostMapping("/post")

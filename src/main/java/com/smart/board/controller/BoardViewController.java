@@ -27,7 +27,10 @@ public class BoardViewController {
   @GetMapping("/board")
   public String showBoardDetailPage(Long postId,
       @AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
-    model.addAttribute("post", boardService.getPostByPostId(postId, userDetails));
+    if (userDetails != null) {
+      boardService.updateViewCount(postId, userDetails.getUserId());
+    }
+    model.addAttribute("post", boardService.getPostByPostId(postId));
     model.addAttribute("comments", boardService.getCommentsByPostId(postId));
     model.addAttribute("userDetails", userDetails);
     return "board";
@@ -39,8 +42,8 @@ public class BoardViewController {
   }
 
   @GetMapping("/board/update")
-  public String showBoardUpdatePage(Long postId, @AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
-    model.addAttribute("post", boardService.getPostByPostId(postId, userDetails));
+  public String showBoardUpdatePage(Long postId, Model model) {
+    model.addAttribute("post", boardService.getPostByPostId(postId));
     return "boardUpdate";
   }
 }
