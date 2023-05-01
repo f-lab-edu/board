@@ -3,15 +3,17 @@ package com.smart.user.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.smart.user.controller.dto.UserDto.UserInfo;
+import com.smart.user.controller.dto.UserInfoDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 @ExtendWith(MockitoExtension.class)
 public class UserSecurityServiceTest {
+
   @InjectMocks
   private UserSecurityService userSecurityService;
   @Mock
@@ -24,8 +26,7 @@ public class UserSecurityServiceTest {
   public void loadUserByUsername() {
     //given : 이메일이 주어지고
     var email = "test@gmail.com";
-    var userInfo= UserInfo.builder()
-        .userId(1L)
+    var userInfo = UserInfoDto.builder()
         .name("test")
         .email(email)
         .password("1234")
@@ -38,7 +39,7 @@ public class UserSecurityServiceTest {
     var userDetails = userSecurityService.loadUserByUsername(email);
 
     //then : 사용자 정보를 확인할 수 있다.
-    assertEquals(email,userDetails.getUsername());
+    assertEquals(email, userDetails.getUsername());
   }
 }
 

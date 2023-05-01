@@ -1,18 +1,94 @@
 package com.smart.user.service;
 
-import com.smart.user.controller.dto.UserDto;
-import com.smart.user.controller.dto.UserDto.UserInfo;
+import com.smart.global.error.DuplicatedUserEmailException;
+import com.smart.global.error.DuplicatedUserNicknameException;
+import com.smart.global.error.IllegalAuthCodeException;
+import com.smart.global.error.NotFoundUserException;
+import com.smart.mail.event.MailAuthEvent;
+import com.smart.user.controller.dto.UserInfoDto;
+import com.smart.user.controller.dto.UserSaveDto;
+import com.smart.user.controller.dto.UserUpdateDto;
+import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
+import com.smart.user.repository.AuthCodeRepository;
+import com.smart.user.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
+import java.util.UUID;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-public interface UserService {
+@Service
+public class UserService {
 
-  User join(UserDto.JoinRequest request);
+  private final UserRepository userRepository;
 
-  void verifyAuthCode(String email, String authCode);
+  private final ApplicationEventPublisher eventPublisher;
 
-  UserInfo getUserByEmail(String email);
+  private final HttpSession session;
 
-  void updateUserInfo(User user);
+  private final AuthCodeRepository authCodeRepository;
 
-  void isDuplicateNickname(String nickname);
+  public UserService(UserRepository userRepository, ApplicationEventPublisher eventPublisher,
+      HttpSession session, AuthCodeRepository authCodeRepository) {
+    this.userRepository = userRepository;
+    this.eventPublisher = eventPublisher;
+    this.session = session;
+    this.authCodeRepository = authCodeRepository;
+  }
+
+  @Transactional
+  public Long join(UserSaveDto saveDto) {
+    if (userRepository.existsByEmail(saveDto.getEmail())) {
+      throw new DuplicatedUserEmailException();
+    }
+    if (userRepository.existsByNickname(saveDto.getNickname())) {
+      throw new DuplicatedUserNicknameException();
+    }
+
+    String authCode = authCodeRepository.getAuthCode(saveDto.getEmail());
+    authCodeRepository.saveAuthCode(saveDto.getEmail(), authCode);
+    eventPublisher.publishEvent(new MailAuthEvent(saveDto.getEmail(), authCode));
+
+    return userRepository.save(saveDto.toEntity());
+  }
+
+  public void verifyAuthCode(String email, String authCode) {
+    String storedAuthCode = authCodeRepository.getAuthCode(email);
+    if (storedAuthCode == null || !storedAuthCode.equals(authCode)) {
+      throw new IllegalAuthCodeException();
+    }
+    authCodeRepository.removeAuthCode(email);
+
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(NotFoundUserException::new);
+
+    user.setUserStatus(Status.NORMAL);
+    userRepository.save(user);
+  }
+
+  public UserInfoDto getUserByEmail(String email) {
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(NotFoundUserException::new);
+    return UserInfoDto.from(user);
+  }
+
+  public void updateUserInfo(UserUpdateDto userUpdateDto) {
+    User user = userRepository.findByEmail(userUpdateDto.getEmail())
+        .orElseThrow(NotFoundUserException::new);
+
+    isDuplicateNickname(userUpdateDto.getNickname());
+
+    user.setName(userUpdateDto.getName());
+    user.setNickname(userUpdateDto.getNickname());
+    user.setPassword(userUpdateDto.getPassword());
+
+    userRepository.save(userUpdateDto.toEntity(user));
+  }
+
+  public void isDuplicateNickname(String nickname) {
+    if (userRepository.existsByNickname(nickname)) {
+      throw new DuplicatedUserNicknameException();
+    }
+  }
 }

@@ -1,9 +1,8 @@
 package com.smart.user.controller;
 
-import com.smart.global.error.NotFoundUserException;
-import com.smart.user.controller.dto.UserDto;
-import com.smart.user.controller.dto.UserDto.UserInfo;
-import com.smart.user.domain.User;
+import com.smart.user.controller.dto.UserInfoDto;
+import com.smart.user.controller.dto.UserSaveDto;
+import com.smart.user.controller.dto.UserUpdateDto;
 import com.smart.user.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -28,19 +27,15 @@ public class UserController {
   }
 
   @GetMapping("/{email}/exist")
-  public ResponseEntity<UserInfo> getUser(@PathVariable("email") String email) {
-    try {
-      UserInfo userInfo = userService.getUserByEmail(email);
-      return ResponseEntity.ok(userInfo);
-    } catch (NotFoundUserException e) {
-      return ResponseEntity.notFound().build();
-    }
+  public ResponseEntity<UserInfoDto> getUserByEmail(@PathVariable("email") String email) {
+    UserInfoDto user = userService.getUserByEmail(email);
+    return ResponseEntity.ok(user);
   }
 
   @PostMapping("/join")
-  public ResponseEntity<User> join(@RequestBody @Valid UserDto.JoinRequest request) {
-    User user = userService.join(request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(user);
+  public ResponseEntity<Void> join(@RequestBody @Valid UserSaveDto request) {
+    userService.join(request);
+    return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
   @GetMapping("/join-auth")
@@ -50,8 +45,8 @@ public class UserController {
   }
 
   @PutMapping("/update")
-  public ResponseEntity<Void> updateUserNickname(@RequestBody User user) {
-    userService.updateUserInfo(user);
+  public ResponseEntity<Void> updateUserNickname(@RequestBody UserUpdateDto userUpdateDto) {
+    userService.updateUserInfo(userUpdateDto);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 

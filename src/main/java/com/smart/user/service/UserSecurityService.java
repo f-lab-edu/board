@@ -1,6 +1,6 @@
 package com.smart.user.service;
 
-import com.smart.user.controller.dto.UserDto.UserInfo;
+import com.smart.user.controller.dto.UserInfoDto;
 import com.smart.user.domain.CustomUserDetails;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,17 +15,18 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserSecurityService implements UserDetailsService {
+
   private final UserService userService;
   private final PasswordEncoder passwordEncoder;
 
   @Override
   public UserDetails loadUserByUsername(String email) {
-    UserInfo userInfo = userService.getUserByEmail(email);
+    UserInfoDto userInfo = userService.getUserByEmail(email);
 
     return buildUserDetails(userInfo);
   }
 
-  private CustomUserDetails buildUserDetails(UserInfo userInfo) {
+  private CustomUserDetails buildUserDetails(UserInfoDto userInfo) {
     Collection<? extends GrantedAuthority> authorities = Arrays.asList(
         new SimpleGrantedAuthority(userInfo.getRole()));
 

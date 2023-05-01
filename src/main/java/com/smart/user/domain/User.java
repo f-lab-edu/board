@@ -22,4 +22,24 @@ public class User {
   private LocalDateTime updateDate;
   private Status userStatus;
   private String role;
+
+  public void setUserId(Long userId) {
+    this.userId = userId;
+  }
+
+  public void setUserStatus(Status userStatus) {
+    this.userStatus = userStatus;
+  }
+
+  public void setName(String name){
+    this.name = name;
+  }
+
+  public void setPassword(String password){
+    this.password = password;
+  }
+
+  public void setNickname(String nickname){
+    this.nickname = nickname;
+  }
 }
