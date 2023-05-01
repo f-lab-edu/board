@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 public class PostRepositoryImpl implements PostRepository {
 
   private Map<Long, Post> posts = new HashMap<>();
-  private static Long sequence = 0L;
+  private static Long sequence = 1L;
 
   @Override
   public List<Post> findAll() {
