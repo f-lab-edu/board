@@ -107,6 +107,21 @@ public class BoardServiceTest {
     assertThat(retPostDto.getViewCount()).isEqualTo(1L);
   }
 
+  @DisplayName("비로그인한 사람이 해당 게시물 조회 시 조회수를 증가시킨다.")
+  @Test
+  public void getPostByPostId_UpdateViewCount_NotLoginUser() {
+    PostCreateDto createDto = PostCreateDto
+        .builder()
+        .title("title")
+        .content("content")
+        .build();
+    Long postId = boardService.createPost(createDto, userId);
+
+    PostReadDto retPostDto = boardService.getPostByPostId(postId, null);
+
+    assertThat(retPostDto.getViewCount()).isEqualTo(1L);
+  }
+
   @DisplayName("본인 글일 경우, 해당 게시물 조회 시 조회수를 증가시키지 않는다.")
   @Test
   public void getPostByPostId_NotUpdateViewCount_OwnPost() {
