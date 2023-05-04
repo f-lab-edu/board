@@ -14,8 +14,8 @@ import com.smart.global.error.NotFoundEntityException;
 import com.smart.global.error.PermissionDeniedException;
 import com.smart.user.domain.User;
 import com.smart.user.repository.UserRepository;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,12 +34,11 @@ public class BoardService {
   }
 
   public List<PostReadDto> getPosts() {
-    List<PostReadDto> postReadDtos = new ArrayList<>();
-    for (Post post : postRepository.findAll()) {
-      User user = findUserByUserId(post.getUserId());
-      postReadDtos.add(PostReadDto.toDto(post, user));
-    }
-    return postReadDtos;
+    return postRepository.findAll().stream()
+        .map(post -> {
+          User user = findUserByUserId(post.getUserId());
+          return PostReadDto.toDto(post, user);
+        }).collect(Collectors.toList());
   }
 
   @Transactional
@@ -74,12 +73,11 @@ public class BoardService {
   }
 
   public List<CommentReadDto> getCommentsByPostId(Long postId) {
-    List<CommentReadDto> commentReadDtos = new ArrayList<>();
-    for (Comment comment : commentRepository.findByPostId(postId)) {
-      User user = findUserByUserId(comment.getUserId());
-      commentReadDtos.add(CommentReadDto.toDto(comment, user));
-    }
-    return commentReadDtos;
+    return commentRepository.findByPostId(postId).stream()
+        .map(comment -> {
+          User user = findUserByUserId(comment.getUserId());
+          return CommentReadDto.toDto(comment, user);
+        }).collect(Collectors.toList());
   }
 
   public CommentReadDto getCommentByCommentId(Long commentId) {
