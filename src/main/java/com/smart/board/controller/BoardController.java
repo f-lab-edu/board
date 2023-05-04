@@ -7,7 +7,7 @@ import com.smart.board.controller.dto.post.PostCreateDto;
 import com.smart.board.controller.dto.post.PostReadDto;
 import com.smart.board.controller.dto.post.PostUpdateDto;
 import com.smart.board.service.BoardService;
-import com.smart.global.annotation.AuthUserId;
+import com.smart.security.AuthUserId;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;

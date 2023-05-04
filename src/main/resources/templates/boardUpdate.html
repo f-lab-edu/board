@@ -26,13 +26,13 @@
 
     fetch(url, options)
     .then(response => {
-      alert('수정 완료');
-      location.href = '/board?postId=' + post.postId;
+      if (response.ok) {
+        alert('수정 완료');
+        location.href = '/board?postId=' + post.postId;
+      } else {
+        response.text().then(error => alert(error));
+      }
     })
-    .catch(error => {
-      console.log(error);
-      alert('수정 실패');
-    });
   }
 </script>
 <body>

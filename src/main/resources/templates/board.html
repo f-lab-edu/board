@@ -25,13 +25,13 @@
 
     fetch(url, options)
     .then(response => {
-      alert('작성 완료');
-      location.reload()
+      if (response.ok) {
+        alert('작성 완료');
+        location.reload();
+      } else {
+        response.text().then(error => alert(error))
+      }
     })
-    .catch(error => {
-      console.log(error);
-      alert('작성 실패');
-    });
   }
 
   function updateComment(comment) {
@@ -53,14 +53,13 @@
 
     fetch(url, options)
     .then(response => {
-      alert('수정 완료');
-      location.reload()
-    })
-    .catch(error => {
-      console.log(error);
-      alert('수정 실패');
+      if (response.ok) {
+        alert('수정 완료');
+        location.reload();
+      } else {
+        response.text().then(error => alert(error));
+      }
     });
-
   }
 
   function deleteComment(comment) {
@@ -74,12 +73,12 @@
 
     fetch(url, options)
     .then(response => {
-      alert('삭제 완료');
+      if (response.ok) {
+        alert('삭제 완료');
+      } else {
+        response.text().then(error => alert(error));
+      }
       location.reload()
-    })
-    .catch(error => {
-      console.log(error);
-      alert('삭제 실패');
     });
   }
 
@@ -94,12 +93,13 @@
 
     fetch(url, options)
     .then(response => {
-      alert('삭제 완료');
-      location.href = '/boards';
-    })
-    .catch(error => {
-      console.log(error);
-      alert('삭제 실패');
+      if (response.ok) {
+        alert('삭제 완료');
+        location.href = '/boards';
+      } else {
+        response.text().then(error => alert(error));
+        location.reload();
+      }
     });
   }
 </script>

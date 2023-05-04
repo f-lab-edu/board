@@ -1,4 +1,4 @@
-package com.smart.config;
+package com.smart.security;
 
 import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +24,7 @@ public class SpringSecurityConfig {
             .requestMatchers(HttpMethod.GET, "/api/v1/posts", "/api/v1/post/**",
                 "/api/v1/comment/**").permitAll()
             .requestMatchers("/", "/login", "/auth", "/join", "/api/v1/user/**", "/boards",
-                "/board","/error").permitAll()
+                "/board", "/error").permitAll()
             .anyRequest().authenticated() //모든 요청 인증요청
         )
         .formLogin(login -> login

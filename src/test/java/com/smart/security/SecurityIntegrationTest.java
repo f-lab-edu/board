@@ -1,4 +1,4 @@
-package com.smart.user.controller;
+package com.smart.security;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
@@ -25,6 +25,7 @@ import org.springframework.web.context.WebApplicationContext;
 @SpringBootTest
 @Transactional
 public class SecurityIntegrationTest {
+
   @Autowired
   private WebApplicationContext context;
   @Autowired
@@ -33,7 +34,7 @@ public class SecurityIntegrationTest {
   private User user;
 
   @BeforeEach
-  public void setup(){
+  public void setup() {
 
     mockMvc = MockMvcBuilders
         .webAppContextSetup(this.context)
@@ -56,8 +57,8 @@ public class SecurityIntegrationTest {
   @Test
   public void testLoginSuccess() throws Exception {
     ResultActions resultActions = mockMvc.perform(formLogin("/login")
-            .user("email", user.getEmail())
-            .password("password", user.getPassword()))
+        .user("email", user.getEmail())
+        .password("password", user.getPassword()))
         .andDo(print())
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("/boards"))
@@ -68,10 +69,10 @@ public class SecurityIntegrationTest {
   }
 
   @Test
-  public void testLoginFail() throws Exception{
+  public void testLoginFail() throws Exception {
     ResultActions resultActions = mockMvc.perform(formLogin("/login")
-            .user("email", user.getEmail())
-            .password("password", "wrong"))
+        .user("email", user.getEmail())
+        .password("password", "wrong"))
         .andDo(print())
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("/login?error"))

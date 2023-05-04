@@ -1,8 +1,8 @@
 package com.smart.board.controller;
 
 import com.smart.board.service.BoardService;
-import com.smart.global.annotation.AuthUserId;
-import com.smart.user.domain.CustomUserDetails;
+import com.smart.security.AuthUserId;
+import com.smart.security.CustomUserDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,9 +27,9 @@ public class BoardViewController {
 
   @GetMapping("/board")
   public String showBoardDetailPage(Long postId,
-      @AuthenticationPrincipal CustomUserDetails userDetails, @AuthUserId Long userId,
+      @AuthenticationPrincipal CustomUserDetails userDetails, @AuthUserId Long loginUserId,
       Model model) {
-    model.addAttribute("post", boardService.getPostByPostId(postId, userId));
+    model.addAttribute("post", boardService.getPostByPostId(postId, loginUserId));
     model.addAttribute("comments", boardService.getCommentsByPostId(postId));
     model.addAttribute("userDetails", userDetails);
     return "board";
@@ -41,8 +41,8 @@ public class BoardViewController {
   }
 
   @GetMapping("/board/update")
-  public String showBoardUpdatePage(Long postId, @AuthUserId Long userId, Model model) {
-    model.addAttribute("post", boardService.getPostByPostId(postId, userId));
+  public String showBoardUpdatePage(Long postId, @AuthUserId Long loginUserId, Model model) {
+    model.addAttribute("post", boardService.getPostByPostId(postId, loginUserId));
     return "boardUpdate";
   }
 }

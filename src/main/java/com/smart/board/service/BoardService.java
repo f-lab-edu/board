@@ -10,6 +10,7 @@ import com.smart.board.domain.Comment;
 import com.smart.board.domain.Post;
 import com.smart.board.repository.CommentRepository;
 import com.smart.board.repository.PostRepository;
+import com.smart.global.error.DuplicatedUserEmailException;
 import com.smart.global.error.NotFoundEntityException;
 import com.smart.global.error.PermissionDeniedException;
 import com.smart.user.domain.User;

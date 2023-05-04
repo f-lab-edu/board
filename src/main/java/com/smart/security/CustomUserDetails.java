@@ -1,16 +1,18 @@
-package com.smart.user.domain;
+package com.smart.security;
 
 import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class CustomUserDetails implements UserDetails {
+
   private Long userId;
   private String nickname;
   private String name;
   private String email;
   private String password;
   private Collection<? extends GrantedAuthority> authorities;
+
   public Long getUserId() {
     return userId;
   }

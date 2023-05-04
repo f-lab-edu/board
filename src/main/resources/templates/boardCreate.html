@@ -25,13 +25,13 @@
 
     fetch(url, options)
     .then(response => {
-      alert('작성 완료');
-      location.href = '/boards';
+      if (response.ok) {
+        alert('작성 완료');
+        location.href = '/boards';
+      } else {
+        response.text().then(error => alert(error));
+      }
     })
-    .catch(error => {
-      console.log(error);
-      alert('작성 실패');
-    });
   }
 </script>
 <body>
