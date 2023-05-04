@@ -1,4 +1,4 @@
-package com.smart.user.domain;
+package com.smart.board.domain;
 
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -11,19 +11,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-public class User {
+public class Comment {
 
-  private Long userId;
-  private String name;
-  private String email;
-  private String password;
-  private String nickname;
+  private Long commentId;
+  private String content;
   private LocalDateTime createDate;
   private LocalDateTime updateDate;
-  private Status userStatus;
-  private String role;
+  private Long postId;
+  private Long userId;
 
-  public void setUserId(Long userId) {
-    this.userId = userId;
+  public void setCommentId(Long commentId) {
+    this.commentId = commentId;
   }
 }

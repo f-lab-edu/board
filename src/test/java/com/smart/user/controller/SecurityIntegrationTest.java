@@ -60,7 +60,7 @@ public class SecurityIntegrationTest {
             .password("password", user.getPassword()))
         .andDo(print())
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl("/mypage"))
+        .andExpect(redirectedUrl("/boards"))
         .andDo(print());
 
     HttpSession session = resultActions.andReturn().getRequest().getSession();
