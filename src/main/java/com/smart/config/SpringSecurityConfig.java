@@ -21,8 +21,10 @@ public class SpringSecurityConfig {
     http.csrf().disable().cors().disable()
         .authorizeHttpRequests(request -> request
             .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/posts", "/api/v1/post/**",
+                "/api/v1/comment/**").permitAll()
             .requestMatchers("/", "/login", "/auth", "/join", "/api/v1/user/**", "/boards",
-                "/board").permitAll()
+                "/board","/error").permitAll()
             .anyRequest().authenticated() //모든 요청 인증요청
         )
         .formLogin(login -> login

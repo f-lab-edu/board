@@ -12,10 +12,5 @@ public interface PostRepository {
 
   Long save(Post post);
 
-  void update(Post post);
-
   void deleteByPostId(Long postId);
-
-  boolean existsByPostId(Long postId);
-
 }

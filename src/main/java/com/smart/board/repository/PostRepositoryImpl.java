@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 public class PostRepositoryImpl implements PostRepository {
 
   private Map<Long, Post> posts = new HashMap<>();
-  private static Long sequence = 0L;
+  private static Long sequence = 1L;
 
   @Override
   public List<Post> findAll() {
@@ -26,16 +26,11 @@ public class PostRepositoryImpl implements PostRepository {
 
   @Override
   public Long save(Post post) {
-    post.setPostId(sequence++);
+    if(post.getPostId()==null){
+      post.setPostId(sequence++);
+    }
     posts.put(post.getPostId(), post);
     return post.getPostId();
-  }
-
-  @Override
-  public void update(Post post) {
-    if (posts.containsKey(post.getPostId())) {
-      posts.put(post.getPostId(), post);
-    }
   }
 
   @Override
@@ -43,8 +38,4 @@ public class PostRepositoryImpl implements PostRepository {
     posts.remove(postId);
   }
 
-  @Override
-  public boolean existsByPostId(Long postId) {
-    return posts.containsKey(postId);
-  }
 }

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 public class CommentRepositoryImpl implements CommentRepository {
 
   private Map<Long, Comment> comments = new HashMap<>();
-  private static Long sequence = 0L;
+  private static Long sequence = 1L;
 
   @Override
   public List<Comment> findByPostId(Long postId) {
@@ -33,16 +33,11 @@ public class CommentRepositoryImpl implements CommentRepository {
 
   @Override
   public Long save(Comment comment) {
-    comment.setCommentId(sequence++);
+    if(comment.getCommentId()==null){
+      comment.setCommentId(sequence++);
+    }
     comments.put(comment.getCommentId(), comment);
     return comment.getCommentId();
-  }
-
-  @Override
-  public void update(Comment comment) {
-    if (comments.containsKey(comment.getCommentId())) {
-      comments.put(comment.getCommentId(), comment);
-    }
   }
 
   @Override

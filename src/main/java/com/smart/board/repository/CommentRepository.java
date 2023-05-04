@@ -14,10 +14,7 @@ public interface CommentRepository {
 
   Long save(Comment comment);
 
-  void update(Comment comment);
-
   void deleteByCommentId(Long commentId);
 
   boolean existsByCommentId(Long commentId);
-
 }

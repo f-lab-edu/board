@@ -3,10 +3,8 @@ package com.smart.board.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.smart.board.controller.dto.comment.CommentCreateDto;
-import com.smart.board.controller.dto.comment.CommentUpdateDto;
 import com.smart.board.domain.Comment;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -70,38 +68,6 @@ public class CommentRepositoryTest {
 
     assertThat(retComment).isNotNull();
     assertThat(retComment.getCommentId()).isEqualTo(comment.getCommentId());
-  }
-
-  @Test
-  @DisplayName("생성하지 않은 댓글을 업데이트하면 당연히 해당 댓글을 찾을 수 없다.")
-  public void update_NotExistingComment() {
-    Comment updateComment = CommentUpdateDto.builder()
-        .commentId(-1L)
-        .content("update content")
-        .build()
-        .toEntity(comment);
-
-    commentRepository.update(updateComment);
-
-    Optional<Comment> optionalComment = commentRepository.findByCommentId(-1L);
-    assertThat(optionalComment.isEmpty()).isTrue();
-  }
-
-  @Test
-  @DisplayName("댓글을 업데이트 후 해당하는 댓글이 정상적으로 수정되었는지 확인한다.")
-  public void update_ExistingComment() {
-    commentRepository.save(comment);
-    Comment updateComment = CommentUpdateDto.builder()
-        .commentId(comment.getCommentId())
-        .content("update content")
-        .build()
-        .toEntity(comment);
-
-    commentRepository.update(updateComment);
-
-    Comment retComment = commentRepository.findByCommentId(comment.getCommentId()).get();
-    assertThat(retComment.getCommentId()).isEqualTo(updateComment.getCommentId());
-    assertThat(retComment.getContent()).isEqualTo(updateComment.getContent());
   }
 
   @Test

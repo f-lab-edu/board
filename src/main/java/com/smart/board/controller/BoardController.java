@@ -7,11 +7,10 @@ import com.smart.board.controller.dto.post.PostCreateDto;
 import com.smart.board.controller.dto.post.PostReadDto;
 import com.smart.board.controller.dto.post.PostUpdateDto;
 import com.smart.board.service.BoardService;
-import com.smart.user.domain.CustomUserDetails;
+import com.smart.global.annotation.AuthUserId;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,50 +37,48 @@ public class BoardController {
   }
 
   @GetMapping("/post/{postId}")
-  public PostReadDto getPostByPostId(@PathVariable Long postId) {
-    return boardService.getPostByPostId(postId);
+  public PostReadDto getPostByPostId(@PathVariable Long postId, @AuthUserId Long loginUserId) {
+    return boardService.getPostByPostId(postId, loginUserId);
   }
 
   @PostMapping("/post")
   @ResponseStatus(HttpStatus.CREATED)
   public Long createPost(@RequestBody @Valid PostCreateDto createDto,
-      @AuthenticationPrincipal CustomUserDetails userDetails) {
-    return boardService.createPost(createDto, userDetails.getUserId());
+      @AuthUserId Long loginUserId) {
+    return boardService.createPost(createDto, loginUserId);
   }
 
   @PutMapping("/post")
   public void updatePost(@RequestBody @Valid PostUpdateDto updateDto,
-      @AuthenticationPrincipal CustomUserDetails userDetails) {
-    boardService.updatePost(updateDto, userDetails.getUserId());
+      @AuthUserId Long loginUserId) {
+    boardService.updatePost(updateDto, loginUserId);
   }
 
   @DeleteMapping("/post/{postId}")
-  public void deletePost(@PathVariable Long postId,
-      @AuthenticationPrincipal CustomUserDetails userDetails) {
-    boardService.deletePost(postId, userDetails.getUserId());
+  public void deletePost(@PathVariable Long postId, @AuthUserId Long loginUserId) {
+    boardService.deletePost(postId, loginUserId);
   }
 
   @GetMapping("/comment/{postId}")
-  public List<CommentReadDto> getCommentsByPostId(@PathVariable Long postId) {
-    return boardService.getCommentsByPostId(postId);
+  public List<CommentReadDto> getCommentsByPostId(@PathVariable Long loginUserId) {
+    return boardService.getCommentsByPostId(loginUserId);
   }
 
   @PostMapping("/comment")
   @ResponseStatus(HttpStatus.CREATED)
   public Long createComment(@RequestBody @Valid CommentCreateDto createDto,
-      @AuthenticationPrincipal CustomUserDetails userDetails) {
-    return boardService.createComment(createDto, userDetails.getUserId());
+      @AuthUserId Long loginUserId) {
+    return boardService.createComment(createDto, loginUserId);
   }
 
   @PutMapping("/comment")
   public void updateComment(@RequestBody @Valid CommentUpdateDto updateDto,
-      @AuthenticationPrincipal CustomUserDetails userDetails) {
-    boardService.updateComment(updateDto, userDetails.getUserId());
+      @AuthUserId Long loginUserId) {
+    boardService.updateComment(updateDto, loginUserId);
   }
 
   @DeleteMapping("/comment/{commentId}")
-  public void deleteComment(@PathVariable Long commentId,
-      @AuthenticationPrincipal CustomUserDetails userDetails) {
-    boardService.deleteComment(commentId, userDetails.getUserId());
+  public void deleteComment(@PathVariable Long commentId, @AuthUserId Long loginUserId) {
+    boardService.deleteComment(commentId, loginUserId);
   }
 }

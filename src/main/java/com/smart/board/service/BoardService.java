@@ -14,8 +14,8 @@ import com.smart.global.error.NotFoundEntityException;
 import com.smart.global.error.PermissionDeniedException;
 import com.smart.user.domain.User;
 import com.smart.user.repository.UserRepository;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,25 +34,21 @@ public class BoardService {
   }
 
   public List<PostReadDto> getPosts() {
-    List<PostReadDto> postReadDtos = new ArrayList<>();
-    for (Post post : postRepository.findAll()) {
-      User user = findUserByUserId(post.getUserId());
-      postReadDtos.add(PostReadDto.toDto(post, user));
-    }
-    return postReadDtos;
-  }
-
-  public PostReadDto getPostByPostId(Long postId) {
-    Post post = findPostByPostId(postId);
-    User user = findUserByUserId(post.getUserId());
-    return PostReadDto.toDto(post, user);
+    return postRepository.findAll().stream()
+        .map(post -> {
+          User user = findUserByUserId(post.getUserId());
+          return PostReadDto.toDto(post, user);
+        }).collect(Collectors.toList());
   }
 
   @Transactional
-  public void updatePostViewCount(Long postId) {
+  public PostReadDto getPostByPostId(Long postId, Long loginUserId) {
     Post post = findPostByPostId(postId);
-    post.updateViewCount();
-    postRepository.update(post);
+    post.updateViewCount(loginUserId);
+    postRepository.save(post);
+    User user = findUserByUserId(post.getUserId());
+
+    return PostReadDto.toDto(post, user);
   }
 
   @Transactional
@@ -65,7 +61,7 @@ public class BoardService {
   public void updatePost(PostUpdateDto updateDto, Long loginUserId) {
     Post post = findPostByPostId(updateDto.getPostId());
     checkPermission(post.getUserId(), loginUserId);
-    postRepository.update(updateDto.toEntity(post));
+    postRepository.save(updateDto.toEntity(post));
   }
 
   @Transactional
@@ -77,12 +73,11 @@ public class BoardService {
   }
 
   public List<CommentReadDto> getCommentsByPostId(Long postId) {
-    List<CommentReadDto> commentReadDtos = new ArrayList<>();
-    for (Comment comment : commentRepository.findByPostId(postId)) {
-      User user = findUserByUserId(comment.getUserId());
-      commentReadDtos.add(CommentReadDto.toDto(comment, user));
-    }
-    return commentReadDtos;
+    return commentRepository.findByPostId(postId).stream()
+        .map(comment -> {
+          User user = findUserByUserId(comment.getUserId());
+          return CommentReadDto.toDto(comment, user);
+        }).collect(Collectors.toList());
   }
 
   public CommentReadDto getCommentByCommentId(Long commentId) {
@@ -103,7 +98,7 @@ public class BoardService {
   public void updateComment(CommentUpdateDto updateDto, Long loginUserId) {
     Comment comment = findCommentByCommentId(updateDto.getCommentId());
     checkPermission(comment.getUserId(), loginUserId);
-    commentRepository.update(updateDto.toEntity(comment));
+    commentRepository.save(updateDto.toEntity(comment));
   }
 
   @Transactional

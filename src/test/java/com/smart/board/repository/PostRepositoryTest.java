@@ -3,7 +3,6 @@ package com.smart.board.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.smart.board.controller.dto.post.PostCreateDto;
-import com.smart.board.controller.dto.post.PostUpdateDto;
 import com.smart.board.domain.Post;
 import java.util.List;
 import java.util.Optional;
@@ -63,47 +62,12 @@ public class PostRepositoryTest {
   }
 
   @Test
-  @DisplayName("생성하지 않은 게시글 업데이트하면 당연히 해당 게시물을 찾을 수 없다.")
-  public void update_NotExistingPost() {
-    Post updatePost = PostUpdateDto.builder()
-        .postId(-1L)
-        .title("update title")
-        .content("update content")
-        .build()
-        .toEntity(post);
-
-    postRepository.update(updatePost);
-
-    Optional<Post> optionalPost = postRepository.findByPostId(-1L);
-    assertThat(optionalPost.isEmpty()).isTrue();
-  }
-
-  @Test
-  @DisplayName("게시글 업데이트 후 해당하는 게시글이 정상적으로 수정되었는지 확인한다.")
-  public void update_ExistingPost() {
-    postRepository.save(post);
-    Post updateBoard = PostUpdateDto.builder()
-        .postId(post.getPostId())
-        .title("update title")
-        .content("update content")
-        .build()
-        .toEntity(post);
-
-    postRepository.update(updateBoard);
-
-    Post retPost = postRepository.findByPostId(post.getPostId()).get();
-    assertThat(retPost.getPostId()).isEqualTo(updateBoard.getPostId());
-    assertThat(retPost.getTitle()).isEqualTo(updateBoard.getTitle());
-    assertThat(retPost.getContent()).isEqualTo(updateBoard.getContent());
-  }
-
-  @Test
   @DisplayName("게시글 삭제 후 해당 게시글이 삭제되었는지 확인한다.")
   public void deleteByPostId_ExistingPost() {
     postRepository.save(post);
 
     postRepository.deleteByPostId(post.getPostId());
 
-    assertThat(postRepository.existsByPostId(post.getPostId())).isFalse();
+    assertThat(postRepository.findByPostId(post.getPostId())).isEmpty();
   }
 }
