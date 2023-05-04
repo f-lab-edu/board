@@ -42,9 +42,9 @@ public class BoardService {
   }
 
   @Transactional
-  public PostReadDto getPostByPostId(Long postId, Long loginId) {
+  public PostReadDto getPostByPostId(Long postId, Long loginUserId) {
     Post post = findPostByPostId(postId);
-    post.updateViewCount(loginId);
+    post.updateViewCount(loginUserId);
     postRepository.save(post);
     User user = findUserByUserId(post.getUserId());
 

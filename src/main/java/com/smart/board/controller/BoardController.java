@@ -37,46 +37,48 @@ public class BoardController {
   }
 
   @GetMapping("/post/{postId}")
-  public PostReadDto getPostByPostId(@PathVariable Long postId, @AuthUserId Long userId) {
-    return boardService.getPostByPostId(postId, userId);
+  public PostReadDto getPostByPostId(@PathVariable Long postId, @AuthUserId Long loginUserId) {
+    return boardService.getPostByPostId(postId, loginUserId);
   }
 
   @PostMapping("/post")
   @ResponseStatus(HttpStatus.CREATED)
-  public Long createPost(@RequestBody @Valid PostCreateDto createDto, @AuthUserId Long userId) {
-    return boardService.createPost(createDto, userId);
+  public Long createPost(@RequestBody @Valid PostCreateDto createDto,
+      @AuthUserId Long loginUserId) {
+    return boardService.createPost(createDto, loginUserId);
   }
 
   @PutMapping("/post")
-  public void updatePost(@RequestBody @Valid PostUpdateDto updateDto, @AuthUserId Long userId) {
-    boardService.updatePost(updateDto, userId);
+  public void updatePost(@RequestBody @Valid PostUpdateDto updateDto,
+      @AuthUserId Long loginUserId) {
+    boardService.updatePost(updateDto, loginUserId);
   }
 
   @DeleteMapping("/post/{postId}")
-  public void deletePost(@PathVariable Long postId, @AuthUserId Long userId) {
-    boardService.deletePost(postId, userId);
+  public void deletePost(@PathVariable Long postId, @AuthUserId Long loginUserId) {
+    boardService.deletePost(postId, loginUserId);
   }
 
   @GetMapping("/comment/{postId}")
-  public List<CommentReadDto> getCommentsByPostId(@PathVariable Long postId) {
-    return boardService.getCommentsByPostId(postId);
+  public List<CommentReadDto> getCommentsByPostId(@PathVariable Long loginUserId) {
+    return boardService.getCommentsByPostId(loginUserId);
   }
 
   @PostMapping("/comment")
   @ResponseStatus(HttpStatus.CREATED)
   public Long createComment(@RequestBody @Valid CommentCreateDto createDto,
-      @AuthUserId Long userId) {
-    return boardService.createComment(createDto, userId);
+      @AuthUserId Long loginUserId) {
+    return boardService.createComment(createDto, loginUserId);
   }
 
   @PutMapping("/comment")
   public void updateComment(@RequestBody @Valid CommentUpdateDto updateDto,
-      @AuthUserId Long userId) {
-    boardService.updateComment(updateDto, userId);
+      @AuthUserId Long loginUserId) {
+    boardService.updateComment(updateDto, loginUserId);
   }
 
   @DeleteMapping("/comment/{commentId}")
-  public void deleteComment(@PathVariable Long commentId, @AuthUserId Long userId) {
-    boardService.deleteComment(commentId, userId);
+  public void deleteComment(@PathVariable Long commentId, @AuthUserId Long loginUserId) {
+    boardService.deleteComment(commentId, loginUserId);
   }
 }
