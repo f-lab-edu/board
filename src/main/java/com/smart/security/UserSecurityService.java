@@ -1,7 +1,8 @@
-package com.smart.user.service;
+package com.smart.security;
 
 import com.smart.user.controller.dto.UserDto.UserInfo;
-import com.smart.user.domain.CustomUserDetails;
+import com.smart.security.CustomUserDetails;
+import com.smart.user.service.UserService;
 import java.util.Arrays;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;

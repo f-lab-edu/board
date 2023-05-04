@@ -14,7 +14,7 @@ import com.smart.board.repository.PostRepository;
 import com.smart.board.repository.PostRepositoryImpl;
 import com.smart.global.error.NotFoundEntityException;
 import com.smart.global.error.PermissionDeniedException;
-import com.smart.user.domain.CustomUserDetails;
+import com.smart.security.CustomUserDetails;
 import com.smart.user.domain.User;
 import com.smart.user.repository.UserRepository;
 import com.smart.user.repository.UserRepositoryImpl;
