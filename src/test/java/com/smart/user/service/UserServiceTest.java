@@ -1,6 +1,7 @@
 package com.smart.user.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
@@ -12,6 +13,8 @@ import com.smart.global.error.DuplicatedUserNicknameException;
 import com.smart.global.error.IllegalAuthCodeException;
 import com.smart.global.error.NotFoundUserException;
 import com.smart.mail.event.MailAuthEvent;
+import com.smart.mail.service.MailService;
+import com.smart.mail.service.implement.MailServiceImpl;
 import com.smart.user.controller.dto.UserInfoDto;
 import com.smart.user.controller.dto.UserSaveDto;
 import com.smart.user.controller.dto.UserUpdateDto;
@@ -26,6 +29,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.mail.javamail.JavaMailSender;
 
 class UserServiceTest {
 
@@ -34,7 +38,11 @@ class UserServiceTest {
 
   private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
-  private final UserService userService = new UserService(userRepository, eventPublisher, authCodeRepository);
+  private final JavaMailSender javaMailSender = mock(JavaMailSender.class);
+  private final MailService mailService = new MailServiceImpl(javaMailSender);
+
+  private final UserService userService = new UserService(userRepository, eventPublisher,
+      authCodeRepository, mailService);
 
   private UserSaveDto userSaveDto;
 
@@ -132,6 +140,7 @@ class UserServiceTest {
     assertThrows(NotFoundUserException.class, () -> userService.getUserByEmail("test@email"));
   }
 
+  @DisplayName("닉네임 변경을 성공한다.")
   @Test
   public void 유저정보변경성공() {
     // Given
@@ -152,5 +161,16 @@ class UserServiceTest {
 
     //then
     assertEquals(retUserInfo.getNickname(), newNickname);
+  }
+
+  @DisplayName("비밀번호를 잊은 사용자가 임시 비밀번호를 발급한다.")
+  @Test
+  void 임시비밀번호발급성공() {
+    userService.join(userSaveDto);
+
+    userService.resetPassword(userSaveDto.getEmail());
+
+    UserInfoDto retUserInfo = userService.getUserByEmail(userSaveDto.getEmail());
+    assertNotEquals(retUserInfo.getPassword(),userSaveDto.getPassword());
   }
 }

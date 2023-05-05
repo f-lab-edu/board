@@ -55,4 +55,10 @@ public class UserController {
     userService.isDuplicateNickname(nickname);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
+
+  @PostMapping("/reset-password")
+  public ResponseEntity<Void> sendPasswordResetCodeEmail(@RequestParam String userEmail) {
+    userService.resetPassword(userEmail);
+    return ResponseEntity.status(HttpStatus.OK).build();
+  }
 }

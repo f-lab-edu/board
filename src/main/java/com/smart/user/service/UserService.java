@@ -5,6 +5,7 @@ import com.smart.global.error.DuplicatedUserNicknameException;
 import com.smart.global.error.IllegalAuthCodeException;
 import com.smart.global.error.NotFoundUserException;
 import com.smart.mail.event.MailAuthEvent;
+import com.smart.mail.service.MailService;
 import com.smart.user.controller.dto.UserInfoDto;
 import com.smart.user.controller.dto.UserSaveDto;
 import com.smart.user.controller.dto.UserUpdateDto;
@@ -25,11 +26,14 @@ public class UserService {
 
   private final AuthCodeRepository authCodeRepository;
 
+  private final MailService mailService;
+
   public UserService(UserRepository userRepository, ApplicationEventPublisher eventPublisher,
-      AuthCodeRepository authCodeRepository) {
+      AuthCodeRepository authCodeRepository, MailService mailService) {
     this.userRepository = userRepository;
     this.eventPublisher = eventPublisher;
     this.authCodeRepository = authCodeRepository;
+    this.mailService = mailService;
   }
 
   @Transactional
@@ -85,5 +89,17 @@ public class UserService {
     if (userRepository.existsByNickname(nickname)) {
       throw new DuplicatedUserNicknameException();
     }
+  }
+
+  public void resetPassword(String userEmail) {
+    User user = userRepository.findByEmail(userEmail)
+        .orElseThrow(NotFoundUserException::new);
+
+    String temporaryPassword = authCodeRepository.generateAuthCode();
+    user.updatePassword(temporaryPassword);
+    userRepository.save(user);
+
+    authCodeRepository.saveAuthCode(user.getEmail(), temporaryPassword);
+    mailService.sendPasswordResetEmail(user.getEmail(), temporaryPassword);
   }
 }

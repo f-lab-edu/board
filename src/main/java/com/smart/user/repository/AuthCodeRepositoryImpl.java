@@ -2,6 +2,7 @@ package com.smart.user.repository;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -23,4 +24,10 @@ public class AuthCodeRepositoryImpl implements AuthCodeRepository {
   public void removeAuthCode(String email) {
     authCodeMap.remove(email);
   }
+
+  @Override
+  public String generateAuthCode() {
+    return UUID.randomUUID().toString();
+  }
+
 }

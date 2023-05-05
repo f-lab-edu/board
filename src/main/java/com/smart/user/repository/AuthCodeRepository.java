@@ -6,4 +6,6 @@ public interface AuthCodeRepository {
   String getAuthCode(String email);
 
   void removeAuthCode(String email);
+
+  String generateAuthCode();
 }
