@@ -58,7 +58,7 @@ public class UserService {
     User user = userRepository.findByEmail(email)
         .orElseThrow(NotFoundUserException::new);
 
-    user.setUserStatus(Status.NORMAL);
+    user.updateUserStatus(Status.NORMAL);
     userRepository.save(user);
   }
 
@@ -74,9 +74,9 @@ public class UserService {
 
     isDuplicateNickname(userUpdateDto.getNickname());
 
-    user.setName(userUpdateDto.getName());
-    user.setNickname(userUpdateDto.getNickname());
-    user.setPassword(userUpdateDto.getPassword());
+    user.updateName(userUpdateDto.getName());
+    user.updateNickname(userUpdateDto.getNickname());
+    user.updatePassword(userUpdateDto.getPassword());
 
     userRepository.save(userUpdateDto.toEntity(user));
   }

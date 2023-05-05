@@ -15,19 +15,24 @@ public class UserRepositoryImpl implements UserRepository {
 
   @Override
   public Optional<User> findByEmail(String email) {
-    return users.stream()
-        .filter(user -> user.getEmail().equals(email)).findFirst();
+    for (User user : users) {
+      if (user.getEmail().equals(email)) {
+        return Optional.of(user);
+      }
+    }
+    return Optional.empty();
   }
 
   @Override
   public void deleteByEmail(String email) {
-    this.findByEmail(email).ifPresent(users::remove);
+    Optional<User> userOptional = findByEmail(email);
+    userOptional.ifPresent(users::remove);
   }
 
   @Override
   public Long save(User user) {
     if (user.getUserId() == null) {
-      user.setUserId(sequence++);
+      user.updateUserId(sequence++);
     }
     users.add(user);
     return user.getUserId();
@@ -36,12 +41,12 @@ public class UserRepositoryImpl implements UserRepository {
   @Override
   public boolean existsByEmail(String email) {
     return users.stream()
-        .anyMatch(user -> user.getEmail().equals(email));
+                .anyMatch(user -> user.getEmail().equals(email));
   }
 
   @Override
   public boolean existsByNickname(String nickname) {
     return users.stream()
-        .anyMatch(user -> user.getNickname().equals(nickname));
+                .anyMatch(user -> user.getNickname().equals(nickname));
   }
 }
