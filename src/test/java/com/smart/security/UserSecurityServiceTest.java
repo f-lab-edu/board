@@ -1,9 +1,10 @@
-package com.smart.user.service;
+package com.smart.security;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import com.smart.user.controller.dto.UserInfoDto;
+import com.smart.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

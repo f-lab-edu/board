@@ -1,4 +1,4 @@
-package com.smart.user.controller;
+package com.smart.security;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
@@ -57,11 +57,11 @@ public class SecurityIntegrationTest {
   @Test
   public void testLoginSuccess() throws Exception {
     ResultActions resultActions = mockMvc.perform(formLogin("/login")
-            .user("email", user.getEmail())
-            .password("password", user.getPassword()))
+        .user("email", user.getEmail())
+        .password("password", user.getPassword()))
         .andDo(print())
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl("/mypage"))
+        .andExpect(redirectedUrl("/boards"))
         .andDo(print());
 
     HttpSession session = resultActions.andReturn().getRequest().getSession();
@@ -71,8 +71,8 @@ public class SecurityIntegrationTest {
   @Test
   public void testLoginFail() throws Exception {
     ResultActions resultActions = mockMvc.perform(formLogin("/login")
-            .user("email", user.getEmail())
-            .password("password", "wrong"))
+        .user("email", user.getEmail())
+        .password("password", "wrong"))
         .andDo(print())
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("/login?error"))

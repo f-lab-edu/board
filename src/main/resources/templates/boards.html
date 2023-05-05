@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Boards Page</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 800px;
+    }
+
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+<h1>Boards Page</h1>
+<div th:if="${userDetails != null}">
+  <p th:text="'Hello, ' + ${userDetails.name} + '!'"/>
+  <button th:onclick="|location.href='@{/board/create}'|">글쓰기</button>
+  <button th:onclick="|location.href='@{/logout}'|">로그아웃</button>
+</div>
+<div th:if="${userDetails == null}">
+  <button th:onclick="|location.href='@{/login}'|">로그인</button>
+  <button th:onclick="|location.href='@{/join}'|">회원가입</button>
+</div>
+<hr/>
+<table>
+  <thead>
+  <tr>
+    <th style="width: 60%">Title</th>
+    <th style="width: 15%">Author</th>
+    <th style="width: 25%">Date</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="post:${posts}">
+    <td><a th:text="${post.title}" th:href="@{/board(postId = ${post.postId})}"></a></td>
+    <td th:text="${post.nickname}">nickname</td>
+    <td th:text="${post.createDate}">createDate</td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>

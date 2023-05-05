@@ -49,4 +49,14 @@ public class UserRepositoryImpl implements UserRepository {
     return users.stream()
                 .anyMatch(user -> user.getNickname().equals(nickname));
   }
+
+  @Override
+  public Optional<User> findByUserId(Long userId) {
+    for (User user : users) {
+      if (user.getUserId().equals(userId)) {
+        return Optional.of(user);
+      }
+    }
+    return Optional.empty();
+  }
 }
