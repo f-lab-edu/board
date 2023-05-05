@@ -1,7 +1,7 @@
 package com.smart.user.controller;
 
-import com.smart.user.domain.CustomUserDetails;
-import com.smart.user.service.UserSecurityService;
+import com.smart.security.CustomUserDetails;
+import com.smart.security.UserSecurityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
