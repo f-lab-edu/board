@@ -23,7 +23,23 @@ public class User {
   private Status userStatus;
   private String role;
 
-  public void setUserId(Long userId) {
+  public void updateUserId(Long userId) {
     this.userId = userId;
+  }
+
+  public void updateUserStatus(Status userStatus) {
+    this.userStatus = userStatus;
+  }
+
+  public void updateName(String name){
+    this.name = name;
+  }
+
+  public void updatePassword(String password){
+    this.password = password;
+  }
+
+  public void updateNickname(String nickname){
+    this.nickname = nickname;
   }
 }
