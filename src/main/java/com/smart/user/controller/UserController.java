@@ -52,7 +52,7 @@ public class UserController {
 
   @GetMapping("/users/nickname/{nickname}/exist")
   public ResponseEntity<Void> checkNickname(@PathVariable String nickname) {
-    userService.isDuplicateNickname(nickname);
+    userService.checkDuplicateNickname(nickname);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 

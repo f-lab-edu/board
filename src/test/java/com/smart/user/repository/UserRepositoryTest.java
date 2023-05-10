@@ -35,8 +35,8 @@ class UserRepositoryTest {
   @Test
   public void 유저회원가입() {
     userRepository.save(user);
-    Optional<User> foundUser = userRepository.findByEmail(user.getEmail());
-    Assertions.assertTrue(foundUser.isPresent());
+    User foundUser = userRepository.findByEmail(user.getEmail());
+    Assertions.assertEquals(foundUser, user);
   }
 
   @DisplayName("중복된 이메일이 존재하는 경우 true 를 반환한다.")

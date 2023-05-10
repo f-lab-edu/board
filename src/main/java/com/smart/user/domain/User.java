@@ -27,19 +27,25 @@ public class User {
     this.userId = userId;
   }
 
-  public void updateUserStatus(Status userStatus) {
-    this.userStatus = userStatus;
+  public void approveUserAuth() {
+    this.userStatus = Status.NORMAL;
   }
 
-  public void updateName(String name){
+  public void updateName(String name) {
+    if (name == null || name.isBlank()) {
+      throw new IllegalArgumentException("이름은 필수 입력 사항입니다.");
+    }
     this.name = name;
   }
 
-  public void updatePassword(String password){
+  public void updatePassword(String password) {
     this.password = password;
   }
 
-  public void updateNickname(String nickname){
+  public void updateNickname(String nickname) {
+    if (nickname == null || nickname.isBlank()) {
+      throw new IllegalArgumentException("닉네임은 필수 입력 사항입니다.");
+    }
     this.nickname = nickname;
   }
 }

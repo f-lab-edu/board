@@ -13,6 +13,7 @@ import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
 import com.smart.user.repository.AuthCodeRepository;
 import com.smart.user.repository.UserRepository;
+import java.util.Optional;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,9 +42,7 @@ public class UserService {
     if (userRepository.existsByEmail(saveDto.getEmail())) {
       throw new DuplicatedUserEmailException();
     }
-    if (userRepository.existsByNickname(saveDto.getNickname())) {
-      throw new DuplicatedUserNicknameException();
-    }
+    checkDuplicateNickname(saveDto.getNickname());
 
     String authCode = authCodeRepository.getAuthCode(saveDto.getEmail());
     authCodeRepository.saveAuthCode(saveDto.getEmail(), authCode);
@@ -59,24 +58,21 @@ public class UserService {
     }
     authCodeRepository.removeAuthCode(email);
 
-    User user = userRepository.findByEmail(email)
-        .orElseThrow(NotFoundUserException::new);
+    User verifiedUser = userRepository.findByEmail(email);
 
-    user.updateUserStatus(Status.NORMAL);
-    userRepository.save(user);
+    verifiedUser.approveUserAuth();
+    userRepository.save(verifiedUser);
   }
 
   public UserInfoDto getUserByEmail(String email) {
-    User user = userRepository.findByEmail(email)
-        .orElseThrow(NotFoundUserException::new);
+    User user = userRepository.findByEmail(email);
     return UserInfoDto.from(user);
   }
 
   public void updateUserInfo(UserUpdateDto userUpdateDto) {
-    User user = userRepository.findByEmail(userUpdateDto.getEmail())
-        .orElseThrow(NotFoundUserException::new);
+    User user = userRepository.findByEmail(userUpdateDto.getEmail());
 
-    isDuplicateNickname(userUpdateDto.getNickname());
+    checkDuplicateNickname(userUpdateDto.getNickname());
 
     user.updateName(userUpdateDto.getName());
     user.updateNickname(userUpdateDto.getNickname());
@@ -85,15 +81,14 @@ public class UserService {
     userRepository.save(userUpdateDto.toEntity(user));
   }
 
-  public void isDuplicateNickname(String nickname) {
+  public void checkDuplicateNickname(String nickname) {
     if (userRepository.existsByNickname(nickname)) {
       throw new DuplicatedUserNicknameException();
     }
   }
 
   public void resetPassword(String userEmail) {
-    User user = userRepository.findByEmail(userEmail)
-        .orElseThrow(NotFoundUserException::new);
+    User user = userRepository.findByEmail(userEmail);
 
     String temporaryPassword = authCodeRepository.generateAuthCode();
     user.updatePassword(temporaryPassword);

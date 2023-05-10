@@ -1,6 +1,5 @@
 package com.smart.user.controller.dto;
 
-import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
