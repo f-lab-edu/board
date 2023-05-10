@@ -3,17 +3,14 @@ package com.smart.user.service;
 import com.smart.global.error.DuplicatedUserEmailException;
 import com.smart.global.error.DuplicatedUserNicknameException;
 import com.smart.global.error.IllegalAuthCodeException;
-import com.smart.global.error.NotFoundUserException;
 import com.smart.mail.event.MailAuthEvent;
 import com.smart.mail.service.MailService;
 import com.smart.user.controller.dto.UserInfoDto;
 import com.smart.user.controller.dto.UserSaveDto;
 import com.smart.user.controller.dto.UserUpdateDto;
-import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
 import com.smart.user.repository.AuthCodeRepository;
 import com.smart.user.repository.UserRepository;
-import java.util.Optional;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,11 +41,12 @@ public class UserService {
     }
     checkDuplicateNickname(saveDto.getNickname());
 
-    String authCode = authCodeRepository.getAuthCode(saveDto.getEmail());
-    authCodeRepository.saveAuthCode(saveDto.getEmail(), authCode);
-    eventPublisher.publishEvent(new MailAuthEvent(saveDto.getEmail(), authCode));
+    User user = saveDto.toEntity();
+    String authCode = authCodeRepository.generateAuthCode();
+    userRepository.save(user);
 
-    return userRepository.save(saveDto.toEntity());
+    eventPublisher.publishEvent(new MailAuthEvent(user.getEmail(), authCode));
+    return user.getUserId();
   }
 
   public void verifyAuthCode(String email, String authCode) {
