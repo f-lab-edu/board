@@ -67,8 +67,12 @@ class UserServiceTest {
     userService.join(userSaveDto);
 
     UserInfoDto savedUser = userService.getUserByEmail(userSaveDto.getEmail());
-    assertEquals(userSaveDto.getEmail(), savedUser.getEmail());
-    assertEquals(userSaveDto.getNickname(), savedUser.getNickname());
+
+    String expectedEmail = userSaveDto.getEmail();
+    String expectedNickName = userSaveDto.getNickname();
+
+    assertEquals(expectedEmail, savedUser.getEmail());
+    assertEquals(expectedNickName, savedUser.getNickname());
   }
 
   @DisplayName("회원가입을 성공하여 인증메일이벤트를 호출한다.")
@@ -79,11 +83,12 @@ class UserServiceTest {
 
     userService.join(userSaveDto);
 
+    String expectedEmail = userSaveDto.getEmail();
     verify(eventPublisher).publishEvent(any(MailAuthEvent.class));
-    Assertions.assertEquals(userSaveDto.getEmail(), mailEventCaptor.getValue().getEmail());
+    Assertions.assertEquals(expectedEmail, mailEventCaptor.getValue().getEmail());
   }
 
-  @DisplayName("중복닉네임으로 회원가입을 실패한다.")
+  @DisplayName("중복닉네임으로 회원가입시 DuplicatedUserNicknameException이 발생한다.")
   @Test
   public void 중복닉네임회원가입실패() {
     UserSaveDto userSaveDto1 = UserSaveDto
@@ -98,7 +103,7 @@ class UserServiceTest {
     assertThrows(DuplicatedUserNicknameException.class, () -> userService.join(userSaveDto));
   }
 
-  @DisplayName("중복이메일로 회원가입을 실패한다.")
+  @DisplayName("중복이메일로 회원가입시 DuplicatedUserEmailException발생한다.")
   @Test
   public void 중복이메일회원가입실패() {
     userService.join(userSaveDto);
@@ -144,7 +149,6 @@ class UserServiceTest {
   @DisplayName("닉네임 변경을 성공한다.")
   @Test
   public void 유저정보변경성공() {
-    // Given
     userService.join(userSaveDto);
     String newNickname = "newNickname";
     UserUpdateDto userUpdateDto = UserUpdateDto
@@ -155,14 +159,11 @@ class UserServiceTest {
         .email("test@email")
         .build();
 
-    // When
     userService.updateUserInfo(userUpdateDto);
 
     UserInfoDto retUserInfo = userService.getUserByEmail(userUpdateDto.getEmail());
-
-    //then
-    assertEquals(retUserInfo.getNickname(), newNickname);
-
+    String expectedNickname = userUpdateDto.getNickname();
+    assertEquals(expectedNickname, retUserInfo.getNickname());
   }
 
   @DisplayName("유효하지않은 닉네임을 입력한 경우 InvalidUserInfoException이 발생한다.")
@@ -192,12 +193,13 @@ class UserServiceTest {
     UserInfoDto retUserInfo = userService.getUserByEmail(userSaveDto.getEmail());
     String originalPassword = userSaveDto.getPassword();
     String newPassword = retUserInfo.getPassword();
-    assertNotEquals(newPassword, originalPassword);
+
+    assertNotEquals(originalPassword, newPassword);
   }
 
   @DisplayName("유효하지 않은 비밀번호를 입력한 경우 InvalidUserInfoException이 발생한다.")
   @Test
-  void 유효하지않은비밀번호변경(){
+  void 유효하지않은비밀번호변경() {
     userService.join(userSaveDto);
 
     String invalidPassword = "invalidPassword";
