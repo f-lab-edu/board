@@ -193,7 +193,7 @@ class UserServiceTest {
     UserInfoDto retUserInfo = userService.getUserByEmail(userSaveDto.getEmail());
     String originalPassword = userSaveDto.getPassword();
     String newPassword = retUserInfo.getPassword();
-
+    System.out.println(authCodeRepository.getAuthCode(userSaveDto.getEmail()));
     assertNotEquals(originalPassword, newPassword);
   }
 

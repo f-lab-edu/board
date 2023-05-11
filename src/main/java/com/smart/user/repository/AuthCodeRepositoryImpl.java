@@ -1,8 +1,11 @@
 package com.smart.user.repository;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -27,20 +30,17 @@ public class AuthCodeRepositoryImpl implements AuthCodeRepository {
 
   @Override
   public String generateAuthCode() {
-    return getTempPassword();
+    return getTempPassword(10);
   }
-  public String getTempPassword(){
-    char[] charSet = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
-        'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
 
-    String str = "";
+  public String getTempPassword(int len) {
+    final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-    // 문자 배열 길이의 값을 랜덤으로 10개를 뽑아 구문을 작성함
-    int idx = 0;
-    for (int i = 0; i < 10; i++) {
-      idx = (int) (charSet.length * Math.random());
-      str += charSet[idx];
-    }
-    return str;
+    SecureRandom random = new SecureRandom();
+
+    return IntStream.range(0, len)
+        .map(i -> random.nextInt(chars.length()))
+        .mapToObj(randomIndex -> String.valueOf(chars.charAt(randomIndex)))
+        .collect(Collectors.joining());
   }
 }
