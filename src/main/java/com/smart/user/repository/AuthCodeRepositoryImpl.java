@@ -30,10 +30,10 @@ public class AuthCodeRepositoryImpl implements AuthCodeRepository {
 
   @Override
   public String generateAuthCode() {
-    return getTempPassword(10);
+    return generateRandomString(10);
   }
 
-  public String getTempPassword(int len) {
+  public String generateRandomString(int len) {
     final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     SecureRandom random = new SecureRandom();
