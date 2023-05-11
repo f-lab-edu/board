@@ -36,9 +36,7 @@ public class UserService {
 
   @Transactional
   public Long join(UserSaveDto saveDto) {
-    if (userRepository.existsByEmail(saveDto.getEmail())) {
-      throw new DuplicatedUserEmailException();
-    }
+    checkDuplicateEmail(saveDto.getEmail());
     checkDuplicateNickname(saveDto.getNickname());
 
     User user = saveDto.toEntity();
@@ -47,6 +45,12 @@ public class UserService {
 
     eventPublisher.publishEvent(new MailAuthEvent(user.getEmail(), authCode));
     return user.getUserId();
+  }
+
+  private void checkDuplicateEmail(String email) {
+    if (userRepository.existsByEmail(email)) {
+      throw new DuplicatedUserEmailException();
+    }
   }
 
   public void verifyAuthCode(String email, String authCode) {

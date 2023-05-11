@@ -170,7 +170,7 @@ class UserServiceTest {
   void 유효하지않은닉네임변경() {
     // Given
     userService.join(userSaveDto);
-    String wrongNickname = "tooLongNickname123";
+    String wrongNickname = "invalidTooLongNickname";
     UserUpdateDto userUpdateDto = UserUpdateDto
         .builder()
         .name("name")
