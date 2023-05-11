@@ -42,7 +42,7 @@ public class UserService {
     checkDuplicateNickname(saveDto.getNickname());
 
     User user = saveDto.toEntity();
-    String authCode = authCodeRepository.generateAuthCode();
+    String authCode = getAuthCode();
     userRepository.save(user);
 
     eventPublisher.publishEvent(new MailAuthEvent(user.getEmail(), authCode));
@@ -70,11 +70,10 @@ public class UserService {
   public void updateUserInfo(UserUpdateDto userUpdateDto) {
     User user = userRepository.findByEmail(userUpdateDto.getEmail());
 
-    checkDuplicateNickname(userUpdateDto.getNickname());
-
-    user.updateName(userUpdateDto.getName());
-    user.updateNickname(userUpdateDto.getNickname());
-    user.updatePassword(userUpdateDto.getPassword());
+    String originalNickname = user.getNickname();
+    if (!originalNickname.equals(userUpdateDto.getNickname())) {
+      checkDuplicateNickname(userUpdateDto.getNickname());
+    }
 
     userRepository.save(userUpdateDto.toEntity(user));
   }
@@ -88,11 +87,27 @@ public class UserService {
   public void resetPassword(String userEmail) {
     User user = userRepository.findByEmail(userEmail);
 
-    String temporaryPassword = authCodeRepository.generateAuthCode();
-    user.updatePassword(temporaryPassword);
-    userRepository.save(user);
+    String temporaryPassword = getAuthCode();
+    saveUserWithTemporaryPassword(user, temporaryPassword);
 
-    authCodeRepository.saveAuthCode(user.getEmail(), temporaryPassword);
+    saveAuthCode(user, temporaryPassword);
+    sendResetPasswordEmail(user, temporaryPassword);
+  }
+
+  private void sendResetPasswordEmail(User user, String temporaryPassword) {
     mailService.sendPasswordResetEmail(user.getEmail(), temporaryPassword);
+  }
+
+  private void saveAuthCode(User user, String temporaryPassword) {
+    authCodeRepository.saveAuthCode(user.getEmail(), temporaryPassword);
+  }
+
+  private void saveUserWithTemporaryPassword(User user, String temporaryPassword) {
+    user.updateTemporaryPassword(temporaryPassword);
+    userRepository.save(user);
+  }
+
+  private String getAuthCode() {
+    return authCodeRepository.generateAuthCode();
   }
 }

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import com.smart.global.error.DuplicatedUserEmailException;
 import com.smart.global.error.DuplicatedUserNicknameException;
 import com.smart.global.error.IllegalAuthCodeException;
+import com.smart.global.error.InvalidUserInfoException;
 import com.smart.global.error.NotFoundUserException;
 import com.smart.mail.event.MailAuthEvent;
 import com.smart.mail.service.MailService;
@@ -52,7 +53,7 @@ class UserServiceTest {
         .builder()
         .name("name")
         .nickname("nickname")
-        .password("password")
+        .password("Password1*")
         .email("test@email")
         .build();
 
@@ -89,7 +90,7 @@ class UserServiceTest {
         .builder()
         .name("name")
         .nickname("nickname")
-        .password("password")
+        .password("Password1*")
         .email("test1@email")
         .build();
     userService.join(userSaveDto1);
@@ -150,7 +151,7 @@ class UserServiceTest {
         .builder()
         .name("name")
         .nickname(newNickname)
-        .password("password")
+        .password("Password1*")
         .email("test@email")
         .build();
 
@@ -161,6 +162,24 @@ class UserServiceTest {
 
     //then
     assertEquals(retUserInfo.getNickname(), newNickname);
+
+  }
+
+  @DisplayName("유효하지않은 닉네임을 입력한 경우 InvalidUserInfoException이 발생한다.")
+  @Test
+  void 유효하지않은닉네임변경() {
+    // Given
+    userService.join(userSaveDto);
+    String wrongNickname = "tooLongNickname123";
+    UserUpdateDto userUpdateDto = UserUpdateDto
+        .builder()
+        .name("name")
+        .nickname(wrongNickname)
+        .password("Password1*")
+        .email("test@email")
+        .build();
+
+    assertThrows(InvalidUserInfoException.class, () -> userService.updateUserInfo(userUpdateDto));
   }
 
   @DisplayName("비밀번호를 잊은 사용자가 임시 비밀번호를 발급한다.")
@@ -171,6 +190,26 @@ class UserServiceTest {
     userService.resetPassword(userSaveDto.getEmail());
 
     UserInfoDto retUserInfo = userService.getUserByEmail(userSaveDto.getEmail());
-    assertNotEquals(retUserInfo.getPassword(),userSaveDto.getPassword());
+    String originalPassword = userSaveDto.getPassword();
+    String newPassword = retUserInfo.getPassword();
+    assertNotEquals(newPassword, originalPassword);
+  }
+
+  @DisplayName("유효하지 않은 비밀번호를 입력한 경우 InvalidUserInfoException이 발생한다.")
+  @Test
+  void 유효하지않은비밀번호변경(){
+    userService.join(userSaveDto);
+
+    String invalidPassword = "invalidPassword";
+
+    UserUpdateDto userUpdateDto = UserUpdateDto
+        .builder()
+        .name("name")
+        .nickname("nickname")
+        .password(invalidPassword)
+        .email("test@email")
+        .build();
+
+    assertThrows(InvalidUserInfoException.class, () -> userService.updateUserInfo(userUpdateDto));
   }
 }

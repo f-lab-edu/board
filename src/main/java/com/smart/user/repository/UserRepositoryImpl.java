@@ -33,6 +33,7 @@ public class UserRepositoryImpl implements UserRepository {
     if (user.getUserId() == null) {
       user.updateUserId(sequence++);
     }
+    users.removeIf(existingUser -> existingUser.getUserId().equals(user.getUserId()));
     users.add(user);
     return user.getUserId();
   }
