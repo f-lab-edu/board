@@ -31,10 +31,13 @@ public class User {
     this.userId = userId;
     this.name = name;
     this.email = email;
+
     validatePassword(password);
     this.password = password;
+
     validateNickname(nickname);
     this.nickname = nickname;
+
     this.createDate = createDate;
     this.updateDate = updateDate;
     this.userStatus = userStatus;
