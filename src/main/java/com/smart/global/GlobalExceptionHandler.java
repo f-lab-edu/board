@@ -3,6 +3,7 @@ package com.smart.global;
 import com.smart.global.error.DuplicatedUserEmailException;
 import com.smart.global.error.DuplicatedUserNicknameException;
 import com.smart.global.error.IllegalAuthCodeException;
+import com.smart.global.error.InvalidUserInfoException;
 import com.smart.global.error.NotFoundEntityException;
 import com.smart.global.error.PermissionDeniedException;
 import org.springframework.http.HttpStatus;
@@ -41,4 +42,9 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(exception.getMessage(), HttpStatus.FORBIDDEN);
   }
 
+  @ExceptionHandler(InvalidUserInfoException.class)
+  public ResponseEntity<String> handleInvalidUserInfoException(
+      InvalidUserInfoException exception) {
+    return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+  }
 }

@@ -7,9 +7,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.smart.user.dao.UserDao;
 import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
+import com.smart.user.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +29,7 @@ public class SecurityIntegrationTest {
   @Autowired
   private WebApplicationContext context;
   @Autowired
-  private UserDao userDao;
+  private UserRepository userRepository;
   private MockMvc mockMvc;
   private User user;
 
@@ -51,7 +51,7 @@ public class SecurityIntegrationTest {
         .userStatus(Status.NORMAL)
         .createDate(LocalDateTime.now())
         .build();
-    userDao.joinUser(user);
+    userRepository.save(user);
   }
 
   @Test

@@ -5,8 +5,15 @@ import java.util.Optional;
 
 public interface UserRepository {
 
-  Optional<User> findByUserId(Long userId);
+  User findByEmail(String email);
+
+  void deleteByEmail(String email);
 
   Long save(User user);
 
+  boolean existsByEmail(String email);
+
+  boolean existsByNickname(String nickname);
+
+  Optional<User> findByUserId(Long userId);
 }
