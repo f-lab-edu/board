@@ -74,8 +74,7 @@ public class UserService {
   public void updateUserInfo(UserUpdateDto userUpdateDto) {
     User user = userRepository.findByEmail(userUpdateDto.getEmail());
 
-    String originalNickname = user.getNickname();
-    if (!originalNickname.equals(userUpdateDto.getNickname())) {
+    if(user.isNicknameChanged(userUpdateDto.getNickname())){
       checkDuplicateNickname(userUpdateDto.getNickname());
     }
 

@@ -67,4 +67,8 @@ public class User {
   public void updateTemporaryPassword(String temporaryPassword) {
     this.password = temporaryPassword;
   }
+
+  public boolean isNicknameChanged(String nickname){
+    return !nickname.equals(this.getNickname());
+  }
 }
