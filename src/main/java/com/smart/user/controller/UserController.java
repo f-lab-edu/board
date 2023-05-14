@@ -45,14 +45,20 @@ public class UserController {
   }
 
   @PutMapping("/update")
-  public ResponseEntity<Void> updateUserNickname(@RequestBody UserUpdateDto userUpdateDto) {
+  public ResponseEntity<Void> updateUserNickname(@RequestBody @Valid UserUpdateDto userUpdateDto) {
     userService.updateUserInfo(userUpdateDto);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
   @GetMapping("/users/nickname/{nickname}/exist")
   public ResponseEntity<Void> checkNickname(@PathVariable String nickname) {
-    userService.isDuplicateNickname(nickname);
+    userService.checkDuplicateNickname(nickname);
+    return ResponseEntity.status(HttpStatus.OK).build();
+  }
+
+  @PostMapping("/reset-password")
+  public ResponseEntity<Void> sendPasswordResetCodeEmail(@RequestParam String userEmail) {
+    userService.resetPassword(userEmail);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 }

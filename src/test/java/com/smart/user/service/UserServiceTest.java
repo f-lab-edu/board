@@ -1,6 +1,7 @@
 package com.smart.user.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
@@ -10,8 +11,11 @@ import static org.mockito.Mockito.verify;
 import com.smart.global.error.DuplicatedUserEmailException;
 import com.smart.global.error.DuplicatedUserNicknameException;
 import com.smart.global.error.IllegalAuthCodeException;
+import com.smart.global.error.InvalidUserInfoException;
 import com.smart.global.error.NotFoundUserException;
 import com.smart.mail.event.MailAuthEvent;
+import com.smart.mail.service.MailService;
+import com.smart.mail.service.implement.MailServiceImpl;
 import com.smart.user.controller.dto.UserInfoDto;
 import com.smart.user.controller.dto.UserSaveDto;
 import com.smart.user.controller.dto.UserUpdateDto;
@@ -26,6 +30,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.mail.javamail.JavaMailSender;
 
 class UserServiceTest {
 
@@ -34,7 +39,11 @@ class UserServiceTest {
 
   private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
-  private final UserService userService = new UserService(userRepository, eventPublisher, authCodeRepository);
+  private final JavaMailSender javaMailSender = mock(JavaMailSender.class);
+  private final MailService mailService = new MailServiceImpl(javaMailSender);
+
+  private final UserService userService = new UserService(userRepository, eventPublisher,
+      authCodeRepository, mailService);
 
   private UserSaveDto userSaveDto;
 
@@ -44,7 +53,7 @@ class UserServiceTest {
         .builder()
         .name("name")
         .nickname("nickname")
-        .password("password")
+        .password("Password1*")
         .email("test@email")
         .build();
 
@@ -58,8 +67,12 @@ class UserServiceTest {
     userService.join(userSaveDto);
 
     UserInfoDto savedUser = userService.getUserByEmail(userSaveDto.getEmail());
-    assertEquals(userSaveDto.getEmail(), savedUser.getEmail());
-    assertEquals(userSaveDto.getNickname(), savedUser.getNickname());
+
+    String expectedEmail = userSaveDto.getEmail();
+    String expectedNickName = userSaveDto.getNickname();
+
+    assertEquals(expectedEmail, savedUser.getEmail());
+    assertEquals(expectedNickName, savedUser.getNickname());
   }
 
   @DisplayName("회원가입을 성공하여 인증메일이벤트를 호출한다.")
@@ -70,18 +83,19 @@ class UserServiceTest {
 
     userService.join(userSaveDto);
 
+    String expectedEmail = userSaveDto.getEmail();
     verify(eventPublisher).publishEvent(any(MailAuthEvent.class));
-    Assertions.assertEquals(userSaveDto.getEmail(), mailEventCaptor.getValue().getEmail());
+    Assertions.assertEquals(expectedEmail, mailEventCaptor.getValue().getEmail());
   }
 
-  @DisplayName("중복닉네임으로 회원가입을 실패한다.")
+  @DisplayName("중복닉네임으로 회원가입시 DuplicatedUserNicknameException이 발생한다.")
   @Test
   public void 중복닉네임회원가입실패() {
     UserSaveDto userSaveDto1 = UserSaveDto
         .builder()
         .name("name")
         .nickname("nickname")
-        .password("password")
+        .password("Password1*")
         .email("test1@email")
         .build();
     userService.join(userSaveDto1);
@@ -89,7 +103,7 @@ class UserServiceTest {
     assertThrows(DuplicatedUserNicknameException.class, () -> userService.join(userSaveDto));
   }
 
-  @DisplayName("중복이메일로 회원가입을 실패한다.")
+  @DisplayName("중복이메일로 회원가입시 DuplicatedUserEmailException발생한다.")
   @Test
   public void 중복이메일회원가입실패() {
     userService.join(userSaveDto);
@@ -132,25 +146,72 @@ class UserServiceTest {
     assertThrows(NotFoundUserException.class, () -> userService.getUserByEmail("test@email"));
   }
 
+  @DisplayName("닉네임 변경을 성공한다.")
   @Test
   public void 유저정보변경성공() {
-    // Given
     userService.join(userSaveDto);
     String newNickname = "newNickname";
     UserUpdateDto userUpdateDto = UserUpdateDto
         .builder()
         .name("name")
         .nickname(newNickname)
-        .password("password")
+        .password("Password1*")
         .email("test@email")
         .build();
 
-    // When
     userService.updateUserInfo(userUpdateDto);
 
     UserInfoDto retUserInfo = userService.getUserByEmail(userUpdateDto.getEmail());
+    String expectedNickname = userUpdateDto.getNickname();
+    assertEquals(expectedNickname, retUserInfo.getNickname());
+  }
 
-    //then
-    assertEquals(retUserInfo.getNickname(), newNickname);
+  @DisplayName("유효하지않은 닉네임을 입력한 경우 InvalidUserInfoException이 발생한다.")
+  @Test
+  void 유효하지않은닉네임변경() {
+    // Given
+    userService.join(userSaveDto);
+    String wrongNickname = "invalidTooLongNickname";
+    UserUpdateDto userUpdateDto = UserUpdateDto
+        .builder()
+        .name("name")
+        .nickname(wrongNickname)
+        .password("Password1*")
+        .email("test@email")
+        .build();
+
+    assertThrows(InvalidUserInfoException.class, () -> userService.updateUserInfo(userUpdateDto));
+  }
+
+  @DisplayName("비밀번호를 잊은 사용자가 임시 비밀번호를 발급한다.")
+  @Test
+  void 임시비밀번호발급성공() {
+    userService.join(userSaveDto);
+
+    userService.resetPassword(userSaveDto.getEmail());
+
+    UserInfoDto retUserInfo = userService.getUserByEmail(userSaveDto.getEmail());
+    String originalPassword = userSaveDto.getPassword();
+    String newPassword = retUserInfo.getPassword();
+    System.out.println(authCodeRepository.getAuthCode(userSaveDto.getEmail()));
+    assertNotEquals(originalPassword, newPassword);
+  }
+
+  @DisplayName("유효하지 않은 비밀번호를 입력한 경우 InvalidUserInfoException이 발생한다.")
+  @Test
+  void 유효하지않은비밀번호변경() {
+    userService.join(userSaveDto);
+
+    String invalidPassword = "invalidPassword";
+
+    UserUpdateDto userUpdateDto = UserUpdateDto
+        .builder()
+        .name("name")
+        .nickname("nickname")
+        .password(invalidPassword)
+        .email("test@email")
+        .build();
+
+    assertThrows(InvalidUserInfoException.class, () -> userService.updateUserInfo(userUpdateDto));
   }
 }

@@ -40,4 +40,23 @@ public class MailServiceImpl implements MailService {
 
     return mailMessage;
   }
+
+  @Override
+  public void sendPasswordResetEmail(String email, String temporaryPassword) {
+    javaMailSender.send(makePasswordResetMail(email, temporaryPassword));
+  }
+
+  private SimpleMailMessage makePasswordResetMail(String email, String temporaryPassword) {
+    SimpleMailMessage mailMessage = new SimpleMailMessage();
+
+    mailMessage.setTo(email);
+    mailMessage.setSubject("임시 비밀번호가 발급되었습니다.");
+    String message = """
+                  [임시 비밀번호]\n
+                  아래 임시 비밀번호로 로그인 후 비밀번호를 재설정해주세요.\n
+                  [%s]
+                  """.formatted(temporaryPassword);
+    mailMessage.setText(message);
+    return mailMessage;
+  }
 }

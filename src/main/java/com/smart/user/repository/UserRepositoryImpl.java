@@ -1,5 +1,6 @@
 package com.smart.user.repository;
 
+import com.smart.global.error.NotFoundUserException;
 import com.smart.user.domain.User;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,19 +15,17 @@ public class UserRepositoryImpl implements UserRepository {
   private static Long sequence = 1L;
 
   @Override
-  public Optional<User> findByEmail(String email) {
-    for (User user : users) {
-      if (user.getEmail().equals(email)) {
-        return Optional.of(user);
-      }
-    }
-    return Optional.empty();
+  public User findByEmail(String email) {
+    return users.stream()
+        .filter(user -> user.getEmail().equals(email))
+        .findFirst()
+        .orElseThrow(NotFoundUserException::new);
   }
 
   @Override
   public void deleteByEmail(String email) {
-    Optional<User> userOptional = findByEmail(email);
-    userOptional.ifPresent(users::remove);
+    User user = this.findByEmail(email);
+    users.remove(user);
   }
 
   @Override
@@ -34,6 +33,7 @@ public class UserRepositoryImpl implements UserRepository {
     if (user.getUserId() == null) {
       user.updateUserId(sequence++);
     }
+    users.removeIf(existingUser -> existingUser.getUserId().equals(user.getUserId()));
     users.add(user);
     return user.getUserId();
   }
@@ -52,11 +52,8 @@ public class UserRepositoryImpl implements UserRepository {
 
   @Override
   public Optional<User> findByUserId(Long userId) {
-    for (User user : users) {
-      if (user.getUserId().equals(userId)) {
-        return Optional.of(user);
-      }
-    }
-    return Optional.empty();
+    return users.stream()
+        .filter(user -> user.getUserId().equals(userId))
+        .findFirst();
   }
 }

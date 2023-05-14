@@ -3,12 +3,11 @@ package com.smart.user.service;
 import com.smart.global.error.DuplicatedUserEmailException;
 import com.smart.global.error.DuplicatedUserNicknameException;
 import com.smart.global.error.IllegalAuthCodeException;
-import com.smart.global.error.NotFoundUserException;
 import com.smart.mail.event.MailAuthEvent;
+import com.smart.mail.service.MailService;
 import com.smart.user.controller.dto.UserInfoDto;
 import com.smart.user.controller.dto.UserSaveDto;
 import com.smart.user.controller.dto.UserUpdateDto;
-import com.smart.user.domain.Status;
 import com.smart.user.domain.User;
 import com.smart.user.repository.AuthCodeRepository;
 import com.smart.user.repository.UserRepository;
@@ -25,27 +24,33 @@ public class UserService {
 
   private final AuthCodeRepository authCodeRepository;
 
+  private final MailService mailService;
+
   public UserService(UserRepository userRepository, ApplicationEventPublisher eventPublisher,
-      AuthCodeRepository authCodeRepository) {
+      AuthCodeRepository authCodeRepository, MailService mailService) {
     this.userRepository = userRepository;
     this.eventPublisher = eventPublisher;
     this.authCodeRepository = authCodeRepository;
+    this.mailService = mailService;
   }
 
   @Transactional
   public Long join(UserSaveDto saveDto) {
-    if (userRepository.existsByEmail(saveDto.getEmail())) {
+    checkDuplicateEmail(saveDto.getEmail());
+    checkDuplicateNickname(saveDto.getNickname());
+
+    User user = saveDto.toEntity();
+    String authCode = getAuthCode();
+    userRepository.save(user);
+
+    eventPublisher.publishEvent(new MailAuthEvent(user.getEmail(), authCode));
+    return user.getUserId();
+  }
+
+  private void checkDuplicateEmail(String email) {
+    if (userRepository.existsByEmail(email)) {
       throw new DuplicatedUserEmailException();
     }
-    if (userRepository.existsByNickname(saveDto.getNickname())) {
-      throw new DuplicatedUserNicknameException();
-    }
-
-    String authCode = authCodeRepository.getAuthCode(saveDto.getEmail());
-    authCodeRepository.saveAuthCode(saveDto.getEmail(), authCode);
-    eventPublisher.publishEvent(new MailAuthEvent(saveDto.getEmail(), authCode));
-
-    return userRepository.save(saveDto.toEntity());
   }
 
   public void verifyAuthCode(String email, String authCode) {
@@ -55,35 +60,58 @@ public class UserService {
     }
     authCodeRepository.removeAuthCode(email);
 
-    User user = userRepository.findByEmail(email)
-        .orElseThrow(NotFoundUserException::new);
+    User verifiedUser = userRepository.findByEmail(email);
 
-    user.updateUserStatus(Status.NORMAL);
-    userRepository.save(user);
+    verifiedUser.approveUserAuth();
+    userRepository.save(verifiedUser);
   }
 
   public UserInfoDto getUserByEmail(String email) {
-    User user = userRepository.findByEmail(email)
-        .orElseThrow(NotFoundUserException::new);
+    User user = userRepository.findByEmail(email);
     return UserInfoDto.from(user);
   }
 
   public void updateUserInfo(UserUpdateDto userUpdateDto) {
-    User user = userRepository.findByEmail(userUpdateDto.getEmail())
-        .orElseThrow(NotFoundUserException::new);
+    User user = userRepository.findByEmail(userUpdateDto.getEmail());
 
-    isDuplicateNickname(userUpdateDto.getNickname());
-
-    user.updateName(userUpdateDto.getName());
-    user.updateNickname(userUpdateDto.getNickname());
-    user.updatePassword(userUpdateDto.getPassword());
+    String originalNickname = user.getNickname();
+    if (!originalNickname.equals(userUpdateDto.getNickname())) {
+      checkDuplicateNickname(userUpdateDto.getNickname());
+    }
 
     userRepository.save(userUpdateDto.toEntity(user));
   }
 
-  public void isDuplicateNickname(String nickname) {
+  public void checkDuplicateNickname(String nickname) {
     if (userRepository.existsByNickname(nickname)) {
       throw new DuplicatedUserNicknameException();
     }
+  }
+
+  public void resetPassword(String userEmail) {
+    User user = userRepository.findByEmail(userEmail);
+
+    String temporaryPassword = getAuthCode();
+    saveUserWithTemporaryPassword(user, temporaryPassword);
+
+    saveAuthCode(user, temporaryPassword);
+    sendResetPasswordEmail(user, temporaryPassword);
+  }
+
+  private void sendResetPasswordEmail(User user, String temporaryPassword) {
+    mailService.sendPasswordResetEmail(user.getEmail(), temporaryPassword);
+  }
+
+  private void saveAuthCode(User user, String temporaryPassword) {
+    authCodeRepository.saveAuthCode(user.getEmail(), temporaryPassword);
+  }
+
+  private void saveUserWithTemporaryPassword(User user, String temporaryPassword) {
+    user.updateTemporaryPassword(temporaryPassword);
+    userRepository.save(user);
+  }
+
+  private String getAuthCode() {
+    return authCodeRepository.generateAuthCode();
   }
 }
