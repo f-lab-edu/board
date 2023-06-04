@@ -22,6 +22,7 @@
 
 
 ## 기술 스택
+<img src="https://github.com/f-lab-edu/board/blob/master/src/main/resources/img/tech-skills.png">
 • Java 17 버전으로 개발했습니다.
 
 • **Springboot** 로 웹 어플리케이션 서버를 구축했습니다.
