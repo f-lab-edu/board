@@ -22,7 +22,7 @@
 
 
 ## 기술 스택
-<img src="https://github.com/f-lab-edu/board/blob/master/src/main/resources/img/tech-skills.png">
+<img src="https://github.com/f-lab-edu/board/blob/master/src/main/resources/img/tech-skills.png" width="85%">
 
 • Java 17 버전으로 개발했습니다.
 
