@@ -21,7 +21,7 @@ class UserRepositoryTest {
         .userId(1L)
         .name("name")
         .nickname("nickname")
-        .password("password")
+        .password("Password1*")
         .email("test@email")
         .build();
   }
