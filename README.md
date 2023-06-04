@@ -1,4 +1,6 @@
+<p align="middle" >
 <img width="60%" src="https://github.com/f-lab-edu/board/blob/master/src/main/resources/img/board-logo.jpg"/>
+</p>
 
 # 프로젝트 소개
 
