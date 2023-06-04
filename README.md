@@ -36,7 +36,7 @@
 
 </br>
 
-
+프로젝트의 더 자세한 내용은 [wiki](https://github.com/f-lab-edu/board/wiki)를 읽어주세요!
 ## 멤버 소개
 
 | 김영화 | 허정화 |
